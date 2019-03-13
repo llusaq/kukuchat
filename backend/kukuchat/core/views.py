@@ -27,3 +27,4 @@ def register(request):
                         status=HTTP_400_BAD_REQUEST)
     user = get_user_model().objects.create(username=username, password=password, email=email)
     return Response(status=HTTP_200_OK)
+
