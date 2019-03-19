@@ -8,7 +8,7 @@
         <div class="col card s12 m5 pull-m1 l4 pull-l1">
             <form>
                 <div class="card-content">
-                    <span class="card-title center-align">Log In</span>
+                    <span class="card-title center-align">Sign Up</span>
                     <div class="row">
                         <div class="input-field col s12">
                             <label for="login">Login</label>
@@ -16,11 +16,16 @@
                         </div>
                         <div class="input-field col s12">
                             <label for="password">Password </label>
-                            <input type="password" class="validate" name="password" id="password" required="" aria-required="true"/>
+                            <input :type="passwordFieldType" class="validate" name="password" id="password" required="" aria-required="true"/>
+                            <i class="material-icons" @click="switchVisibility()">{{ passwordFieldText }}</i>
+                        </div>
+                        <div class="input-field col s12">
+                            <label for="email">Email </label>
+                            <input type="email" class="validate" name="email" id="email" required="" aria-required="true"/>
                         </div>
                         <div class="col s12">
-                            <button class="btn green darken-2 waves-effect waves-light col s3">Log In </button>
-                            <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s3">Sign Up </a>
+                            <a @click="login()" class="btn green darken-2 waves-effect waves-light col s3">Log In </a>
+                            <button @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s3">Sign Up </button>
                             <a @click="restore()" class="restore">Forgot password?</a>
                         </div>
                     </div>
@@ -32,11 +37,22 @@
 
 <script>
 export default {
-  name: 'Login',
-  methods: {
-      signup() {
-          this.$parent.dynamicComponent = 'signup';
+  name: 'Signup',
+  data() {
+      return {
+        passwordFieldType: 'password',
+        passwordFieldText: 'visibility_off'
       }
+  },
+  methods: {
+      login() {
+          this.$parent.dynamicComponent = 'login';
+      },
+      switchVisibility() {
+      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password'
+      this.passwordFieldText= this.passwordFieldText === 'visibility' ? 'visibility_off' : 'visibility'
+
+    }
   }
 }
 </script>
@@ -79,10 +95,17 @@ a:hover {
     height: 450px;
 }
 
+i {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+}
+
 .restore {
     font-size: 12px;
     margin: 9px 0 0 0;
-    display: inline-block
+    display: inline-block;
 }
 
 @media only screen and (max-width: 600px) {
