@@ -20,5 +20,5 @@ def register(request):
     if username is None or password is None:
         return Response({'error': 'Please provide both username and password'},
                         status=HTTP_400_BAD_REQUEST)
-    get_user_model().objects.create(username=username, password=password, email=email)
+    get_user_model().objects.create_user(username=username, password=password, email=email)
     return Response(status=HTTP_200_OK)
