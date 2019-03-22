@@ -16,12 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path 
 from rest_framework.authtoken import views
-from core.views import register
+
+from core.views import auth, provider
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login/', views.obtain_auth_token),
-    path('api/register/', register),
-
+    path('api/register/', auth.register),
+    path('api/providers/get_avaliable_providers/', provider.get_avaliable_providers),
 ]

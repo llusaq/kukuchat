@@ -4,3 +4,5 @@ django-filter==2.1.0
 Markdown==3.0.1
 django-cors-headers==2.5.2
 Telethon==1.6.2
+fbchat==1.6.4
+jsonfield==2.0.2
