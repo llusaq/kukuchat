@@ -59,7 +59,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    'localhost:8000',
+    'localhost:8080',
 ]
 
 ROOT_URLCONF = 'kukuchat.urls'
