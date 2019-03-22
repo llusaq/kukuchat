@@ -8,7 +8,5 @@ from core.providers.telegram import TelegramProvider
 
 class TelegramTests(TestCase):
 
-    @patch.object(TelegramClient, 'TelegramClient')
-    def test_can_login(self, client_mock):
+    def test_can_login(self):
         TelegramProvider.login()
-        print (abc)
