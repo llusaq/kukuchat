@@ -11,4 +11,3 @@ class ProvidersTests(TestCase):
 
     def test_can_list_avaliable_providers(self):
         resp = self.client.get('/api/providers/get_avaliable_providers/')
-        import ipdb; ipdb.set_trace()
