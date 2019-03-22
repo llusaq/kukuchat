@@ -10,10 +10,15 @@ class TelegramProvider:
 
 
     @classmethod
-    def login (cls, **_required_credentials):
+    def login (cls, **credentials):
         phone_number = _required_credentials['phone_number']
         api_id = _required_credentials['api_id']
         api_hash = _required_credentials['api_hash']
 
-        client = cls.TelegramClient(Telegram_cli, api_id, api_hash)
+        client = cls.TelegramClient('Telegram_cli', api_id, api_hash)
         client.start()
+        me = client.get_me()
+        print ('abc')
+        me.send_message('medford', 'Test message')
+
+    def send_message(cls):
