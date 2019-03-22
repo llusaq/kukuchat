@@ -1,7 +1,5 @@
 <template>
-  <keep-alive>
     <component :is="dynamicComponent"></component>
-  </keep-alive>
 </template>
 
 <script>
