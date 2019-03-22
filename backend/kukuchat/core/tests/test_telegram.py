@@ -10,4 +10,5 @@ class TelegramTests(TestCase):
 
     @patch.object(TelegramClient, 'TelegramClient')
     def test_can_login(self, client_mock):
-        
+        TelegramProvider.login()
+        print (abc)
