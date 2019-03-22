@@ -58,6 +58,10 @@ MIDDLEWARE = [
     'django.middleware.common.BrokenLinkEmailsMiddleware',
 ]
 
+CORS_ORIGIN_WHITELIST = [
+    'localhost:8000',
+]
+
 ROOT_URLCONF = 'kukuchat.urls'
 
 TEMPLATES = [
