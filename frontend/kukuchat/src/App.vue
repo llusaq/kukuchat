@@ -8,7 +8,7 @@
 export default {
   data() {
     return {
-      isDark: false
+      isDark: true
     }
   }
 }
@@ -18,7 +18,8 @@ export default {
 
 html,body {
   height:100%;
-  background-color: #f5f5f5
+  background-color: #f5f5f5;
+  min-width: 365px;
 }
 
 #app {
@@ -37,6 +38,11 @@ html,body {
 
 .dark > .login-box > .card {
   background-color: #272727;
+}
+
+#toast-container {
+  position: fixed;
+  top: 50px;
 }
 
 </style>

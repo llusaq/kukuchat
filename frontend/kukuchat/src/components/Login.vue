@@ -12,15 +12,16 @@
                     <div class="row">
                         <div class="input-field col s12">
                             <label for="login">Login</label>
-                            <input type="text" class="validate" name="login" id="login" required="" aria-required="true"/>
+                            <input type="text" v-model="username" @keyup="editLogin()" :class="validateLogin" name="login" id="login"/>
                         </div>
                         <div class="input-field col s12">
                             <label for="password">Password </label>
-                            <input type="password" class="validate" name="password" id="password" required="" aria-required="true"/>
+                            <input :type="passwordFieldType" @keyup="editPassword()" v-model="password" :class="validatePassword" name="password" id="password"/>
+                            <i class="material-icons" @click="switchVisibility()">{{ passwordFieldText }}</i>
                         </div>
                         <div class="col s12">
-                            <button class="btn green darken-2 waves-effect waves-light col s3">Log In </button>
-                            <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s3">Sign Up </a>
+                            <a @click="login()" class="btn green darken-2 waves-effect waves-light col s4">Log In </a>
+                            <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Sign Up </a>
                             <a @click="restore()" class="restore">Forgot password?</a>
                         </div>
                     </div>
@@ -31,13 +32,60 @@
 </template>
 
 <script>
+
+import {http} from '../plugins/axios'
+
 export default {
-  name: 'Login',
-  methods: {
-      signup() {
-          this.$parent.dynamicComponent = 'signup';
-      }
-  }
+    name: 'Login',
+    data() {
+        return {
+        username: '',
+        password: '',
+        passwordFieldType: 'password',
+        passwordFieldText: 'visibility_off',
+        validateLogin: '',
+        validatePassword: '',
+        }
+    },
+    methods: {
+        signup() {
+            this.$parent.dynamicComponent = 'signup';
+        },
+        editLogin() {
+            this.validateLogin = 'valid'
+        },
+        editPassword() {
+            this.validatePassword = 'valid'
+        },
+        switchVisibility() {
+            this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password'
+            this.passwordFieldText= this.passwordFieldText === 'visibility' ? 'visibility_off' : 'visibility'
+        },
+        login() {
+             if (this.username === '') {
+                this.validateLogin = 'invalid'
+                M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
+            } 
+            else if (this.password === '') {
+                this.validatePassword = 'invalid'
+                M.toast({html: 'Password must not be empty', classes: 'red darken-2'})
+            }
+            else { 
+                let data = {
+                    username: this.username,
+                    password: this.password,
+                }
+
+                http.post('/api/login/', data)
+                .then(res => {
+                    M.toast({html: 'Logging successful', classes: 'green darken-2'})
+                })
+                .catch(err => {
+                    M.toast({html: 'Logging failed', classes: 'red darken-2'})
+                });
+            }
+        }
+    }
 }
 </script>
 
@@ -55,7 +103,6 @@ input:focus, .valid {
 .login-box {
   height: 100%;
   margin: auto;
-  min-width: 365px;
 }
 
 a {
@@ -83,6 +130,14 @@ a:hover {
     font-size: 12px;
     margin: 9px 0 0 0;
     display: inline-block
+}
+
+i {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+    z-index: 9999;
 }
 
 @media only screen and (max-width: 600px) {
