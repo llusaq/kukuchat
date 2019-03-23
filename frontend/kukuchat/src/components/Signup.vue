@@ -1,10 +1,4 @@
 <template>
-    <div class="valign-wrapper row login-box">
-        <div class="col m5 l6 pull-l1 center-align left-side">
-            <h5>CooCoo chat for everyone</h5>
-            <p>Keep all your favorite communication chats in one service</p>
-            <img class="main-img" src="../../public/image.png" alt="image">
-        </div>
         <div class="col card s12 m5 pull-m1 l4 pull-l1">
             <form >
                 <div class="card-content">
@@ -35,7 +29,6 @@
                 </div>
             </form>
         </div>
-    </div>
 </template>
 
 <script>

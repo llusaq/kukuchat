@@ -8,7 +8,7 @@
 export default {
   data() {
     return {
-      isDark: true
+      isDark: false
     }
   }
 }
@@ -18,12 +18,13 @@ export default {
 
 html,body {
   height:100%;
-  background-color: #f5f5f5;
+  background-color: #fafafa;
   min-width: 365px;
 }
 
 #app {
   height: 100%;
+  overflow: hidden;
 }
 
 .dark {

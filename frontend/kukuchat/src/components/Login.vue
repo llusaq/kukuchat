@@ -1,33 +1,26 @@
 <template>
-    <div class="valign-wrapper row login-box">
-        <div class="col m5 l6 pull-l1 center-align left-side">
-            <h5>CooCoo chat for everyone</h5>
-            <p>Keep all your favorite communication chats in one service</p>
-            <img class="main-img" src="../../public/image.png" alt="image">
-        </div>
-        <div class="col card s12 m5 pull-m1 l4 pull-l1">
-            <form>
-                <div class="card-content">
-                    <span class="card-title center-align">Log In</span>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <label for="login">Login</label>
-                            <input type="text" v-model="username" @keyup="editLogin()" :class="validateLogin" name="login" id="login"/>
-                        </div>
-                        <div class="input-field col s12">
-                            <label for="password">Password </label>
-                            <input :type="passwordFieldType" @keyup="editPassword()" v-model="password" :class="validatePassword" name="password" id="password"/>
-                            <i class="material-icons" @click="switchVisibility()">{{ passwordFieldText }}</i>
-                        </div>
-                        <div class="col s12">
-                            <a @click="login()" class="btn green darken-2 waves-effect waves-light col s4">Log In </a>
-                            <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Sign Up </a>
-                            <a @click="restore()" class="restore">Forgot password?</a>
-                        </div>
+    <div class="col card s12 m5 pull-m1 l4 pull-l1">
+        <form>
+            <div class="card-content">
+                <span class="card-title center-align">Log In</span>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <label for="login">Login</label>
+                        <input type="text" v-model="username" @keyup="editLogin()" :class="validateLogin" name="login" id="login"/>
+                    </div>
+                    <div class="input-field col s12">
+                        <label for="password">Password </label>
+                        <input :type="passwordFieldType" @keyup="editPassword()" v-model="password" :class="validatePassword" name="password" id="password"/>
+                        <i class="material-icons" @click="switchVisibility()">{{ passwordFieldText }}</i>
+                    </div>
+                    <div class="col s12">
+                        <a @click="login()" class="btn green darken-2 waves-effect waves-light col s4">Log In </a>
+                        <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Sign Up </a>
+                        <a @click="restore()" class="restore">Forgot password?</a>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </template>
 
@@ -100,10 +93,6 @@ input:focus, .valid {
     box-shadow: 0 1px 0 0 #1565c0 !important;
 }
 
-.login-box {
-  height: 100%;
-  margin: auto;
-}
 
 a {
     color: #1565c0;
@@ -138,23 +127,6 @@ i {
     right: 20px;
     cursor: pointer;
     z-index: 9999;
-}
-
-@media only screen and (max-width: 600px) {
-    .card {
-        box-shadow: none;
-    }
-
-    .left-side {
-        display: none;
-    }
-}
-
-@media only screen and (max-width: 1000px) and (min-width: 600px) {
-    .main-img {
-        width: 250px;
-        height: 250px;
-    }
 }
 
 </style>
