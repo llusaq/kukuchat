@@ -3,12 +3,14 @@ from abc import ABC, abstractmethod
 
 class BaseProvider(ABC):
 
-    @classmethod
     @abstractmethod
-    def login(cls, **kwargs):
+    def login(self, **kwargs):
         pass
 
-    @classmethod
     @abstractmethod
-    def get_required_credentials(cls):
+    def get_required_credentials(self):
+        pass
+
+    @abstractmethod
+    def is_logged_in(self):
         pass

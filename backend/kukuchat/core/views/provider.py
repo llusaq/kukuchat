@@ -17,8 +17,14 @@ provider_mapping = {
 @api_view(['GET'])
 def get_avaliable_providers(request):
     providers_dirpath = f'{settings.BASE_DIR}/core/providers'
+    for name, klass in provider_mapping.items():
+        request.session.setdefault(name, klass())
     providers = [
-        {'name': k, 'credentials': v.get_required_credentials(), 'logged': str(bool(v.client)).lower()}
+        {
+            'name': k,
+            'credentials': request.session[name].get_required_credentials(),
+            'logged': request.session[name].is_logged_in(),
+        }
         for k, v in provider_mapping.items()
     ]
     return Response({'providers': providers})
@@ -27,7 +33,7 @@ def get_avaliable_providers(request):
 @api_view(['POST'])
 def provider_interact(request, provider_name, provider_func_name):
     data = json.loads(request.body)
-    provider = provider_mapping[provider_name]
-    func = getattr(provider, provider_func_name)
-    ret = func(**data)
+    provider = request.session[provider_name]
+    method = getattr(provider, provider_func_name)
+    ret = method(**data)
     return Response(ret)

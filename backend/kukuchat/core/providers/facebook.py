@@ -10,15 +10,18 @@ class FacebookProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    client = None
 
-    @classmethod
-    def get_required_credentials(cls):
-        return cls._required_credentials
+    def __init__(self):
+        self.client = None
 
-    @classmethod
-    def login(cls, **credentials):
+    def get_required_credentials(self):
+        return self._required_credentials
+
+    def login(self, **credentials):
         username = credentials['username']
         password = credentials['password']
 
-        cls.client = fbchat.Client(username, password)
+        self.client = fbchat.Client(username, password)
+
+    def is_logged_in(self):
+        return self.client is None and self.client.isLoggedIn()
