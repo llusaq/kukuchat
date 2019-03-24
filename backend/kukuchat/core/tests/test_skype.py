@@ -29,7 +29,7 @@ class SkypeTests(TestCase):
 
         results = ch.getMsgs()
         self.assertEqual(id_message, results[0].content)
-        ch.sendFile(open("song.mp3", "rb"), "song.mp3") # file upload
+        #ch.sendFile(open("song.mp3", "rb"), "song.mp3") # file upload
         
 #pprint(ch.getMsgs())
 #sk = Skype('579631148', '12qwertyU') # connect to Skype
