@@ -1,6 +1,5 @@
-from telethon import TelegramClient, sync
-
 from core.providers.provider import BaseProvider
+
 
 class TelegramProvider(BaseProvider):
 
@@ -16,11 +15,4 @@ class TelegramProvider(BaseProvider):
 
     @classmethod
     def login(cls, **credentials):
-        phone_number = cls._required_credentials['phone_number']
-        api_id = cls._required_credentials['api_id']
-        api_hash = cls.required_credentials['api_hash']
-
-        client = cls.TelegramClient('Telegram_cli', api_id, api_hash)
-        client.start()
-        me = client.get_me()
-        me.send_message('medford', 'Test message')
+        pass

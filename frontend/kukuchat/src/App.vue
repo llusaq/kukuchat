@@ -18,11 +18,13 @@ export default {
 
 html,body {
   height:100%;
-  background-color: #f5f5f5
+  background-color: #fafafa;
+  min-width: 365px;
 }
 
 #app {
   height: 100%;
+  overflow: hidden;
 }
 
 .dark {
@@ -37,6 +39,11 @@ html,body {
 
 .dark > .login-box > .card {
   background-color: #272727;
+}
+
+#toast-container {
+  position: fixed;
+  top: 50px;
 }
 
 </style>

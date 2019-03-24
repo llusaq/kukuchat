@@ -1,59 +1,118 @@
 <template>
-    <div class="valign-wrapper row login-box">
-        <div class="col m5 l6 pull-l1 center-align left-side">
-            <h5>CooCoo chat for everyone</h5>
-            <p>Keep all your favorite communication chats in one service</p>
-            <img class="main-img" src="../../public/image.png" alt="image">
-        </div>
         <div class="col card s12 m5 pull-m1 l4 pull-l1">
-            <form>
+            <form >
                 <div class="card-content">
                     <span class="card-title center-align">Sign Up</span>
                     <div class="row">
                         <div class="input-field col s12">
                             <label for="login">Login</label>
-                            <input type="text" class="validate" name="login" id="login" required="" aria-required="true"/>
+                            <input type="text" @keyup="editLogin()" v-model="username" :class="validateLogin" name="login" id="login"/>
                         </div>
                         <div class="input-field col s12">
                             <label for="password">Password </label>
-                            <input :type="passwordFieldType" class="validate" name="password" id="password" required="" aria-required="true"/>
-                            <i class="material-icons" @click="switchVisibility()">{{ passwordFieldText }}</i>
+                            <input type="password" @keyup="editPassword()" v-model="password" :class="validatePassword" name="password" id="password"/>
+                            
+                        </div>
+                        <div class="input-field col s12">
+                            <label for="password2">Accept password </label>
+                            <input type="password" @keyup="editPassword2()" v-model="password2" :class="validatePassword2" name="password2" id="password2"/>
                         </div>
                         <div class="input-field col s12">
                             <label for="email">Email </label>
-                            <input type="email" class="validate" name="email" id="email" required="" aria-required="true"/>
+                            <input type="email" v-model="email" @keyup="editEmail()" :class="validateEmail" name="email" id="email"/>
                         </div>
                         <div class="col s12">
-                            <a @click="login()" class="btn green darken-2 waves-effect waves-light col s3">Log In </a>
-                            <button @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s3">Sign Up </button>
-                            <a @click="restore()" class="restore">Forgot password?</a>
+                            <a @click="login()" class="btn green darken-2 waves-effect waves-light col s4">Go back </a>
+                            <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Sign Up </a>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-    </div>
 </template>
 
 <script>
-export default {
-  name: 'Signup',
-  data() {
-      return {
-        passwordFieldType: 'password',
-        passwordFieldText: 'visibility_off'
-      }
-  },
-  methods: {
-      login() {
-          this.$parent.dynamicComponent = 'login';
-      },
-      switchVisibility() {
-      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password'
-      this.passwordFieldText= this.passwordFieldText === 'visibility' ? 'visibility_off' : 'visibility'
 
+import {http} from '../plugins/axios'
+
+export default {
+    name: 'Signup',
+    data() {
+        return {
+            username: '',
+            password: '',
+            password2: '',
+            email: '',
+            validateLogin: '',
+            validatePassword: '',
+            validatePassword2: '',
+            validateEmail: ''
+        }
+    },
+    methods: {
+        login() {
+            this.$parent.dynamicComponent = 'login';
+        },
+        editLogin() {
+            this.validateLogin = 'valid'
+        },
+        editPassword() {
+            this.validatePassword = 'valid'
+        },
+        editPassword2() {
+            this.validatePassword2 = 'valid'
+        },
+        editEmail() {
+            this.validateEmail = 'valid'
+        },
+        validEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        },
+        signup() {
+            if (this.username === '') {
+                this.validateLogin = 'invalid'
+                M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
+            } 
+            else if (this.password === '') {
+                this.validatePassword = 'invalid'
+                M.toast({html: 'Password must not be empty', classes: 'red darken-2'})
+            }
+            else if (this.password2 === '') {
+                this.validatePassword2 = 'invalid'
+                M.toast({html: 'Accept password must not be empty', classes: 'red darken-2'})
+            }
+            else if (this.password != this.password2) {
+                this.validatePassword2 = 'invalid'
+                M.toast({html: 'Passwords doesn`t match', classes: 'red darken-2'})
+            }
+            else if (this.email === '') {
+                this.validateEmail = 'invalid'
+                M.toast({html: 'Email must not be empty', classes: 'red darken-2'})
+            }
+            else if (!this.validEmail(this.email)) {
+                this.validateEmail = 'invalid'
+                M.toast({html: 'Email is not correct', classes: 'red darken-2'})
+            }
+            else { 
+                let data = {
+                    username: this.username,
+                    password: this.password,
+                    email: this.email
+                }
+
+                http.post('/api/register/', data)
+                    .then(res => {
+                        M.toast({html: 'Registration successful', classes: 'green darken-2'})
+                        this.$parent.dynamicComponent = 'login';
+                    })
+                    .catch(err => {
+                        M.toast({html: 'Registration failed', classes: 'red darken-2'})
+                        console.log(err)
+                    });
+            }
+        }
     }
-  }
 }
 </script>
 
@@ -71,7 +130,6 @@ input:focus, .valid {
 .login-box {
   height: 100%;
   margin: auto;
-  min-width: 365px;
 }
 
 a {
@@ -95,18 +153,13 @@ a:hover {
     height: 450px;
 }
 
-i {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    cursor: pointer;
-}
-
 .restore {
     font-size: 12px;
     margin: 9px 0 0 0;
     display: inline-block;
 }
+
+
 
 @media only screen and (max-width: 600px) {
     .card {
