@@ -23,10 +23,12 @@ class ProvidersTests(base.AuthenticatedTestCase):
                 'providers': [
                     {
                         'name': 'telegram',
+                        'logged': str(bool(telegram.TelegramProvider.client)).lower(),
                         'credentials': telegram.TelegramProvider.get_required_credentials(),
                     },
                     {
                         'name': 'facebook',
+                        'logged': str(bool(facebook.FacebookProvider.client)).lower(),
                         'credentials': facebook.FacebookProvider.get_required_credentials(),
                     }
                 ],

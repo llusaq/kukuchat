@@ -18,7 +18,7 @@ provider_mapping = {
 def get_avaliable_providers(request):
     providers_dirpath = f'{settings.BASE_DIR}/core/providers'
     providers = [
-        {'name': k, 'credentials': v.get_required_credentials()}
+        {'name': k, 'credentials': v.get_required_credentials(), 'logged': str(bool(v.client)).lower()}
         for k, v in provider_mapping.items()
     ]
     return Response({'providers': providers})
