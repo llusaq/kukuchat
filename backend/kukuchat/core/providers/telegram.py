@@ -1,24 +1,26 @@
 from telethon import TelegramClient, sync
 
-class TelegramProvider:
+from core.providers.provider import BaseProvider
+
+class TelegramProvider(BaseProvider):
 
     _required_credentials = {
-        'phone_number': '123123123'
-        'api_id': 873144
-        'api_hash': 'd7f230abfc4ec30c8323fa5fd2223161'
+        'phone_number': {'type': 'text', 'help': 'Phone number'},
+        'api_id': {'type': 'number', 'help': 'Api ID'},
+        'api_hash': {'type': 'text', 'help': 'Api hash'},
     }
 
+    @classmethod
+    def get_required_credentials(cls):
+        return cls._required_credentials
 
     @classmethod
-    def login (cls, **credentials):
-        phone_number = _required_credentials['phone_number']
-        api_id = _required_credentials['api_id']
-        api_hash = _required_credentials['api_hash']
+    def login(cls, **credentials):
+        phone_number = cls._required_credentials['phone_number']
+        api_id = cls._required_credentials['api_id']
+        api_hash = cls.required_credentials['api_hash']
 
         client = cls.TelegramClient('Telegram_cli', api_id, api_hash)
         client.start()
         me = client.get_me()
-        print ('abc')
         me.send_message('medford', 'Test message')
-
-    def send_message(cls):
