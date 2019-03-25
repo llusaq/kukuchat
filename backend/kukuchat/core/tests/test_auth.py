@@ -45,3 +45,40 @@ async def test_user_can_login():
     assert resp == {'status': 'ok', 'msg': 'Logged in successfully'}
 
     await communicator.disconnect()
+
+
+@pytest.mark.django_db
+@pytest.mark.asyncio
+async def test_user_can_check_login_state():
+    data = {
+        'action': 'am_i_logged',
+    }
+
+    await database_sync_to_async(lambda: get_user_model().objects.create_user(
+        username='test1',
+        password='test1',
+        email='test1@test.test',
+    ))()
+
+    communicator = WebsocketCommunicator(application, 'ws/chat/')
+
+    connected, _ = await communicator.connect()
+    assert connected
+
+    await communicator.send_json_to(
+        {
+            'action': 'login',
+            'username': 'test',
+            'password': 'test',
+        }
+    )
+
+    await communicator.send_json_to(data)
+
+    print(await communicator.receive_json_from())
+
+    resp = await communicator.receive_json_from()
+
+    assert resp == {'status': 'ok', 'is_logged': True}
+
+    await communicator.disconnect()
