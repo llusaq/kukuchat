@@ -39,5 +39,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return {'status': 'ok', 'msg': 'Logged in successfully'}
 
     async def am_i_logged(self, data):
-        is_logged = bool(get_user(self.scope))
-        return {'status': 'ok', 'is_logged': is_logged}
+        user = await get_user(self.scope)
+        resp = {'status': 'ok', 'is_logged': user.is_authenticated, 'username': user.username}
+        return resp
