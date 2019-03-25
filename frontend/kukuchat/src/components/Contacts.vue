@@ -1,5 +1,5 @@
 <template>
-    <div class="col l3 m4 s12 contacts">
+    <div class="col l3 m4 s12 contacts" >
             <div class="nav-wrapper">
                 <div class="input-field">
                     <input id="search" type="search" v-model="search" autocomplete="off">
@@ -7,7 +7,7 @@
                 </div>
             </div>
         <ul class="scroll">
-            <li v-for="contact in filteredList" @click="select(contact)" :class="{ clicked: clicked === contact }">
+            <li v-for="contact in filteredList" @click="select(contact)"  :class="{ clicked: selectedContact === contact }">
                 <div class="icon">
 				    <span :style="{backgroundColor: randomColor()}">AV</span>
                 </div>
@@ -38,7 +38,7 @@ export default {
                 'Andro Vsmop5',
             ],
             randcolor: '',
-            clicked: 1,
+            clicked: '',
             search: ''
         }
     },
@@ -57,6 +57,10 @@ export default {
         }
     },
     computed: {
+
+        selectedContact() {
+            return this.$parent.currentChat === '' ? '' : this.$parent.currentChat; 
+        },
         filteredList() {
             return this.contacts.filter(contact => {
                 return contact.toLowerCase().includes(this.search.toLowerCase())
@@ -68,14 +72,14 @@ export default {
 
 <style scoped>
 .contacts {
-    height: calc(100% - 55px);
+    height: 100%;
     float: left;
     padding: 0;
     background-color: #f5f5f5;
 }
 
-.scroll {
-    height: calc(100% - 40px);
+.contacts {
+    height: calc(100% - 35px);
     overflow: scroll;
 }
 

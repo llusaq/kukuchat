@@ -14,7 +14,7 @@
                             
                         </div>
                         <div class="input-field col s12">
-                            <label for="password2">Accept password </label>
+                            <label for="password2">Confirm password </label>
                             <input type="password" @keyup="editPassword2()" v-model="password2" :class="validatePassword2" name="password2" id="password2"/>
                         </div>
                         <div class="input-field col s12">

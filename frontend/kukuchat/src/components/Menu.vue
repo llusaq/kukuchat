@@ -1,15 +1,22 @@
 <template>
     <div class="row settings">
-        <a class="col l3 m4 s12 menu-el" :class="{opened: opened}" @click="settings()">
+        <a class="col l3 m4 s12 menu-el" :class="{opened: opened}" @click="settings()" v-if="currentChat == '' && width <= 600">
             <i class="material-icons left">{{ icon }}</i>
             CooCoo
         </a>
-        <div class="col card l3 m4" v-if="opened">
+        <a class="col l3 m4 s12 menu-el" :class="{opened: opened}" @click="settings()" v-else-if="width > 600">
+            <i class="material-icons left">{{ icon }}</i>
+            CooCoo
+        </a>
+        <div class="col card l3 m4 s12" v-if="opened">
             <a class="settings-btn modal-trigger" href="#add-account" @click="settings()">Add account</a>
             <a class="settings-btn">Log out</a>
         </div>
-        <a class="col l9 m8 s12 menu-el" v-if="">
+        <a class="col l9 m8 s12 menu-el" v-if="currentChat != '' && width <= 600">
             {{ currentChat }}
+        </a>
+        <a class="col l9 m8 s12 menu-el" v-else-if="width > 600">
+            {{ currentChat }} 
         </a>
         <div id="add-account" class="modal">
              <div class="modal-header">
@@ -57,7 +64,7 @@ export default {
             style: 'white',
             opened: false,
             showModal: false,
-            
+            width: window.innerWidth,
         }
     },
     mounted() {

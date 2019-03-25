@@ -88,16 +88,11 @@
         </div>
 
         <div class="textinputboard">
-
-
             <textarea name="" class=" type_msg" placeholder="Type your message..."></textarea>
-
-
             <div class="sendbtnarea">
                 <button class="btn waves-effect waves-light" type="submit" name="action">SEND
                     <i class="material-icons right">send</i>
                 </button>
-
             </div>
         </div>
     </div>

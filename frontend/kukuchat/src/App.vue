@@ -8,9 +8,13 @@
 export default {
   data() {
     return {
-      isDark: false
+      isDark: false,
+      socket: ''
     }
+  },
+  methods: {
   }
+
 }
 </script>
 
@@ -123,6 +127,7 @@ html,body {
 #toast-container {
   position: fixed;
   top: 50px;
+  height: fit-content;
 }
 
 </style>

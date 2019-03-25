@@ -1,16 +1,16 @@
 <template>
     <div class="col card s12 m5 pull-m1 l4 pull-l1">
-        <form>
+        <form @submit.prevent="pingServer">
             <div class="card-content">
                 <span class="card-title center-align">Log In</span>
                 <div class="row">
                     <div class="input-field col s12">
                         <label for="login">Login</label>
-                        <input type="text" v-model="username" @keyup="editLogin()" :class="validateLogin" name="login" id="login"/>
+                        <input type="text" v-model="username" @keyup.enter="login()" @keyup="editLogin()" :class="validateLogin" name="login" id="login"/>
                     </div>
                     <div class="input-field col s12">
                         <label for="password">Password </label>
-                        <input :type="passwordFieldType" @keyup="editPassword()" v-model="password" :class="validatePassword" name="password" id="password"/>
+                        <input :type="passwordFieldType"  @keyup.enter="login()" @keyup="editPassword()" v-model="password" :class="validatePassword" name="password" id="password"/>
                         <i class="material-icons" @click="switchVisibility()">{{ passwordFieldText }}</i>
                     </div>
                     <div class="col s12">
@@ -27,6 +27,7 @@
 <script>
 
 import {http} from '../plugins/axios'
+import store from '../store'
 
 export default {
     name: 'Login',
@@ -38,6 +39,7 @@ export default {
         passwordFieldText: 'visibility_off',
         validateLogin: '',
         validatePassword: '',
+        socket: ''
         }
     },
     methods: {
@@ -65,19 +67,47 @@ export default {
             }
             else { 
                 let data = {
+                    action: 'login',
                     username: this.username,
                     password: this.password,
                 }
 
-                http.post('/api/login/', data)
-                .then(res => {
-                    M.toast({html: 'Logging successful', classes: 'green darken-2'})
-                })
-                .catch(err => {
-                    M.toast({html: 'Logging failed', classes: 'red darken-2'})
-                });
+                this.socket.send(JSON.stringify(data));
+
             }
+        },
+        connect() {
+            this.socket = new WebSocket("ws://localhost:8000/ws/chat/");
+            this.socket.onopen = () => {
+                console.log("connected");   
+                this.socket.onmessage = ({data}) => {
+                    data = JSON.parse(data)
+                    console.log(data)
+                    if (data.status === "ok") {
+                        this.$router.push({name: 'chat'})
+                    } else {
+                        M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                    }
+                };
+                let data = {
+                    action: 'am_i_logged'
+                }
+                this.socket.send(JSON.stringify(data));
+            };
+        },
+        disconnect() {
+            this.socket.close();
+        },
+        sendMessage(data) {
+            console.log('sent')
+            this.socket.send(data)
         }
+    },
+    beforeMount() {
+        this.connect();
+    },
+    mounted() {
+       
     }
 }
 </script>

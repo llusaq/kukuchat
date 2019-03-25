@@ -1,9 +1,11 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper" @keyup.esc="escape()">
         <Menu :current-chat="currentChat"></Menu>
         <div class="row chat">
-            <Contacts></Contacts>
-            <Conversation></Conversation>
+            <Contacts v-if="currentChat == '' && width <= 600"></Contacts>
+            <Contacts v-else-if="width > 600"></Contacts>
+            <Conversation v-if="currentChat != '' && width <= 600"></Conversation>
+            <Conversation v-else-if=" currentChat != '' && width > 600"></Conversation>
         </div>
     </div>
     
@@ -19,13 +21,27 @@ export default {
     name: 'chat',
     data() {
         return {
-            currentChat: 'empty'
+            currentChat: '',
+            width: window.innerWidth
         }
     },
     components: {
         Contacts,
         Menu,
         Conversation
+    },
+    created: function () {
+        window.addEventListener('keyup', this.onkey)
+    },
+    beforeDestroy: function () {
+        window.removeEventListener('keyup', this.onkey)
+    },
+    methods: {
+        onkey(event) {
+            if (event.keyCode == 27) {
+                this.currentChat = '';
+            }
+        }
     }
 }
 </script>
