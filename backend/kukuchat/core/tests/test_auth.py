@@ -82,3 +82,50 @@ async def test_user_can_check_login_state():
     assert resp == {'action': 'am_i_logged', 'status': 'ok', 'is_logged': True, 'username': 'test1'}
 
     await communicator.disconnect()
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.asyncio
+async def test_user_can_logout():
+    await database_sync_to_async(get_user_model().objects.create_user)(
+        username='test',
+        password='test',
+        email='test@test.com',
+    )
+
+    communicator = WebsocketCommunicator(application, 'ws/chat/')
+
+    await communicator.connect()
+    await communicator.send_json_to({
+        'action': 'login',
+        'username': 'test',
+        'password': 'test',
+    })
+
+    resp = await communicator.receive_json_from()
+
+    await communicator.send_json_to({
+        'action': 'am_i_logged',
+    })
+
+    resp = await communicator.receive_json_from()
+
+    assert resp['is_logged'] is True
+
+    await communicator.send_json_to({
+        'action': 'logout',
+    })
+
+    resp = await communicator.receive_json_from()
+
+    assert resp['status'] == 'ok'
+
+    await communicator.send_json_to({
+        'action': 'am_i_logged',
+    })
+
+    resp = await communicator.receive_json_from()
+
+    assert resp['is_logged'] is False
+
+    await communicator.disconnect()
