@@ -9,7 +9,7 @@ from core.consumers.chat import ChatConsumer
 from kukuchat.routing import application
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 def test_user_register(client):
     user = client.post('/api/register/',{'username': 'user1','password': '12qwertyU','email': 'user1@yopmail.com'})
     assert get_user_model().objects.all().count() == 1
@@ -18,7 +18,7 @@ def test_user_register(client):
     assert results == [{'username': 'user1', 'email': 'user1@yopmail.com'}]
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_user_can_login():
     user = await database_sync_to_async(lambda: get_user_model().objects.create_user(
@@ -47,7 +47,7 @@ async def test_user_can_login():
     await communicator.disconnect()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_user_can_check_login_state():
     data = {
