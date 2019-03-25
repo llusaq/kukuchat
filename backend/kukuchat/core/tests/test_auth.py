@@ -42,7 +42,7 @@ async def test_user_can_login():
 
     resp = await communicator.receive_json_from()
 
-    assert resp == {'status': 'ok', 'msg': 'Logged in successfully'}
+    assert resp == {'action': 'login', 'status': 'ok', 'msg': 'Logged in successfully'}
 
     await communicator.disconnect()
 
@@ -75,10 +75,10 @@ async def test_user_can_check_login_state():
 
     await communicator.send_json_to(data)
 
-    print(await communicator.receive_json_from())
+    await communicator.receive_json_from()
 
     resp = await communicator.receive_json_from()
 
-    assert resp == {'status': 'ok', 'is_logged': True}
+    assert resp == {'action': 'am_i_logged', 'status': 'ok', 'is_logged': True}
 
     await communicator.disconnect()

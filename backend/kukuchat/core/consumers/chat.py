@@ -26,7 +26,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 'msg': str(e),
             })
         else:
-            await self.send_json(resp)
+            await self.send_json({'action': action, **resp})
 
     async def login(self, data):
         user = await database_sync_to_async(lambda: get_user_model().objects.get(
@@ -40,4 +40,4 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def am_i_logged(self, data):
         is_logged = bool(get_user(self.scope))
-        await self.send_json({'status': 'ok', 'is_logged': is_logged})
+        return {'status': 'ok', 'is_logged': is_logged}
