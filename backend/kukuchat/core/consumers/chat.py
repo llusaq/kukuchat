@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from channels.auth import login
+from channels.auth import login, get_user
 from channels.db import database_sync_to_async
 
 from asgiref.sync import sync_to_async
@@ -26,7 +26,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 'msg': str(e),
             })
         else:
-            await self.send_json(resp)
+            await self.send_json({'action': action, **resp})
 
     async def login(self, data):
         user = await database_sync_to_async(lambda: get_user_model().objects.get(
@@ -37,3 +37,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await login(self.scope, user)
         await database_sync_to_async(self.scope['session'].save)()
         return {'status': 'ok', 'msg': 'Logged in successfully'}
+
+    async def am_i_logged(self, data):
+        user = await get_user(self.scope)
+        resp = {'status': 'ok', 'is_logged': user.is_authenticated, 'username': user.username}
+        return resp
