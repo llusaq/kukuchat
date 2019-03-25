@@ -118,7 +118,7 @@ async def test_user_can_logout():
 
     resp = await communicator.receive_json_from()
 
-    assert resp['status'] == 'ok'
+    assert resp == {'status': 'ok', 'action': 'logout', 'msg': 'Logged out successfuly'}
 
     await communicator.send_json_to({
         'action': 'am_i_logged',
