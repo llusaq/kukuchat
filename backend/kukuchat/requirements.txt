@@ -6,3 +6,8 @@ django-cors-headers==2.5.2
 Telethon==1.6.2
 fbchat==1.6.4
 jsonfield==2.0.2
+channels==2.1.7
+pytest-asyncio==0.10.0
+pytest-django==3.4.8
+skpy==0.9
+ipdb==0.12
