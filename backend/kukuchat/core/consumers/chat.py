@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from channels.auth import login, get_user
+from channels.auth import login, get_user, logout
 from channels.db import database_sync_to_async
 
 from asgiref.sync import sync_to_async
@@ -42,3 +42,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         user = await get_user(self.scope)
         resp = {'status': 'ok', 'is_logged': user.is_authenticated, 'username': user.username}
         return resp
+
+    async def logout(self, data):
+        await logout(self.scope)
+        return {'status': 'ok', 'msg': 'Logged out successfuly'}
+
