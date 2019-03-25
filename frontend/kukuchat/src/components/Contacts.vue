@@ -1,5 +1,5 @@
 <template>
-    <div class="col l3 m4 contacts">
+    <div class="col l3 m4 s12 contacts">
             <div class="nav-wrapper">
                 <div class="input-field">
                     <input id="search" type="search" v-model="search" autocomplete="off">
@@ -31,10 +31,10 @@ export default {
                 'Andro Vsmop2',
                 'Andro Vsmop3',
                 'Andro Vsmop4',
-                'Andro Vsmop4',
-                'Andro Vsmop4',
-                'Andro Vsmop4',
-                'Andro Vsmop4',
+                'Andro Vsmop5',
+                'Andro Vsmop5',
+                'Andro Vsmop5',
+                'Andro Vsmop5',
                 'Andro Vsmop5',
             ],
             randcolor: '',
@@ -68,10 +68,9 @@ export default {
 
 <style scoped>
 .contacts {
-    height: calc(100% - 40px);
+    height: calc(100% - 55px);
     float: left;
     padding: 0;
-    border-right: 1px solid #f5f5f5;
     background-color: #f5f5f5;
 }
 
@@ -90,7 +89,7 @@ li {
 }
 
 li:hover {
-    background-color: #dcdcdc;
+    background-color: #e0e0e0 ;
 }
 
 span {
@@ -148,7 +147,6 @@ span {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px #f5f5f5; 
   border-radius: 10px;
 }
  
@@ -164,18 +162,24 @@ span {
 }
 
 .nav-wrapper {
-    background-color: white;
     width: 90%;
     margin: 0 auto;
+    border-radius: 20px;
 }
 
 .nav-wrapper input {
     border: 1px solid #dcdcdc !important;
+    background-color: white;
     height: 40px !important;
+    border-radius: 10px;
 }
 
 .label-icon {
     margin-top: 10px;
+}
+
+.active i {
+    color: #64b5f6 !important;
 }
 
 </style>

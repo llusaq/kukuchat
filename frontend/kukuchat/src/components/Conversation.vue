@@ -1,20 +1,11 @@
 <template>
     <div class="col l9 m8">
-
-
         <div class="topinfoboard">
-
-
             <div class="user_info">
                 <div class="whowith">Chat with Andro</div>
-
             </div>
             <div class="messagecount">78 Messages</div>
-
-
         </div>
-
-
         <div class="messageboard">
             <div class="card">
                 <div class="holder">
@@ -109,8 +100,6 @@
 
             </div>
         </div>
-
-
     </div>
 </template>
 
@@ -134,12 +123,6 @@
         background: #7F7FD5;
         background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
         background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
-    }
-
-
-    .messageboard {
-
-
     }
 
     .msg_time {
@@ -258,7 +241,6 @@
         color: white;
         margin-left: 10px;
     }
-
 </style>
 
 
