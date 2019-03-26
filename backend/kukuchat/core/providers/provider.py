@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class BaseProvider(ABC):
 
     @abstractmethod
-    def login(self, data):
+    async def login(self, data):
         pass
 
     @abstractmethod
