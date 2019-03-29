@@ -4,13 +4,13 @@ from abc import ABC, abstractmethod
 class BaseProvider(ABC):
 
     @abstractmethod
-    def login(self, **kwargs):
+    async def login(self, data):
         pass
 
     @abstractmethod
-    def get_required_credentials(self):
+    async def get_required_credentials(self):
         pass
 
     @abstractmethod
-    def is_logged_in(self):
+    async def am_i_logged(self, data):
         pass
