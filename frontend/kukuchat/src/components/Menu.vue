@@ -10,7 +10,7 @@
         </a>
         <div class="col card l3 m4 s12" v-if="opened">
             <a class="settings-btn modal-trigger" href="#add-account" @click="settings()">Add account</a>
-            <a class="settings-btn">Log out</a>
+            <a class="settings-btn" @click="logout()">Log out</a>
         </div>
         <a class="col l9 m8 s12 menu-el" v-if="currentChat != '' && width <= 600">
             {{ currentChat }}
@@ -74,7 +74,23 @@ export default {
         settings() {
             this.icon = this.icon === 'menu' ? 'clear' : 'menu';
             this.opened = !this.opened;
+            this.socket = new WebSocket("ws://localhost:8000/ws/chat/");
+            this.socket.onopen = () => {
+                console.log("connected");   
+                this.socket.onmessage = ({data}) => {
+                    data = JSON.parse(data)
+                    console.log(data)
+                    
+                };
+                
+            };
         },
+        logout() {
+            let data = {
+                    action: 'logout'
+                }
+            //this.socket.send(JSON.stringify(data));
+        }
     },
     props: ['currentChat'],
 }

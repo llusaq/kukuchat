@@ -74,6 +74,11 @@ export default {
 
                 this.socket.send(JSON.stringify(data));
 
+                data = {
+                    action: 'am_i_logged'
+                }
+                this.socket.send(JSON.stringify(data));
+
             }
         },
         connect() {
@@ -83,9 +88,10 @@ export default {
                 this.socket.onmessage = ({data}) => {
                     data = JSON.parse(data)
                     console.log(data)
-                    if (data.status === "ok") {
+                    if (data.is_logged) {
                         this.$router.push({name: 'chat'})
-                    } else {
+                    } 
+                    if (data.status === 'error') {
                         M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
                     }
                 };
