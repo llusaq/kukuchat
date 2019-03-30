@@ -5,10 +5,10 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.auth import login, get_user, logout
 from channels.db import database_sync_to_async
 
+from asgiref.sync import async_to_sync
+
 from core.providers import facebook
 from core import utils
-
-from asgiref.sync import async_to_sync
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
 
