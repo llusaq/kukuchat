@@ -8,21 +8,25 @@ from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 
 from core.providers import facebook
+from core.providers import skype
 from core import utils
+
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         await self.accept()
         self.facebook = facebook.FacebookProvider()
+        self.skype = skype.SkypeProvider()
 
         user = await get_user(self.scope)
         if not isinstance(user, AnonymousUser):
             await utils.autolog(
-                user,
+                user, 
                 [
                     ('facebook', self.facebook),
-                ],
+                    ('skype', self.skype),
+                ]
             )
 
     async def disconnect(self, code):
