@@ -22,3 +22,5 @@ yarn-error.log*
 *.sln
 *.sw*
 db.sqlite3
+
+.token-skype-app
