@@ -17,7 +17,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.facebook = facebook.FacebookProvider()
 
         user = await get_user(self.scope)
-        utils.autolog(user, [('facebook', self.facebook)])
+        if not isinstance(user, AnonymousUser):
+            await utils.autolog(
+                user,
+                [
+                    ('facebook', self.facebook),
+                ],
+            )
 
     async def disconnect(self, code):
         pass
