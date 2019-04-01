@@ -9,13 +9,18 @@
 import Login from '@/components/Login.vue'
 import Signup from '@/components/Signup.vue'
 import Info from '@/components/Info.vue'
+import Restore from '@/components/Restore.vue'
+
 
 export default {
     name: 'home',
     components: {
         Login,
         Signup,
-        Info
+        Info,
+        Restore
+
+
     },
     data() {
         return {
