@@ -1,3 +1,6 @@
+import pathlib
+import tempfile
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 
@@ -67,6 +70,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             return {'status': 'error', 'msg': 'Bad credentials'}
         await login(self.scope, user)
         await database_sync_to_async(self.scope['session'].save)()
+        await self._create_dir(user)
         return {'msg': 'Logged in successfully'}
 
     async def am_i_logged(self, data):
@@ -77,3 +81,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def logout(self, data):
         await logout(self.scope)
         return {'msg': 'Logged out successfuly'}
+    
+    async def _create_dir(self, user):
+        temp = tempfile.gettempdir()
+        path = pathlib.Path(temp) / user.temp_dir
+        path.mkdir(parents=True, exist_ok=True) 
+
+
