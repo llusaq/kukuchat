@@ -5,15 +5,18 @@
 </template>
 
 <script>
+import { store } from '@/store'
+
 export default {
   data() {
     return {
-      isDark: false,
+      isDark: store.getters.isDark,
       socket: ''
     }
   },
   methods: {
-  }
+  },
+
 
 }
 </script>
@@ -105,13 +108,13 @@ html,body {
     background-color: #333333 !important;
 }
 
-.dark > .wrapper > .chat > .contacts ::-webkit-scrollbar-thumb {
+.dark > .wrapper > .chat > ::-webkit-scrollbar-thumb {
   background: #424242; 
   border-radius: 10px;
 }
 
 /* Handle on hover */
-.dark > .wrapper > .chat > .contacts ::-webkit-scrollbar-thumb:hover {
+.dark > .wrapper > .chat > ::-webkit-scrollbar-thumb:hover {
   background: #616161; 
 }
 
