@@ -43,6 +43,11 @@ export default {
         }
     },
     methods: {
+
+
+        restore() {
+            this.$parent.dynamicComponent = 'restore';
+        },
         signup() {
             this.$parent.dynamicComponent = 'signup';
         },
@@ -60,12 +65,11 @@ export default {
              if (this.username === '') {
                 this.validateLogin = 'invalid'
                 M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
-            } 
+             }
             else if (this.password === '') {
                 this.validatePassword = 'invalid'
                 M.toast({html: 'Password must not be empty', classes: 'red darken-2'})
-            }
-            else { 
+             } else {
                 let data = {
                     action: 'login',
                     username: this.username,
