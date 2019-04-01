@@ -16,13 +16,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         await self.accept()
-        self.facebook = facebook.FacebookProvider()
-        self.skype = skype.SkypeProvider()
 
         user = await get_user(self.scope)
+
+        self.facebook = facebook.FacebookProvider(user)
+        self.skype = skype.SkypeProvider(user)
+
         if not isinstance(user, AnonymousUser):
             await utils.autolog(
-                user, 
+                user,
                 [
                     ('facebook', self.facebook),
                     ('skype', self.skype),

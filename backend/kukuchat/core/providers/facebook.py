@@ -16,7 +16,7 @@ class FacebookProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    def __init__(self):
+    def __init__(self, user):
         self.client = None
 
     async def get_required_credentials(self, data):
