@@ -14,3 +14,7 @@ class BaseProvider(ABC):
     @abstractmethod
     async def am_i_logged(self, data):
         pass
+
+    @abstractmethod
+    async def get_chats(self, data):
+        pass

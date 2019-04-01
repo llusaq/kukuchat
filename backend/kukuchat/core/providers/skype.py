@@ -42,3 +42,6 @@ class SkypeProvider(BaseProvider):
     async def am_i_logged(self, data):
         is_logged = self.sk.conn.connected is True
         return {'is_logged': is_logged}
+
+    async def get_chats(self, data):
+        pass

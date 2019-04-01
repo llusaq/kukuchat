@@ -35,3 +35,38 @@ async def comm(db, client):
     await comm.receive_json_from()
 
     return comm
+
+
+@pytest.fixture
+@pytest.mark.asyncio
+async def logged(db, client):
+    password = ''.join(random.choices(string.ascii_letters, k=8))
+    username = ''.join(random.choices(string.ascii_letters, k=8))
+
+    await database_sync_to_async(get_user_model().objects.create_user)(
+        username=username,
+        password=password,
+        email='test@test.com',
+    )
+
+    comm = WebsocketCommunicator(application, 'ws/chat/')
+
+    await comm.connect()
+
+    await comm.send_json_to({
+        'action': 'login',
+        'username': username,
+        'password': password,
+    })
+
+    await comm.receive_json_from()
+
+    await comm.send_json_to({
+        'action': 'provider_facebook_login',
+        'username': '579631148',
+        'password': '12qwertyU',
+    })
+
+    await comm.receive_json_from()
+
+    return comm
