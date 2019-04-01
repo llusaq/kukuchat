@@ -4,6 +4,14 @@
                 <div class="card-content">
                     <span class="card-title center-align">Sign Up</span>
                     <div class="row">
+
+
+                        <div class="input-field col s12">
+                            <label for="email">Email </label>
+                            <input type="email" v-model="email" @keyup="editEmail()" :class="validateEmail" name="email"
+                                   id="email"/>
+                        </div>
+
                         <div class="input-field col s12">
                             <label for="login">Login</label>
                             <input type="text" @keyup="editLogin()" v-model="username" :class="validateLogin" name="login" id="login"/>
@@ -11,19 +19,19 @@
                         <div class="input-field col s12">
                             <label for="password">Password </label>
                             <input type="password" @keyup="editPassword()" v-model="password" :class="validatePassword" name="password" id="password"/>
-                            
+
                         </div>
                         <div class="input-field col s12">
                             <label for="password2">Confirm password </label>
                             <input type="password" @keyup="editPassword2()" v-model="password2" :class="validatePassword2" name="password2" id="password2"/>
                         </div>
-                        <div class="input-field col s12">
-                            <label for="email">Email </label>
-                            <input type="email" v-model="email" @keyup="editEmail()" :class="validateEmail" name="email" id="email"/>
-                        </div>
+
                         <div class="col s12">
-                            <a @click="login()" class="btn green darken-2 waves-effect waves-light col s4">Go back </a>
-                            <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Sign Up </a>
+
+                            <a @click="signup()" class="btn green darken-2 waves-effect waves-light col s4">Sign Up </a>
+
+                            <a @click="login()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Go
+                                back </a>
                         </div>
                     </div>
                 </div>
@@ -73,7 +81,7 @@ export default {
             if (this.username === '') {
                 this.validateLogin = 'invalid'
                 M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
-            } 
+            }
             else if (this.password === '') {
                 this.validatePassword = 'invalid'
                 M.toast({html: 'Password must not be empty', classes: 'red darken-2'})
@@ -93,8 +101,7 @@ export default {
             else if (!this.validEmail(this.email)) {
                 this.validateEmail = 'invalid'
                 M.toast({html: 'Email is not correct', classes: 'red darken-2'})
-            }
-            else { 
+            } else {
                 let data = {
                     username: this.username,
                     password: this.password,

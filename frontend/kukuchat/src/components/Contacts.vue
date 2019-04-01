@@ -7,7 +7,7 @@
                 </div>
             </div>
         <ul class="scroll">
-            <li v-for="contact in filteredList" @click="select(contact)"  :class="{ clicked: selectedContact === contact }">
+            <li v-for="contact in filteredList" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
                 <div class="icon">
 				    <span :style="{backgroundColor: randomColor()}">AV</span>
                 </div>
@@ -57,7 +57,6 @@ export default {
         }
     },
     computed: {
-
         selectedContact() {
             return this.$parent.currentChat === '' ? '' : this.$parent.currentChat; 
         },
