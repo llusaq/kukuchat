@@ -46,3 +46,6 @@ class SkypeProvider(BaseProvider):
 
     async def get_chats(self, data):
         pass
+
+    async def post_login_action(self, data):
+        pass

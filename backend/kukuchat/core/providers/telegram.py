@@ -20,3 +20,6 @@ class TelegramProvider(BaseProvider):
 
     def is_logged_in(self):
         pass
+
+    async def post_login_action(self, data):
+        pass

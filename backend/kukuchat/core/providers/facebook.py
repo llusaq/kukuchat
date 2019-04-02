@@ -46,3 +46,6 @@ class FacebookProvider(BaseProvider):
             'facebook',
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
+
+    async def post_login_action(self, data):
+        pass
