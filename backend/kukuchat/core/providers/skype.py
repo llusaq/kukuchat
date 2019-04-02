@@ -22,9 +22,10 @@ class SkypeProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    def __init__(self, user):
+    def __init__(self, scope):
         self.sk = Skype(connect=False)
-        self.user = user
+        self.scope = scope
+
     async def get_required_credentials(self, data):
         return self._required_credentials
 
@@ -49,4 +50,7 @@ class SkypeProvider(BaseProvider):
         return {'is_logged': is_logged}
 
     async def get_chats(self, data):
+        pass
+
+    async def post_login_action(self, data):
         pass

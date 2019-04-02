@@ -18,7 +18,7 @@ class FacebookProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    def __init__(self, user):
+    def __init__(self, scope):
         self.client = None
 
     async def get_required_credentials(self, data):
@@ -46,3 +46,6 @@ class FacebookProvider(BaseProvider):
             'facebook',
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
+
+    async def post_login_action(self, data):
+        pass
