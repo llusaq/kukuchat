@@ -19,8 +19,9 @@ class SkypeProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    def __init__(self, user):
+    def __init__(self, scope):
         self.sk = Skype(connect=False)
+        self.scope = scope
 
     async def get_required_credentials(self, data):
         return self._required_credentials

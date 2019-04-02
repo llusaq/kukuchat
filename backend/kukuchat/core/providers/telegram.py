@@ -9,7 +9,7 @@ class TelegramProvider(BaseProvider):
         'api_hash': {'type': 'text', 'help': 'Api hash'},
     }
 
-    def __init__(self):
+    def __init__(self, scope):
         self.Client = None
 
     def get_required_credentials(self):
