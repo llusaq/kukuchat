@@ -9,6 +9,7 @@ from asgiref.sync import async_to_sync
 
 from core.providers import facebook
 from core.providers import skype
+from core.providers import telegram
 from core import utils
 
 
@@ -28,6 +29,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 [
                     ('facebook', self.facebook),
                     ('skype', self.skype),
+                    ('telegram', self.telegram),
                 ]
             )
 

@@ -1,4 +1,5 @@
 from core.providers.provider import BaseProvider
+from telethon import TelegramClient
 
 
 class TelegramProvider(BaseProvider):
@@ -12,11 +13,15 @@ class TelegramProvider(BaseProvider):
     def __init__(self):
         self.Client = None
 
-    def get_required_credentials(self):
+    async def get_required_credentials(self):
         return self._required_credentials
 
-    def login(self, **credentials):
-        pass
+    async def login(self, data):
+        apiid = data['api_id']
+        apihash = data['api_hash']
+        self.Client = TelegramClient('telegram_session', apiid, apihash).start()
 
-    def is_logged_in(self):
+        return {'msg': 'Succesfully logged into Telegram'}
+
+    async def is_logged_in(self):
         pass
