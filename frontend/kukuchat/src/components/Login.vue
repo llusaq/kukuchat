@@ -26,8 +26,8 @@
 
 <script>
 
-import {http} from '../plugins/axios'
-import store from '../store'
+import { http } from '@/plugins/axios'
+import { store } from '@/store'
 
 export default {
     name: 'Login',
@@ -76,48 +76,42 @@ export default {
                     password: this.password,
                 }
 
-                this.socket.send(JSON.stringify(data));
+                 store.getters.socket.send(JSON.stringify(data));
 
                 data = {
                     action: 'am_i_logged'
                 }
-                this.socket.send(JSON.stringify(data));
+                 store.getters.socket.send(JSON.stringify(data));
 
             }
         },
         connect() {
-            this.socket = new WebSocket("ws://localhost:8000/ws/chat/");
-            this.socket.onopen = () => {
-                console.log("connected");
-                this.socket.onmessage = ({data}) => {
-                    data = JSON.parse(data)
-                    console.log(data)
-                    if (data.is_logged) {
-                        this.$router.push({name: 'chat'})
+            if (store.getters.socket === undefined) {
+                store.getters.socket = new WebSocket("ws://localhost:8000/ws/chat/");
+                store.getters.socket.onopen = () => {
+                    store.getters.socket.onmessage = ({data}) => {
+                        data = JSON.parse(data)
+                        if (data.is_logged) {
+                            this.$router.push({name: 'chat'})
+                        } 
+                        if (data.status === 'error') {
+                            M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                        }
+                    };
+                    let data = {
+                        action: 'am_i_logged'
                     }
-                    if (data.status === 'error') {
-                        M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                    }
+                    store.getters.socket.send(JSON.stringify(data));
                 };
-                let data = {
-                    action: 'am_i_logged'
-                }
-                this.socket.send(JSON.stringify(data));
-            };
-        },
-        disconnect() {
-            this.socket.close();
-        },
-        sendMessage(data) {
-            console.log('sent')
-            this.socket.send(data)
+            }
+            else {
+                this.$router.push({name: 'chat'})
+            }
+            
         }
     },
     beforeMount() {
         this.connect();
-    },
-    mounted() {
-
     }
 }
 </script>

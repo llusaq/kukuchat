@@ -5,6 +5,7 @@ from django.core import signing
 from channels.auth import get_user
 
 from core.tests.fixtures import *
+from core.models import Chat
 
 
 @pytest.mark.asyncio
@@ -63,19 +64,15 @@ async def test_required_creds(comm):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_store_creds(comm):
-    await comm.send_json_to({
-        'action': 'provider_facebook_login',
-        'username': '579631148',
-        'password': '12qwertyU',
+async def test_store_creds(logged):
+    await logged.send_json_to({
+        'action': 'provider_facebook_get_chats',
     })
 
-    resp = await comm.receive_json_from()
+    resp = await logged.receive_json_from()
+    chats = resp['chats']
 
-    user = await get_user(comm.instance.scope)
+    assert Chat.objects.all().count() == len(chats)
 
-    creds = signing.loads(user.credentials)
-
-    assert creds['facebook'] == {'username': '579631148', 'password': '12qwertyU'}
-
-    await comm.disconnect()
+    assert 'Maciej Fraszczak' in (c['name'] for c in resp['chats'])
+    await logged.disconnect()

@@ -12,7 +12,11 @@
             <a class="settings-btn modal-trigger" href="#add-account" @click="settings()">Add account</a>
             <a class="settings-btn" @click="logout()">Log out</a>
         </div>
+         <div class="back-btn" @click="toContacts()" v-if="currentChat != '' && width <= 600">  
+                <i class="material-icons">arrow_back</i>
+            </div>
         <a class="col l9 m8 s12 menu-el" v-if="currentChat != '' && width <= 600">
+           
             {{ currentChat }}
         </a>
         <a class="col l9 m8 s12 menu-el" v-else-if="width > 600">
@@ -27,23 +31,23 @@
                 <div class="row">
                     <div class="col l2 m2">
                         <img src="@/assets/messenger.png" alt="messenger">
-                        <span> <b>Messenger</b> </span>
+                        <p> <b>Messenger</b> </p>
                     </div>
                     <div class="col l2 m2">
                         <img src="@/assets/skype.png" alt="skype">
-                        <span> <b>Skype</b> </span>
+                        <p> <b>Skype</b> </p>
                     </div>
                     <div class="col l2 m2">
                         <img src="@/assets/viber.png" alt="viber">
-                        <span> <b>Viber</b> </span>
+                        <p> <b>Viber</b> </p>
                     </div>
                     <div class="col l2 m2">
                         <img src="@/assets/gmail.png" alt="gmail">
-                        <span> <b>Gmail</b> </span>
+                        <p> <b>Gmail</b> </p>
                     </div>
                     <div class="col l2 m2">
                         <img src="@/assets/telegram.png" alt="telegram">
-                        <span> <b>Telegram</b> </span>
+                        <p> <b>Telegram</b> </p>
                     </div>
                 </div>
                
@@ -56,6 +60,8 @@
 </template>
 
 <script>
+import { store } from '@/store'
+
 export default {
     name: 'dropdownmenu',
     data() {
@@ -74,22 +80,18 @@ export default {
         settings() {
             this.icon = this.icon === 'menu' ? 'clear' : 'menu';
             this.opened = !this.opened;
-            this.socket = new WebSocket("ws://localhost:8000/ws/chat/");
-            this.socket.onopen = () => {
-                console.log("connected");   
-                this.socket.onmessage = ({data}) => {
-                    data = JSON.parse(data)
-                    console.log(data)
-                    
-                };
-                
-            };
         },
         logout() {
-            let data = {
-                    action: 'logout'
-                }
-            //this.socket.send(JSON.stringify(data));
+             let data = {
+                 action: 'logout'
+                 }
+            store.getters.socket.send(JSON.stringify(data));
+            store.getters.socket.close();
+            store.getters.socket = undefined;
+            this.$router.push({name: 'home'})
+        },
+        toContacts() {
+            this.$parent.currentChat = '';
         }
     },
     props: ['currentChat'],
@@ -182,7 +184,6 @@ a {
 .modal-content .col {
     margin: 20px 1.6%;
     position: relative;
-    height: 150px;
     transition: all 0.2s ease;
     display: table;
     cursor: pointer;
@@ -195,13 +196,6 @@ a {
     margin-top: -15%;
 }
 
-.modal-content .col span {
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    transform: translate(-50%, -50%);
-}
-
 .col img {
     max-width: 100%;
     height:auto;
@@ -210,9 +204,22 @@ a {
 
 .modal-content {
     padding: 20px;
+    height: 230px;
 }
 
+.back-btn {
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    cursor: pointer;
+    padding: 15px;
+    color: rgba(255, 255, 255, 0.90);
+}
 
+.back-btn:hover {
+    background-color: #616161;
+}
 
 </style>
 

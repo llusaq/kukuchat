@@ -1,10 +1,12 @@
-import logging
+from channels.db import database_sync_to_async
 
 import fbchat
 
 from asgiref.sync import sync_to_async
 
 from core.providers.provider import BaseProvider
+from core.models import Contact, Chat
+from core import utils
 
 
 class FacebookProvider(BaseProvider):
@@ -16,7 +18,7 @@ class FacebookProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    def __init__(self, user):
+    def __init__(self, scope):
         self.client = None
 
     async def get_required_credentials(self, data):
@@ -33,3 +35,17 @@ class FacebookProvider(BaseProvider):
     async def am_i_logged(self, data):
         is_logged = self.client is not None and self.client.isLoggedIn()
         return {'is_logged': is_logged}
+
+    async def get_chats(self, data):
+        all_contacts = await sync_to_async(self.client.fetchAllUsers)()
+        active_contacts = [c for c in all_contacts if c.uid]
+        chats = await utils.turn_provider_contacts_into_chats(
+            active_contacts,
+            lambda c: c.uid,
+            lambda c: c.name,
+            'facebook',
+        )
+        return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
+
+    async def post_login_action(self, data):
+        pass

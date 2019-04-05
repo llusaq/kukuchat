@@ -10,7 +10,7 @@ class TelegramProvider(BaseProvider):
         'api_hash': {'type': 'text', 'help': 'Api hash'},
     }
 
-    def __init__(self):
+    def __init__(self, scope):
         self.Client = None
 
     async def get_required_credentials(self):
@@ -24,4 +24,7 @@ class TelegramProvider(BaseProvider):
         return {'msg': 'Succesfully logged into Telegram'}
 
     async def is_logged_in(self):
+        pass
+
+    async def post_login_action(self, data):
         pass

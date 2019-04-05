@@ -2,6 +2,8 @@ from django.core import signing
 
 from channels.db import database_sync_to_async
 
+from core.models import Contact, Chat
+
 
 async def autolog(user, providers):
     for provider in providers:
@@ -20,3 +22,27 @@ async def store_creds(user, prov_inst, data):
     user_creds.update(new_creds)
     user.credentials = signing.dumps(user_creds)
     user.save()
+
+
+async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_name):
+    ret = []
+    for c in contact:
+        uid = uid_func(c)
+        name = name_func(c)
+
+        def tmp():
+            try:
+                contact = Contact.objects.get(
+                    provider=prov_name,
+                    uid=uid,
+                )
+            except Contact.DoesNotExist:
+                chat = Chat.objects.create(
+                    name=name,
+                )
+            else:
+                chat = contact.chat
+            return chat
+
+        ret.append(await database_sync_to_async(tmp)())
+    return ret
