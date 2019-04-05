@@ -14,4 +14,40 @@ async def test_can_log_in(comm):
         'action': 'provider_telegram_am_i_logged',
     })
 
+    resp = await comm.receive_json_from()
+
+    assert resp == {
+        'status': 'ok',
+        'action': 'provider_telegram_am_i_logged',
+        'is_logged': False
+        }
+
+    await comm.send_json_to({
+        'action': 'provider_telegram_login',
+        #'username': '+48609523405'
+    })
+
+    resp = await comm.receive_json_from()
+
+    assert resp == {
+        'action': 'provider_telegram_login',
+        'status': 'ok',
+        'msg': 'Succesfully logged into Telegram'
+    }
+
+    await comm.send_json_to({
+        'action': 'provider_telegram_am_i_logged',
+    })
+
+    resp = await comm.receive_json_from()
+
+    assert resp == {
+        'status': 'ok',
+        'action': 'provider_telegram_am_i_logged',
+        'is_logged': True
+    }
+
+    await comm.disconnect()
+
+
     

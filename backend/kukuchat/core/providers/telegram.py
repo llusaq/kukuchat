@@ -1,29 +1,42 @@
 from core.providers.provider import BaseProvider
-from telethon import TelegramClient
+from core.models import Contact, Chat
+from core import utils
+from telethon import TelegramClient, sync
+
+from channels.db import database_sync_to_async
+
+from asgiref.sync import sync_to_async
 
 
 class TelegramProvider(BaseProvider):
 
+    name = 'telegram'
+
     _required_credentials = {
-        'phone_number': {'type': 'text', 'help': 'Phone number'},
-        'api_id': {'type': 'number', 'help': 'Api ID'},
-        'api_hash': {'type': 'text', 'help': 'Api hash'},
+        #'username': {'type': 'text', 'help': 'Unique username or phone number'},
     }
 
     def __init__(self, scope):
-        self.Client = None
+      self.client = None
 
     async def get_required_credentials(self):
         return self._required_credentials
 
     async def login(self, data):
-        apiid = data['api_id']
-        apihash = data['api_hash']
-        self.Client = TelegramClient('telegram_session', apiid, apihash).start()
+        #import ipdb; ipdb.set_trace()
+        apiid = '873144'
+        apihash = 'd7f230abfc4ec30c8323fa5fd2223161'
+        self.client = TelegramClient('telegram_session', apiid, apihash)
+        await self.client.start()
 
         return {'msg': 'Succesfully logged into Telegram'}
 
-    async def is_logged_in(self):
+    async def am_i_logged(self, data):
+        is_logged = self.client is not None and self.client.is_user_authorized()
+
+        return {'is_logged': is_logged}
+
+    async def get_chats(self, data):
         pass
 
     async def post_login_action(self, data):

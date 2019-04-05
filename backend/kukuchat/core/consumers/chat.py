@@ -22,6 +22,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         self.facebook = facebook.FacebookProvider(self.scope)
         self.skype = skype.SkypeProvider(self.scope)
+        self.telegram = telegram.TelegramProvider(self.scope)
 
         if not isinstance(user, AnonymousUser):
             await utils.autolog(
