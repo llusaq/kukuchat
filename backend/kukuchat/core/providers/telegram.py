@@ -32,8 +32,7 @@ class TelegramProvider(BaseProvider):
         return {'msg': 'Succesfully logged into Telegram'}
 
     async def am_i_logged(self, data):
-        is_logged = self.client is not None and self.client.is_user_authorized()
-
+        is_logged = self.client is not None
         return {'is_logged': is_logged}
 
     async def get_chats(self, data):
