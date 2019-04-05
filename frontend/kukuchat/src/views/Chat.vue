@@ -8,7 +8,7 @@
             <Conversation v-else-if=" currentChat != '' && width > 600"></Conversation>
         </div>
     </div>
-    
+
 </template>
 
 <script>
@@ -19,19 +19,31 @@ import Conversation from '@/components/Conversation.vue'
 
 export default {
     name: 'chat',
-    data() {
-        return {
-            currentChat: '',
-            width: window.innerWidth
-        }
-    },
+
+    props: ['name'],
     components: {
         Contacts,
         Menu,
-        Conversation
+        Conversation,
+        //  CreateMessage
     },
+
+
+
+    data() {
+        return {
+            currentChat: '',
+            width: window.innerWidth,
+            messages: []
+        }
+    },
+
+
     created: function () {
         window.addEventListener('keyup', this.onkey)
+        //  let ref = baza.collection('messages').orderBy('timestamp');
+
+        //  ref.onSnapshot(snapshot)
     },
     beforeDestroy: function () {
         window.removeEventListener('keyup', this.onkey)
