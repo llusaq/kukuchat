@@ -1,11 +1,10 @@
 import logging
-
+from pathlib import Path
 import tempfile 
 
-from pathlib import Path
+from channels.auth import get_user
 
 from skpy import Skype
-
 from skpy import SkypeAuthException
 
 from asgiref.sync import sync_to_async
@@ -32,16 +31,17 @@ class SkypeProvider(BaseProvider):
     async def login(self, data):
         username = data['username']
         password = data['password']
-        import ipdb ; ipdb.set_trace() 
 
-        self.user.refresh_from_db()
-        temp = Path(self.user.temp_dir) 
+        user_self = await get_user(self.scope)
+        temp = tempfile.gettempdir() / Path(user_self.temp_dir) 
         self.sk.conn.setTokenFile(temp / "token-skype-app")
         try:
             self.sk.conn.readToken()
         except SkypeAuthException:
             self.sk.conn.setUserPwd(username, password)
-            await sync_to_async(self.sk.conn.getSkypeToken)()
+            self.sk.conn.getSkypeToken()
+            
+
 
         return {'msg': 'Successfully logged into Skype'}
 

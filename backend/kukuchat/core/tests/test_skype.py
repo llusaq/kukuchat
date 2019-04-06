@@ -16,8 +16,7 @@ async def test_can_log_to(comm):
     await comm.send_json_to({
         'action': 'provider_skype_am_i_logged',
     })
-    import ipdb ; ipdb.set_trace() 
-
+    
     resp = await comm.receive_json_from()
 
     assert resp == {'status': 'ok', 'action': 'provider_skype_am_i_logged', 'is_logged':False}
