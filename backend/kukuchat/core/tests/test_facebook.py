@@ -1,11 +1,9 @@
 import pytest
 
-from django.core import signing
-
-from channels.auth import get_user
+from channels.db import database_sync_to_async
 
 from core.tests.fixtures import *
-from core.models import Chat
+from core.models import Chat, Contact
 
 
 @pytest.mark.asyncio
@@ -64,15 +62,57 @@ async def test_required_creds(comm):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_store_creds(logged):
-    await logged.send_json_to({
+async def test_store_creds(logged_fb):
+    await logged_fb.send_json_to({
         'action': 'provider_facebook_get_chats',
     })
 
-    resp = await logged.receive_json_from()
+    resp = await logged_fb.receive_json_from()
     chats = resp['chats']
 
     assert Chat.objects.all().count() == len(chats)
 
     assert 'Maciej Fraszczak' in (c['name'] for c in resp['chats'])
-    await logged.disconnect()
+    await logged_fb.disconnect()
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_can_send_and_receive_messages(logged_fb_mj, logged_fb_da):
+
+    dariusz_uid = '100035479385797'
+    dariusz = await database_sync_to_async(Contact.objects.create)(
+        provider='facebook',
+        uid=dariusz_uid,
+        name='Dariusz',
+        chat=await database_sync_to_async(Chat.objects.create)(name='Chat with Dariusz')
+    )
+
+    await logged_fb_mj.send_json_to({
+        'action': 'send_message',
+        'provider': 'facebook',
+        'chat_id': dariusz.chat.id,
+        'content': 'Hi man',
+    })
+
+    resp = await logged_fb_mj.receive_json_from()
+
+    assert resp == {
+        'action': 'send_message',
+        'chat_id': dariusz.chat.id,
+        'provider': 'facebook',
+        'status': 'ok',
+        'content': 'Hi man',
+    }
+
+    resp = await logged_fb_da.receive_json_from()
+
+    assert resp == {
+        'action': 'event_new_message',
+        'chat_id': dariusz.chat.id,
+        'provider': 'facebook',
+        'content': 'Hi man',
+    }
+
+    await logged_fb_mj.disconnect()
+    await logged_fb_da.disconnect()

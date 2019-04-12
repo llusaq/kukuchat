@@ -1,6 +1,9 @@
+from multiprocessing import Process
+
 from channels.db import database_sync_to_async
 
 import fbchat
+from fbchat.models import Message
 
 from asgiref.sync import sync_to_async
 
@@ -28,7 +31,14 @@ class FacebookProvider(BaseProvider):
         username = data['username']
         password = data['password']
 
-        self.client = fbchat.Client(username, password)
+        class MyClient(fbchat.Client):
+
+            def onMessage(*args, **kwargs):
+                self.on_message(*args, **kwargs)
+
+        self.client = MyClient(username, password)
+        self.listener = Process(target=lambda: self.client.listen(markAlive=True))
+        self.listener.start()
 
         return {'msg': 'Successfuly logged into Facebook'}
 
@@ -49,3 +59,7 @@ class FacebookProvider(BaseProvider):
 
     async def post_login_action(self, data):
         pass
+
+    async def send_message(self, uid, content):
+        await sync_to_async(self.client.send)(Message(text=content), uid)
+        return {'provider': 'facebook'}
