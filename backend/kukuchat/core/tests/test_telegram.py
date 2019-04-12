@@ -24,7 +24,6 @@ async def test_can_log_in(comm):
 
     await comm.send_json_to({
         'action': 'provider_telegram_login',
-        #'username': '+48609523405'
     })
 
     resp = await comm.receive_json_from()

@@ -27,7 +27,8 @@ class TelegramProvider(BaseProvider):
         apiid = '873144'
         apihash = 'd7f230abfc4ec30c8323fa5fd2223161'
         self.client = TelegramClient('telegram_session', apiid, apihash)
-        await self.client.start()
+        await self.client.start('+48609523405')
+        #import ipdb; ipdb.set_trace()
 
         return {'msg': 'Succesfully logged into Telegram'}
 
