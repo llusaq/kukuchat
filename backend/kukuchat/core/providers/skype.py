@@ -50,7 +50,14 @@ class SkypeProvider(BaseProvider):
         return {'is_logged': is_logged}
 
     async def get_chats(self, data):
-        pass
-
+        #import ipdb ; ipdb.set_trace()
+        all_contacts = await sync_to_async(self.conn.contacts)()
+        active_contacts = [c for c in all_contacts if c.uid]
+        chats = await utils.turn_provider_contacts_into_chats(
+            lambda c: c.id,
+            lambda c: c.name.first + c.name.last,
+            'skype'
+        )
+        return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
     async def post_login_action(self, data):
         pass
