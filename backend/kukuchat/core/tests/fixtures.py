@@ -1,11 +1,14 @@
+from unittest.mock import MagicMock
 import string
 import random
+
 from django.contrib.auth import get_user_model
 
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 
 import pytest
+import fbchat
 
 from kukuchat.routing import application
 
@@ -39,7 +42,7 @@ async def comm(db, client):
 
 @pytest.fixture
 @pytest.mark.asyncio
-async def logged_fb(db, client):
+async def logged_fb(db, client, monkeypatch):
     password = ''.join(random.choices(string.ascii_letters, k=8))
     username = ''.join(random.choices(string.ascii_letters, k=8))
 
@@ -60,6 +63,8 @@ async def logged_fb(db, client):
     })
 
     await comm.receive_json_from()
+
+    monkeypatch.setattr(fbchat, 'Client', MagicMock())
 
     await comm.send_json_to({
         'action': 'provider_facebook_login',

@@ -1,9 +1,19 @@
+from types import SimpleNamespace
 import pytest
+from unittest.mock import MagicMock
 
 from channels.db import database_sync_to_async
 
 from core.tests.fixtures import *
 from core.models import Chat, Contact
+
+import fbchat
+
+
+@pytest.fixture(autouse=True)
+@pytest.mark.asyncio
+def my_fb_chat(monkeypatch):
+    monkeypatch.setattr(fbchat, 'Client', MagicMock())
 
 
 @pytest.mark.asyncio
@@ -23,7 +33,11 @@ async def test_can_log_in(comm):
         'password': '12qwertyU',
     })
 
+    fbchat.Client.return_value.isLoggedIn.return_value = True
+
     resp = await comm.receive_json_from()
+
+    fbchat.Client.assert_called_once_with('579631148', '12qwertyU')
 
     assert resp == {
         'action': 'provider_facebook_login',
@@ -62,10 +76,21 @@ async def test_required_creds(comm):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_store_creds(logged_fb):
+async def test_can_list_chats(logged_fb):
     await logged_fb.send_json_to({
         'action': 'provider_facebook_get_chats',
     })
+
+    fbchat.Client.return_value.fetchAllUsers.return_value = [
+        SimpleNamespace(
+            name='Maciej Fraszczak',
+            uid=1,
+        ),
+        SimpleNamespace(
+            name='Tomasz Dul',
+            uid=2,
+        ),
+    ]
 
     resp = await logged_fb.receive_json_from()
     chats = resp['chats']

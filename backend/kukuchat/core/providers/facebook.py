@@ -1,14 +1,11 @@
 from multiprocessing import Process
 
-from channels.db import database_sync_to_async
-
 import fbchat
 from fbchat.models import Message
 
 from asgiref.sync import sync_to_async
 
 from core.providers.provider import BaseProvider
-from core.models import Contact, Chat
 from core import utils
 
 
@@ -31,12 +28,7 @@ class FacebookProvider(BaseProvider):
         username = data['username']
         password = data['password']
 
-        class MyClient(fbchat.Client):
-
-            def onMessage(*args, **kwargs):
-                self.on_message(*args, **kwargs)
-
-        self.client = MyClient(username, password)
+        self.client = fbchat.Client(username, password)
         self.listener = Process(target=lambda: self.client.listen(markAlive=True))
         self.listener.start()
 
