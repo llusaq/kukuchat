@@ -20,20 +20,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         await self.accept()
 
-        user = await get_user(self.scope)
-
-        self.facebook = facebook.FacebookProvider(self.scope)
+        self.facebook = facebook.FacebookProvider(self.scope, self.on_message_consumer)
         self.skype = skype.SkypeProvider(self.scope)
         self.telegram = telegram.TelegramProvider(self.scope)
-
-        self.facebook.on_message = self.on_message
-        self.skype.on_message = self.on_message
 
     async def disconnect(self, code):
         pass
 
-    async def on_message(*args, **kwargs):
-        pass
+    async def on_message_consumer(self, provider, author_uid, author_name, content):
+        chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name)
+        await self.send_json({
+            'action': 'new_message',
+            'chat_id': chat.id,
+            'content': content,
+        })
 
     async def receive_json(self, data):
         user = await get_user(self.scope)

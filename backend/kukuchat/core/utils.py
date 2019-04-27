@@ -24,6 +24,26 @@ async def store_creds(user, prov_inst, data):
     user.save()
 
 
+async def get_chat_for_provider_contact(prov_name, uid, name):
+    try:
+        contact = Contact.objects.get(
+            provider=prov_name,
+            uid=uid,
+        )
+    except Contact.DoesNotExist:
+        chat = Chat.objects.create(
+            name=name,
+        )
+        Contact.objects.create(
+            provider=prov_name,
+            uid=uid,
+            chat=chat,
+        )
+    else:
+        chat = contact.chat
+    return chat
+
+
 async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_name):
     ret = []
     for c in contact:
@@ -39,6 +59,11 @@ async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_n
             except Contact.DoesNotExist:
                 chat = Chat.objects.create(
                     name=name,
+                )
+                Contact.objects.create(
+                    provider=prov_name,
+                    uid=uid,
+                    chat=chat,
                 )
             else:
                 chat = contact.chat

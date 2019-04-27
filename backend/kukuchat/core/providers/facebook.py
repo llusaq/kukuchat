@@ -1,9 +1,10 @@
 from multiprocessing import Process
+from threading import Thread
 
 import fbchat
 from fbchat.models import Message
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 
 from core.providers.provider import BaseProvider
 from core import utils
@@ -18,7 +19,8 @@ class FacebookProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    def __init__(self, scope):
+    def __init__(self, scope, on_message_consumer):
+        self.on_message_consumer = on_message_consumer
         self.client = None
 
     async def get_required_credentials(self, data):
@@ -29,6 +31,7 @@ class FacebookProvider(BaseProvider):
         password = data['password']
 
         self.client = fbchat.Client(username, password)
+        self.client.onMessage = self.on_message
         self.listener = Process(target=lambda: self.client.listen(markAlive=True))
         self.listener.start()
 
@@ -51,6 +54,18 @@ class FacebookProvider(BaseProvider):
 
     async def post_login_action(self, data):
         pass
+
+    def on_message(self, *args, **kwargs):
+        t = Thread(
+            target=async_to_sync(self.on_message_consumer),
+            kwargs={
+                'provider': 'facebook',
+                'author_uid': kwargs['author_id'],
+                'content': kwargs['message_object'].text,
+                'author_name': kwargs['name'],
+            }
+        )
+        t.start()
 
     async def send_message(self, uid, content):
         await sync_to_async(self.client.send)(Message(text=content), uid)

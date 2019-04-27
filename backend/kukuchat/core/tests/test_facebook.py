@@ -103,24 +103,28 @@ async def test_can_list_chats(logged_fb):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_can_send_and_receive_messages(logged_fb_mj, logged_fb_da):
+async def test_can_send_messages(logged_fb):
 
     dariusz_uid = '100035479385797'
     dariusz = await database_sync_to_async(Contact.objects.create)(
         provider='facebook',
         uid=dariusz_uid,
-        name='Dariusz',
-        chat=await database_sync_to_async(Chat.objects.create)(name='Chat with Dariusz')
+        chat=await database_sync_to_async(Chat.objects.create)(name='Dariusz')
     )
 
-    await logged_fb_mj.send_json_to({
+    await logged_fb.send_json_to({
         'action': 'send_message',
         'provider': 'facebook',
         'chat_id': dariusz.chat.id,
         'content': 'Hi man',
     })
 
-    resp = await logged_fb_mj.receive_json_from()
+    resp = await logged_fb.receive_json_from()
+
+    send_mock = fbchat.Client.return_value.send
+    send_mock.assert_called_once()
+    assert send_mock.call_args[0][0].text == 'Hi man'
+    assert send_mock.call_args[0][1] == dariusz_uid
 
     assert resp == {
         'action': 'send_message',
@@ -130,14 +134,26 @@ async def test_can_send_and_receive_messages(logged_fb_mj, logged_fb_da):
         'content': 'Hi man',
     }
 
-    resp = await logged_fb_da.receive_json_from()
+    await logged_fb.disconnect()
 
-    assert resp == {
-        'action': 'event_new_message',
-        'chat_id': dariusz.chat.id,
-        'provider': 'facebook',
-        'content': 'Hi man',
-    }
 
-    await logged_fb_mj.disconnect()
-    await logged_fb_da.disconnect()
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_can_receive_messages(logged_fb):
+    some_uid = '123'
+
+    fbchat.Client.return_value.onMessage(
+        message_object=SimpleNamespace(text='hey man'),
+        author_id='123',
+        name='Andrii Donets',
+    )
+
+    resp = await logged_fb.receive_json_from()
+
+    chat = Contact.objects.get(chat__name='Andrii Donets')
+
+    assert resp['action'] == 'new_message'
+    assert resp['content'] == 'hey man'
+    assert resp['chat_id'] == chat.id
+
+    await logged_fb.disconnect()
