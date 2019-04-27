@@ -38,7 +38,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, data):
         user = await get_user(self.scope)
         try:
-            action = data['action']
+            action = data['action']        
+
             if not user.is_authenticated and action not in ['login', 'am_i_logged']:
                 raise Exception('Please log in first')
             if action.startswith('provider'):

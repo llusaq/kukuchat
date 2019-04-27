@@ -8,6 +8,7 @@ from channels.auth import get_user
 import pytest
 
 from core.tests.fixtures import *
+from core.models import Chat, Contact
 
 
 @pytest.mark.asyncio
@@ -63,28 +64,32 @@ async def test_required_cred(comm):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_store_creds(logged_skype):
-    # await comm.send_json_to({
-    #     'action': 'provider_skype_login',
-    #     'username': '579631148',
-    #     'password': '12qwertyU',
-    # })
-
-    # resp = await comm.receive_json_from()
-
-    # user = await get_user(comm.instance.scope)
-
-    # creds = signing.loads(user.credentials)
-
-    # assert creds['skype'] == {'username': '579631148', 'password': '12qwertyU'}
-
-    # await comm.disconnect()
+async def test_can_list_chats(logged_skype):
     await logged_skype.send_json_to({
         'action': 'provider_skype_get_chats',
     })
     resp = await logged_skype.receive_json_from()
-    chats = resp['SkypeContacts']
+    chats = resp['chats']
 
-    assert Chat.object.all().count() == len(chats)
-    assert 'Metf0rd' in (c['name'] for c in resp['chats'])
+    assert Chat.objects.all().count() == len(chats)
+    assert 'АндрійДонець' in (c['name'] for c in resp['chats'])
+    await logged_skype.disconnect()
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_store_creds(comm):
+    await comm.send_json_to({
+        'action': 'provider_skype_login',
+        'username': '579631148',
+        'password': '12qwertyU',
+    })
+
+    resp = await comm.receive_json_from()
+
+    user = await get_user(comm.instance.scope)
+
+    creds = signing.loads(user.credentials)
+
+    assert creds['skype'] == {'username': '579631148', 'password': '12qwertyU'}
+
     await comm.disconnect()
