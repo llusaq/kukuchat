@@ -21,7 +21,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         self.facebook = facebook.FacebookProvider(self.scope, self.on_message_consumer)
-        self.skype = skype.SkypeProvider(self.scope)
+        self.skype = skype.SkypeProvider(self.scope, self.on_message_consumer)
         self.telegram = telegram.TelegramProvider(self.scope)
 
     async def disconnect(self, code):

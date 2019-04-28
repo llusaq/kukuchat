@@ -3,11 +3,13 @@ from pathlib import Path
 import tempfile 
 
 from channels.auth import get_user
+from threading import Thread
+
 
 from skpy import Skype
 from skpy import SkypeAuthException
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 
 from core.providers.provider import BaseProvider
 from core import utils
@@ -26,6 +28,7 @@ class SkypeProvider(BaseProvider):
     def __init__(self, scope):
         self.sk = Skype(connect=False)
         self.scope = scope
+        self.on_message_consumer = on_message_consumer
 
     async def get_required_credentials(self, data):
         return self._required_credentials
@@ -60,7 +63,22 @@ class SkypeProvider(BaseProvider):
             lambda c: c.name.first + c.name.last,
             'skype'
         )
-        #import ipdb ; ipdb.set_trace()
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
     async def post_login_action(self, data):
         pass
+    def on_message(self, *args, **kwargs):
+        t = Thread(
+            target=async_to_sync(self.on_message_consumer),
+            kwargs={
+                'provider': 'skype',
+                'author_uid': kwargs['author_id'],
+                'content': kwargs['message_object'].text,
+                'author_name': kwargs['name'],
+            }
+        )
+        t.start()
+
+    async def send_message(self, id, content):
+        ch = self.sk.chats[id]
+        await sync_to_async(ch.sendMsg)(content)
+        return {'provider': 'skype'}
