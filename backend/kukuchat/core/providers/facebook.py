@@ -56,13 +56,14 @@ class FacebookProvider(BaseProvider):
         pass
 
     def on_message(self, *args, **kwargs):
+        user = self.client.fetchUserInfo(kwargs['author_id'])[kwargs['author_id']]
         t = Thread(
             target=async_to_sync(self.on_message_consumer),
             kwargs={
                 'provider': 'facebook',
                 'author_uid': kwargs['author_id'],
                 'content': kwargs['message_object'].text,
-                'author_name': kwargs['name'],
+                'author_name': user.name,
             }
         )
         t.start()

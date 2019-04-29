@@ -140,12 +140,13 @@ async def test_can_send_messages(logged_fb):
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
 async def test_can_receive_messages(logged_fb):
-    some_uid = '123'
+    fbchat.Client.return_value.fetchUserInfo.return_value = {
+        '123': SimpleNamespace(name='Andrii Donets'),
+    }
 
     fbchat.Client.return_value.onMessage(
         message_object=SimpleNamespace(text='hey man'),
         author_id='123',
-        name='Andrii Donets',
     )
 
     resp = await logged_fb.receive_json_from()

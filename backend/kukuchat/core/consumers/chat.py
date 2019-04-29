@@ -1,8 +1,7 @@
 import pathlib
 import tempfile
 
-from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import authenticate
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.auth import login, get_user, logout
@@ -38,7 +37,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, data):
         user = await get_user(self.scope)
         try:
-            action = data['action']        
+            action = data['action']
 
             if not user.is_authenticated and action not in ['login', 'am_i_logged']:
                 raise Exception('Please log in first')

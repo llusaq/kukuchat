@@ -1,6 +1,5 @@
-import logging
 from pathlib import Path
-import tempfile 
+import tempfile
 
 from channels.auth import get_user
 from threading import Thread
@@ -15,7 +14,6 @@ from core.providers.provider import BaseProvider
 from core import utils
 
 
-
 class SkypeProvider(BaseProvider):
 
     name = 'skype'
@@ -25,7 +23,7 @@ class SkypeProvider(BaseProvider):
         'password': {'type': 'password', 'help': 'Password'},
     }
 
-    def __init__(self, scope):
+    def __init__(self, scope, on_message_consumer):
         self.sk = Skype(connect=False)
         self.scope = scope
         self.on_message_consumer = on_message_consumer
@@ -38,15 +36,13 @@ class SkypeProvider(BaseProvider):
         password = data['password']
 
         user_self = await get_user(self.scope)
-        temp = tempfile.gettempdir() / Path(user_self.temp_dir) 
+        temp = tempfile.gettempdir() / Path(user_self.temp_dir)
         self.sk.conn.setTokenFile(temp / "token-skype-app")
         try:
             self.sk.conn.readToken()
         except SkypeAuthException:
             self.sk.conn.setUserPwd(username, password)
             self.sk.conn.getSkypeToken()
-            
-
 
         return {'msg': 'Successfully logged into Skype'}
 
@@ -64,8 +60,10 @@ class SkypeProvider(BaseProvider):
             'skype'
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
+
     async def post_login_action(self, data):
         pass
+
     def on_message(self, *args, **kwargs):
         t = Thread(
             target=async_to_sync(self.on_message_consumer),
