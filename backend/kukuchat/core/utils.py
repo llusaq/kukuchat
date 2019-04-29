@@ -24,7 +24,7 @@ async def store_creds(user, prov_inst, data):
     user.save()
 
 
-async def get_chat_for_provider_contact(prov_name, uid, name):
+def get_chat_for_provider_contact(prov_name, uid, name):
     try:
         contact = Contact.objects.get(
             provider=prov_name,

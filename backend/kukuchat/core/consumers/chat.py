@@ -7,6 +7,8 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.auth import login, get_user, logout
 from channels.db import database_sync_to_async
 
+from asgiref.sync import async_to_sync
+
 from core.providers import facebook
 from core.providers import skype
 from core.providers import telegram
@@ -26,9 +28,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         pass
 
-    async def on_message_consumer(self, provider, author_uid, author_name, content):
-        chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name)
-        await self.send_json({
+    def on_message_consumer(self, provider, author_uid, author_name, content):
+        chat = utils.get_chat_for_provider_contact(provider, author_uid, author_name)
+        async_to_sync(self.send_json)({
             'action': 'new_message',
             'chat_id': chat.id,
             'content': content,

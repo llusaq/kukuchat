@@ -22,6 +22,7 @@ class FacebookProvider(BaseProvider):
     def __init__(self, scope, on_message_consumer):
         self.on_message_consumer = on_message_consumer
         self.client = None
+        self.dupa = lambda: print('dupa')
 
     async def get_required_credentials(self, data):
         return self._required_credentials
@@ -32,6 +33,7 @@ class FacebookProvider(BaseProvider):
 
         self.client = fbchat.Client(username, password)
         self.client.onMessage = self.on_message
+        self.client.listen(markAlive=True)
         self.listener = Process(target=lambda: self.client.listen(markAlive=True))
         self.listener.start()
 
@@ -58,7 +60,7 @@ class FacebookProvider(BaseProvider):
     def on_message(self, *args, **kwargs):
         user = self.client.fetchUserInfo(kwargs['author_id'])[kwargs['author_id']]
         t = Thread(
-            target=async_to_sync(self.on_message_consumer),
+            target=self.on_message_consumer,
             kwargs={
                 'provider': 'facebook',
                 'author_uid': kwargs['author_id'],
