@@ -37,9 +37,15 @@ async def test_can_log_in(comm):
 
     fbchat.Client.return_value.isLoggedIn.return_value = True
 
+    start_mock = fbchat.Client.return_value.start
+
+    f = asyncio.Future()
+    f.set_result(None)
+    start_mock.return_value = f
+
     resp = await comm.receive_json_from()
 
-    fbchat.Client.assert_called_once_with('579631148', '12qwertyU')
+    start_mock.assert_called_once_with('579631148', '12qwertyU')
 
     assert resp == {
         'action': 'provider_facebook_login',

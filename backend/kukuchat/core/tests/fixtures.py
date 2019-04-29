@@ -1,3 +1,4 @@
+import asyncio
 from unittest.mock import MagicMock
 import string
 import random
@@ -66,6 +67,11 @@ async def logged_fb(db, client, monkeypatch):
     await comm.receive_json_from()
 
     monkeypatch.setattr(fbchat, 'Client', MagicMock())
+
+    f = asyncio.Future()
+    f.set_result(None)
+
+    fbchat.Client.return_value.start.return_value = f
 
     await comm.send_json_to({
         'action': 'provider_facebook_login',

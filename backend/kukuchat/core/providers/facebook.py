@@ -31,7 +31,8 @@ class FacebookProvider(BaseProvider):
         username = data['username']
         password = data['password']
 
-        self.client = fbchat.Client(username, password)
+        self.client = fbchat.Client()
+        await self.client.start(username, password)
         self.client.onMessage = self.on_message
         self.client.listen(markAlive=True)
 
