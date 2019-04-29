@@ -1,5 +1,6 @@
 <template>
     <div class="col l3 m4 s12 contacts" >
+        <a @click="load()">load</a>
             <div class="nav-wrapper">
                 <div class="input-field">
                     <input id="search" type="search" v-model="search" autocomplete="off">
@@ -9,10 +10,10 @@
         <ul class="scroll">
             <li v-for="contact in filteredList" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
                 <div class="icon">
-				    <span :style="{backgroundColor: randomColor()}">AV</span>
+				    <span>{{ contact.name.charAt(0) }}{{ contact.name.charAt(contact.name.indexOf(' ') + 1) }}</span>
                 </div>
                 <div class="info">
-                    <span class="user"> <b>{{ contact }}</b> </span><br>
+                    <span class="user"> <b>{{ contact.name }}</b> </span><br>
 				    <span class="message">last message</span>
                 </div>
                 <div class="clear"></div>
@@ -22,20 +23,16 @@
 </template>
 
 <script>
+
+import { store } from '@/store'
+
 export default {
     name: 'contacts',
     data() {
         return {
             contacts: [
-                'Andro Vsmopasdasdasjd',
-                'Andro Vsmop2',
-                'Andro Vsmop3',
-                'Andro Vsmop4',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
+                {
+                }
             ],
             randcolor: '',
             clicked: '',
@@ -43,17 +40,23 @@ export default {
         }
     },
     methods: {
-         randomColor() {
-            const h = Math.floor(Math.random() * 360),
-            s = Math.floor(Math.random() * 70 + 30) + '%',
-            l = Math.floor(Math.random() * 60 + 20) + '%';
-            return `hsl(${h},${s},${l})`;
-            console.log(`hsl(${h},${s},${l})`);
-        },
         select(name) {
             this.$parent.currentChat = name;
             this.clicked = name;
             this.search = '';
+        },
+        load() {
+            let data = {
+                action: 'provider_facebook_get_chats',
+            }
+            store.getters.socket.send(JSON.stringify(data));
+            store.getters.socket.onmessage = ({data}) => {
+                data = JSON.parse(data)
+                console.log('done')
+                console.log(data)
+                this.contacts = data.chats                
+            };
+            console.log(this.contacts)
         }
     },
     computed: {
@@ -62,7 +65,7 @@ export default {
         },
         filteredList() {
             return this.contacts.filter(contact => {
-                return contact.toLowerCase().includes(this.search.toLowerCase())
+                return contact.name.toLowerCase().includes(this.search.toLowerCase())
             })
         }
     }
@@ -183,6 +186,10 @@ span {
 
 .active i {
     color: #64b5f6 !important;
+}
+
+.icon span {
+    background-color: #ffab40;
 }
 
 </style>
