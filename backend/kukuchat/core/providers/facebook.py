@@ -34,8 +34,6 @@ class FacebookProvider(BaseProvider):
         self.client = fbchat.Client(username, password)
         self.client.onMessage = self.on_message
         self.client.listen(markAlive=True)
-        self.listener = Process(target=lambda: self.client.listen(markAlive=True))
-        self.listener.start()
 
         return {'msg': 'Successfuly logged into Facebook'}
 
@@ -57,19 +55,16 @@ class FacebookProvider(BaseProvider):
     async def post_login_action(self, data):
         pass
 
-    def on_message(self, *args, **kwargs):
-        user = self.client.fetchUserInfo(kwargs['author_id'])[kwargs['author_id']]
-        t = Thread(
-            target=self.on_message_consumer,
-            kwargs={
-                'provider': 'facebook',
-                'author_uid': kwargs['author_id'],
-                'content': kwargs['message_object'].text,
-                'author_name': user.name,
-            }
+    async def on_message(self, *args, **kwargs):
+        aid = kwargs['author_id']
+        user = (await self.client.fetchUserInfo(aid))[aid]
+        await self.on_message_consumer(
+            provider='facebook',
+            author_uid=kwargs['author_id'],
+            content=kwargs['message_object'].text,
+            author_name=user.name,
         )
-        t.start()
 
     async def send_message(self, uid, content):
-        await sync_to_async(self.client.send)(Message(text=content), uid)
+        await self.client.send(Message(text=content), uid)
         return {'provider': 'facebook'}

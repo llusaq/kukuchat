@@ -1,8 +1,10 @@
+import asyncio
 from types import SimpleNamespace
-import pytest
 from unittest.mock import MagicMock
 
 from channels.db import database_sync_to_async
+
+import pytest
 
 from core.tests.fixtures import *
 from core.models import Chat, Contact
@@ -119,9 +121,13 @@ async def test_can_send_messages(logged_fb):
         'content': 'Hi man',
     })
 
+    f = asyncio.Future()
+    f.set_result(None)
+    send_mock = fbchat.Client.return_value.send
+    send_mock.return_value = f
+
     resp = await logged_fb.receive_json_from()
 
-    send_mock = fbchat.Client.return_value.send
     send_mock.assert_called_once()
     assert send_mock.call_args[0][0].text == 'Hi man'
     assert send_mock.call_args[0][1] == dariusz_uid
@@ -140,11 +146,11 @@ async def test_can_send_messages(logged_fb):
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
 async def test_can_receive_messages(logged_fb):
-    fbchat.Client.return_value.fetchUserInfo.return_value = {
-        '123': SimpleNamespace(name='Andrii Donets'),
-    }
+    f = asyncio.Future()
+    f.set_result({'123': SimpleNamespace(name='Andrii Donets')})
+    fbchat.Client.return_value.fetchUserInfo.return_value = f
 
-    fbchat.Client.return_value.onMessage(
+    await fbchat.Client.return_value.onMessage(
         message_object=SimpleNamespace(text='hey man'),
         author_id='123',
     )

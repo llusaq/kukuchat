@@ -28,9 +28,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         pass
 
-    def on_message_consumer(self, provider, author_uid, author_name, content):
-        chat = utils.get_chat_for_provider_contact(provider, author_uid, author_name)
-        async_to_sync(self.send_json)({
+    async def on_message_consumer(self, provider, author_uid, author_name, content):
+        chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name)
+        await self.send_json({
             'action': 'new_message',
             'chat_id': chat.id,
             'content': content,

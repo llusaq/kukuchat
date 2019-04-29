@@ -24,17 +24,17 @@ async def store_creds(user, prov_inst, data):
     user.save()
 
 
-def get_chat_for_provider_contact(prov_name, uid, name):
+async def get_chat_for_provider_contact(prov_name, uid, name):
     try:
-        contact = Contact.objects.get(
+        contact = await database_sync_to_async(Contact.objects.get)(
             provider=prov_name,
             uid=uid,
         )
     except Contact.DoesNotExist:
-        chat = Chat.objects.create(
+        chat = await database_sync_to_async(Chat.objects.create)(
             name=name,
         )
-        Contact.objects.create(
+        await database_sync_to_async(Contact.objects.create)(
             provider=prov_name,
             uid=uid,
             chat=chat,
