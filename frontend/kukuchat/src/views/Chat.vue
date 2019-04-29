@@ -6,6 +6,7 @@
             <Contacts v-else-if="width > 600"></Contacts>
             <Conversation v-if="currentChat != '' && width <= 600"></Conversation>
             <Conversation v-else-if=" currentChat != '' && width > 600"></Conversation>
+            <h5>Add chat service to see something</h5>
         </div>
     </div>
 
@@ -27,8 +28,6 @@ export default {
         Conversation,
         //  CreateMessage
     },
-
-
 
     data() {
         return {
@@ -70,6 +69,11 @@ export default {
 
 .wrapper > .chat {
     height: 100%;
+}
+
+h5 {
+    display: table;
+    margin: 200px auto 0 auto;
 }
 
 </style>
