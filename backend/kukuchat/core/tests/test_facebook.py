@@ -89,7 +89,8 @@ async def test_can_list_chats(logged_fb):
         'action': 'provider_facebook_get_chats',
     })
 
-    fbchat.Client.return_value.fetchAllUsers.return_value = [
+    f = asyncio.Future()
+    f.set_result([
         SimpleNamespace(
             name='Maciej Fraszczak',
             uid=1,
@@ -98,7 +99,9 @@ async def test_can_list_chats(logged_fb):
             name='Tomasz Dul',
             uid=2,
         ),
-    ]
+    ])
+
+    fbchat.Client.return_value.fetchAllUsers.return_value = f
 
     resp = await logged_fb.receive_json_from()
     chats = resp['chats']
