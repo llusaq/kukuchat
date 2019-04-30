@@ -79,8 +79,8 @@ export default {
                 data = {
                     action: 'am_i_logged'
                 }
-                 store.getters.socket.send(JSON.stringify(data));
-
+                store.getters.socket.send(JSON.stringify(data));
+                
             }
         },
         connect() {

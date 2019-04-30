@@ -8,7 +8,7 @@
                 </div>
             </div>
         <ul class="scroll">
-            <li v-for="contact in filteredList" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
+            <li v-for="contact in filteredList" :key="contact.id" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
                 <div class="icon">
 				    <span>{{ contact.name.charAt(0) }}{{ contact.name.charAt(contact.name.indexOf(' ') + 1) }}</span>
                 </div>
@@ -52,7 +52,6 @@ export default {
             store.getters.socket.send(JSON.stringify(data));
             store.getters.socket.onmessage = ({data}) => {
                 data = JSON.parse(data)
-                console.log('done')
                 console.log(data)
                 this.contacts = data.chats                
             };
@@ -64,8 +63,10 @@ export default {
             return this.$parent.currentChat === '' ? '' : this.$parent.currentChat; 
         },
         filteredList() {
+            if (this.contacts !== undefined)
             return this.contacts.filter(contact => {
-                return contact.name.toLowerCase().includes(this.search.toLowerCase())
+                if (contact.name !== undefined)
+                    return contact.name.toLowerCase().includes(this.search.toLowerCase())
             })
         }
     }

@@ -6,14 +6,18 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     isDark: false,
-    socket: ''
+    socket: '',
+    isChat: false
   },
   mutations: {
-    changeTheme (state) {
-      state.isDark = !state.isDark
+    changeTheme(state) {
+      state.isDark = !state.isDark;
     },
     connect: (state, connection ) => {
       state.socket = connection
+    },
+    setChat (state) {
+      state.isChat = true;
     }
   },
   actions: {
@@ -21,6 +25,7 @@ export const store = new Vuex.Store({
   },
   getters: {
     isDark: state => state.isDark,
-    connection: state => state.socket
+    connection: state => state.socket,
+    isChat: state => state.isChat
   }
 })
