@@ -1,10 +1,5 @@
-from multiprocessing import Process
-from threading import Thread
-
 import fbchat
 from fbchat.models import Message
-
-from asgiref.sync import sync_to_async, async_to_sync
 
 from core.providers.provider import BaseProvider
 from core import utils
@@ -22,7 +17,6 @@ class FacebookProvider(BaseProvider):
     def __init__(self, scope, on_message_consumer):
         self.on_message_consumer = on_message_consumer
         self.client = None
-        self.dupa = lambda: print('dupa')
 
     async def get_required_credentials(self, data):
         return self._required_credentials
@@ -43,7 +37,7 @@ class FacebookProvider(BaseProvider):
         return {'is_logged': is_logged}
 
     async def get_chats(self, data):
-        all_contacts = await sync_to_async(self.client.fetchAllUsers)()
+        all_contacts = await self.client.fetchAllUsers()
         active_contacts = [c for c in all_contacts if c.uid]
         chats = await utils.turn_provider_contacts_into_chats(
             active_contacts,
