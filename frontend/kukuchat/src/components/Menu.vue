@@ -10,6 +10,7 @@
         </a>
         <div class="col card l3 m4 s12" v-if="opened">
             <a class="settings-btn modal-trigger" href="#add-account" @click="settings()">Add account</a>
+            <a class="settings-btn modal-trigger" href="#settings" @click="settings()">Settings</a>
             <a class="settings-btn" @click="logout()">Log out</a>
         </div>
         <div class="back-btn" @click="toContacts()" v-if="currentChat != '' && width <= 600">  
@@ -23,17 +24,20 @@
             {{ currentChat.name }} 
         </a>
             <AddAccount></AddAccount>
+            <Settings></Settings>
     </div>
 </template>
 
 <script>
 import { store } from '@/store'
 import AddAccount from './AddAccount'
+import Settings from './Settings'
 
 export default {
     name: 'dropdownmenu',
     components: {
-      AddAccount  
+      AddAccount,
+      Settings
     },
     data() {
         return {
@@ -45,6 +49,8 @@ export default {
     },
     mounted() {
         $('#add-account').modal();
+        $('#settings').modal();
+
     },
     methods: {
         settings() {
@@ -52,13 +58,15 @@ export default {
             this.opened = !this.opened;
         },
         logout() {
-             let data = {
-                 action: 'logout'
-                 }
+            this.$router.push({name: 'home'})
+            let data = {
+                action: 'logout'
+                }
             store.getters.socket.send(JSON.stringify(data));
             store.getters.socket.close();
             store.getters.socket = undefined;
-            this.$router.push({name: 'home'})
+
+            
         },
         toContacts() {
             this.$parent.currentChat = '';

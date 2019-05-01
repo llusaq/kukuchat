@@ -3,27 +3,27 @@
         <div class="modal-header">
             <h4>Add {{ choosenAccount }} account </h4>
             <span class="close-form" @click="close()" v-if="choosenAccount !== ''"><i class="material-icons small left">clear</i></span>
-            <a class="modal-close" @click="close()" v-if="choosenAccount === ''"><i class="material-icons small left">clear</i></a>
+            <a class="modal-close" v-if="choosenAccount === ''"><i class="material-icons small left">clear</i></a>
         </div>
         <div class="modal-content">
             <div class="row" v-if="choosenAccount === ''">
-                <div class="col l2 m2" @click="massengerLogin()">
+                <div v-if="!messenger" class="col l2 m2" @click="massengerLogin()">
                     <img src="@/assets/messenger.png" alt="messenger">
                     <p> <b>Messenger</b> </p>
                 </div>
-                <div class="col l2 m2" @click="accountLogin('Skype')">
+                <div v-if="!skype" class="col l2 m2" @click="accountLogin('Skype')">
                     <img src="@/assets/skype.png" alt="skype">
                     <p> <b>Skype</b> </p>
                 </div>
-                <div class="col l2 m2" @click="accountLogin('Viber')">
+                <div v-if="!viber" class="col l2 m2" @click="accountLogin('Viber')">
                     <img src="@/assets/viber.png" alt="viber">
                     <p> <b>Viber</b> </p>
                 </div>
-                <div class="col l2 m2" @click="accountLogin('Gmail')">
+                <div v-if="!gmail" class="col l2 m2" @click="accountLogin('Gmail')">
                     <img src="@/assets/gmail.png" alt="gmail">
                     <p> <b>Gmail</b> </p>
                 </div>
-                <div class="col l2 m2" @click="accountLogin('Telegram')">
+                <div v-if="!telegram" class="col l2 m2" @click="accountLogin('Telegram')">
                     <img src="@/assets/telegram.png" alt="telegram">
                     <p> <b>Telegram</b> </p>
                 </div>
@@ -51,6 +51,8 @@
 
 import { store } from '@/store'
 import Preloader from './Preloader'
+import { close } from 'fs';
+import { mapState } from 'vuex';
 
 export default {
     name: 'addAccount',
@@ -70,9 +72,17 @@ export default {
             usernameHelp: '',
             passwordField: false,
             passwordHelp: '',
-            preload: false
+            preload: false,
+            messenger: false,
+            skype: false,
+            viber: false,
+            gmail: false,
+            telegram: false,
         }
     },
+    computed: mapState([
+        'isChat'
+    ]),
     methods: {
         editLogin() {
             this.validateLogin = 'valid'
@@ -85,7 +95,7 @@ export default {
             this.passwordFieldText= this.passwordFieldText === 'visibility' ? 'visibility_off' : 'visibility'
         },
         close() {
-                this.choosenAccount = ''
+            this.choosenAccount = ''
         },
         massengerLogin() {
             this.choosenAccount = 'Messenger';
@@ -118,8 +128,16 @@ export default {
                 console.log(data)
                 if (data.status === 'error') {
                     M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                    this.preload = false;
                 }
-                this.preload = false
+                if (data.status === 'ok') {
+                    console.log("suc");
+                    this.preload = false;
+                    this.close();
+                    M.toast({html: 'Messenger added', classes: 'green darken-2'})
+                    this.messenger = true;
+                    store.commit('setChat');
+                }
             };
         }
 
