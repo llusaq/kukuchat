@@ -7,8 +7,6 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.auth import login, get_user, logout
 from channels.db import database_sync_to_async
 
-from asgiref.sync import async_to_sync
-
 from core.providers import facebook
 from core.providers import skype
 from core.providers import telegram
@@ -33,6 +31,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json({
             'action': 'new_message',
             'chat_id': chat.id,
+            'provider': provider,
             'content': content,
         })
 
@@ -84,6 +83,26 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
 
         return {'msg': 'Logged in successfully'}
+
+    async def get_messages(self, data):
+        chat = await database_sync_to_async(models.Chat.objects.get)(
+            pk=data['chat_id']
+        )
+        ret = []
+        for contact in chat.contact_set.all():
+            provider = getattr(self, contact.provider)
+            msgs = await provider.get_last_messages(
+                uid=contact.uid,
+                count=data.get('count', 20)
+            )
+            ret.extend(msgs)
+        return {
+            'chat_id': chat.id,
+            'messages': [
+                {'content': m['content'], 'provider': m['provider']}
+                for m in ret
+            ]
+        }
 
     async def am_i_logged(self, data):
         user = await get_user(self.scope)

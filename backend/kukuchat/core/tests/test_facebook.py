@@ -168,8 +168,57 @@ async def test_can_receive_messages(logged_fb):
 
     chat = Contact.objects.get(chat__name='Andrii Donets')
 
-    assert resp['action'] == 'new_message'
+    resp == {
+        'action': 'new_message',
+        'content': 'hey man',
+        'chat_id': chat.id,
+        'provider': 'facebook',
+    }
     assert resp['content'] == 'hey man'
     assert resp['chat_id'] == chat.id
+
+    await logged_fb.disconnect()
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_can_get_chat_messages(logged_fb):
+    chat = Chat.objects.create(name='Tomasz Dul')
+    contact = Contact.objects.create(
+        provider='facebook',
+        uid='123',
+        chat=chat,
+    )
+
+    f = asyncio.Future()
+    f.set_result([
+        SimpleNamespace(text='hey man'),
+        SimpleNamespace(text='whats up?'),
+    ])
+    fbchat.Client.return_value.fetchThreadMessages.return_value = f
+
+    await logged_fb.send_json_to({
+        'action': 'get_messages',
+        'chat_id': chat.id,
+        'count': 50,
+    })
+
+    resp = await logged_fb.receive_json_from()
+
+    assert resp == {
+        'action': 'get_messages',
+        'chat_id': chat.id,
+        'messages': [
+            {
+                'provider': 'facebook',
+                'content': 'hey man',
+            },
+            {
+                'provider': 'facebook',
+                'content': 'whats up?',
+            },
+        ],
+        'status': 'ok',
+    }
 
     await logged_fb.disconnect()
