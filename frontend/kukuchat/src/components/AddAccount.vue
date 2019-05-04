@@ -131,7 +131,6 @@ export default {
                     this.preload = false;
                 }
                 if (data.status === 'ok') {
-                    console.log("suc");
                     this.preload = false;
                     this.close();
                     M.toast({html: 'Messenger added', classes: 'green darken-2'})

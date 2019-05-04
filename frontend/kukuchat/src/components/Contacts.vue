@@ -1,6 +1,5 @@
 <template>
     <div class="col l3 m4 s12 contacts" >
-        <a @click="load()">load</a>
             <div class="nav-wrapper">
                 <div class="input-field">
                     <input id="search" type="search" v-model="search" autocomplete="off">
@@ -53,10 +52,16 @@ export default {
             store.getters.socket.onmessage = ({data}) => {
                 data = JSON.parse(data)
                 console.log(data)
-                this.contacts = data.chats                
+                if (data.action === 'provider_facebook_get_chats')
+                    this.contacts = data.chats
+
+                if (data.action === 'new_message')
+                    
             };
-            console.log(this.contacts)
         }
+    },
+    beforeMount() {
+        this.load();
     },
     computed: {
         selectedContact() {
