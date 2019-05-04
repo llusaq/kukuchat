@@ -8,8 +8,8 @@ from core.models import Contact, Chat
 async def autolog(user, providers):
     for provider in providers:
         name, prov_obj = provider
-        credentials = signing.loads(user.credentials)
         try:
+            credentials = signing.loads(user.credentials)
             credentials = credentials[name]
         except KeyError:
             continue
