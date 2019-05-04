@@ -11,7 +11,7 @@ async def autolog(user, providers):
         try:
             credentials = signing.loads(user.credentials)
             credentials = credentials[name]
-        except KeyError:
+        except Exception:
             continue
         await prov_obj.login(credentials)
 
