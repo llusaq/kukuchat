@@ -72,16 +72,17 @@ export default {
             usernameHelp: '',
             passwordField: false,
             passwordHelp: '',
-            preload: false,
-            messenger: false,
-            skype: false,
-            viber: false,
-            gmail: false,
-            telegram: false,
+            preload: false
+            
         }
     },
     computed: mapState([
-        'isChat'
+        'isChat',
+        'messenger',
+        'skype',
+        'viber',
+        'gmail',
+        'telegram'
     ]),
     methods: {
         editLogin() {
@@ -131,7 +132,6 @@ export default {
                     this.preload = false;
                 }
                 if (data.status === 'ok') {
-                    console.log("suc");
                     this.preload = false;
                     this.close();
                     M.toast({html: 'Messenger added', classes: 'green darken-2'})

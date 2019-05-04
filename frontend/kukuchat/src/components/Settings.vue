@@ -8,10 +8,10 @@
             <div class="row" >
                 <h6>Theme</h6>
             <div class="switch">
-                <label>
+                <label >
                     Light
-                <input type="checkbox">
-                <span @click="changeTheme()" class="lever"></span>
+                <input @click="changeTheme()" type="checkbox">
+                <span class="lever"></span>
                     Dark
                 </label>
             </div>

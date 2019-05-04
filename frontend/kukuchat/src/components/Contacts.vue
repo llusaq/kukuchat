@@ -1,6 +1,5 @@
 <template>
     <div class="col l3 m4 s12 contacts" >
-        <a @click="load()">load</a>
             <div class="nav-wrapper">
                 <div class="input-field">
                     <input id="search" type="search" v-model="search" autocomplete="off">
@@ -14,7 +13,7 @@
                 </div>
                 <div class="info">
                     <span class="user"> <b>{{ contact.name }}</b> </span><br>
-				    <span class="message">last message</span>
+				    <span class="message">{{ contact.lastMsg }}</span>
                 </div>
                 <div class="clear"></div>
 		    </li>
@@ -25,6 +24,7 @@
 <script>
 
 import { store } from '@/store'
+import { constants } from 'crypto';
 
 export default {
     name: 'contacts',
@@ -32,6 +32,10 @@ export default {
         return {
             contacts: [
                 {
+                    id: '',
+                    name: '',
+                    provider: '',
+                    lastMsg: '',
                 }
             ],
             randcolor: '',
@@ -45,18 +49,41 @@ export default {
             this.clicked = name;
             this.search = '';
         },
-        load() {
+        load: async function() {
             let data = {
                 action: 'provider_facebook_get_chats',
             }
             store.getters.socket.send(JSON.stringify(data));
             store.getters.socket.onmessage = ({data}) => {
+               // store.getters.socket.onmessage = undefinied
                 data = JSON.parse(data)
                 console.log(data)
-                this.contacts = data.chats                
+                if (data.action === 'provider_facebook_get_chats') {
+                    this.contacts = data.chats
+                    for (let contact of this.contacts) {
+                        let data = {
+                            action: 'get_messages',
+                            chat_id: contact.id,
+                            count: 1
+                        }
+                        console.log(data)
+                        store.getters.socket.send(JSON.stringify(data));
+                    }
+                }
+
+                if (data.action === 'get_messages' && data.status === 'ok') {
+                    this.contacts[data.chat_id - 1].provider = data.messages[0].provider
+                    this.contacts[data.chat_id - 1].lastMsg = data.messages[0].content
+                    this.contacts = Array.from(this.contacts);
+                }
             };
-            console.log(this.contacts)
         }
+    },
+    beforeMount() {
+        this.load();
+    },
+    mounted() {
+        console.log(this.messages)
     },
     computed: {
         selectedContact() {
