@@ -107,8 +107,6 @@ async def logged_skype(db, client, monkeypatch):
 
     await comm.receive_json_from()
 
-    #monkeypatch.setattr(skpy, 'Client', MagicMock())
-
     await comm.send_json_to({
         'action': 'provider_skype_login',
         'username': '579631148',

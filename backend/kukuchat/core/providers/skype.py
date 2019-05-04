@@ -4,9 +4,7 @@ import tempfile
 from channels.auth import get_user
 from threading import Thread
 
-
-from skpy import Skype
-from skpy import SkypeAuthException
+import skpy
 
 from asgiref.sync import sync_to_async, async_to_sync
 
@@ -24,7 +22,7 @@ class SkypeProvider(BaseProvider):
     }
 
     def __init__(self, scope, on_message_consumer):
-        self.sk = Skype(connect=False)
+        self.sk = skpy.Skype(connect=False)
         self.scope = scope
         self.on_message_consumer = on_message_consumer
 
@@ -37,13 +35,16 @@ class SkypeProvider(BaseProvider):
 
         user_self = await get_user(self.scope)
         temp = tempfile.gettempdir() / Path(user_self.temp_dir)
-        self.sk.conn.setTokenFile(temp / "token-skype-app")
+        self._token_path = str(temp / 'token-skype-app')
+        self.sk.conn.setTokenFile(self._token_path)
+
         try:
             self.sk.conn.readToken()
         except SkypeAuthException:
             self.sk.conn.setUserPwd(username, password)
             self.sk.conn.getSkypeToken()
-
+            self.sk.conn.writeToken()
+        self._start_listening()
         return {'msg': 'Successfully logged into Skype'}
 
     async def am_i_logged(self, data):
@@ -56,7 +57,7 @@ class SkypeProvider(BaseProvider):
         chats = await utils.turn_provider_contacts_into_chats(
             active_contacts,
             lambda c: c.id,
-            lambda c: c.name.first + c.name.last,
+            lambda c: f'{c.name.first} {c.name.last}',
             'skype'
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
@@ -64,19 +65,31 @@ class SkypeProvider(BaseProvider):
     async def post_login_action(self, data):
         pass
 
-    def on_message(self, *args, **kwargs):
+    async def send_message(self, uid, content):
+        ch = self.sk.contacts[uid].chat
+        ch.sendMsg(content)
+        return {'provider': 'skype'}
+
+    async def get_last_messages(self, uid, count):
+        msgs = await self.sk.chats[uid].getMsg()
+        msgs = [{'provider': 'skype', 'content': m.text} for m in msgs]
+        return msgs
+
+    def _on_event(self, event):
+        user = self.sk.contacts[event.msg.userId]
+        name = f'{user.name.first} {user.name.last}'
         t = Thread(
             target=async_to_sync(self.on_message_consumer),
             kwargs={
                 'provider': 'skype',
-                'author_uid': kwargs['author_id'],
-                'content': kwargs['message_object'].text,
-                'author_name': kwargs['name'],
+                'author_uid': event.msg.userId,
+                'content': event.msg.content,
+                'author_name': name,
             }
         )
-        t.start()
+        t.start()        
 
-    async def send_message(self, id, content):
-        ch = self.sk.chats[id]
-        await sync_to_async(ch.sendMsg)(content)
-        return {'provider': 'skype'}
+    def _start_listening(self):
+        loop = skpy.SkypeEventLoop(tokenFile=self._token_path, autoAck=True)
+        loop.onEvent = self._on_event
+        loop.loop()
