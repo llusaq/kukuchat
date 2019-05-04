@@ -42,9 +42,6 @@ export default {
 
     created: function () {
         window.addEventListener('keyup', this.onkey)
-        //  let ref = baza.collection('messages').orderBy('timestamp');
-
-        //  ref.onSnapshot(snapshot)
     },
     beforeDestroy: function () {
         window.removeEventListener('keyup', this.onkey)
@@ -57,12 +54,12 @@ export default {
     }
     },
     beforeMount() {
-        /*if (store.getters.socket === undefined) {
+        if (store.getters.socket === undefined) {
             this.$router.push({name: 'home'})
-        }*/
-    }
+            }
+        }
+    } 
     
-}
 </script>
 
 <style scoped>
