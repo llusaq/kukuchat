@@ -35,7 +35,9 @@ async def test_can_log_in(comm):
         'password': '12qwertyU',
     })
 
-    fbchat.Client.return_value.isLoggedIn.return_value = True
+    f = asyncio.Future()
+    f.set_result(True)
+    fbchat.Client.return_value.isLoggedIn.return_value = f
 
     start_mock = fbchat.Client.return_value.start
 
@@ -184,7 +186,7 @@ async def test_can_receive_messages(logged_fb):
 @pytest.mark.django_db(transaction=True)
 async def test_can_get_chat_messages(logged_fb):
     chat = Chat.objects.create(name='Tomasz Dul')
-    contact = Contact.objects.create(
+    Contact.objects.create(
         provider='facebook',
         uid='123',
         chat=chat,
@@ -192,10 +194,11 @@ async def test_can_get_chat_messages(logged_fb):
 
     f = asyncio.Future()
     f.set_result([
-        SimpleNamespace(text='hey man'),
-        SimpleNamespace(text='whats up?'),
+        SimpleNamespace(text='hey man', author='123'),
+        SimpleNamespace(text='whats up?', author='me'),
     ])
     fbchat.Client.return_value.fetchThreadMessages.return_value = f
+    fbchat.Client.return_value.uid = 'me'
 
     await logged_fb.send_json_to({
         'action': 'get_messages',
@@ -212,10 +215,12 @@ async def test_can_get_chat_messages(logged_fb):
             {
                 'provider': 'facebook',
                 'content': 'hey man',
+                'me': False,
             },
             {
                 'provider': 'facebook',
                 'content': 'whats up?',
+                'me': True,
             },
         ],
         'status': 'ok',
