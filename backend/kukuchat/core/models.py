@@ -7,7 +7,7 @@ from jsonfield import JSONField
 
 
 def get_random_seq():
-    return secrets.token_hex(60)
+    return secrets.token_hex(20)
 
 
 class User(AbstractUser):
