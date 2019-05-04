@@ -7,7 +7,12 @@ export const store = new Vuex.Store({
   state: {
     isDark: false,
     socket: '',
-    isChat: false
+    isChat: false,
+    messenger: false,
+    skype: false,
+    viber: false,
+    gmail: false,
+    telegram: false,
   },
   mutations: {
     changeTheme(state) {
@@ -18,7 +23,11 @@ export const store = new Vuex.Store({
     },
     setChat (state) {
       state.isChat = true;
+    },
+    setMessenger (state) {
+      state.messenger = true;
     }
+
   },
   actions: {
 

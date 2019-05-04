@@ -18,6 +18,7 @@ import Menu from '@/components/Menu.vue'
 import Conversation from '@/components/Conversation.vue'
 import { store } from '@/store'
 import { mapState } from 'vuex';
+
 export default {
     name: 'chat',
 
@@ -47,19 +48,34 @@ export default {
         window.removeEventListener('keyup', this.onkey)
     },
     methods: {
-    onkey(event) {
-        if (event.keyCode == 27) {
-            this.currentChat = '';
+        onkey(event) {
+            if (event.keyCode == 27) {
+                this.currentChat = '';
+            }
         }
-    }
     },
     beforeMount() {
         if (store.getters.socket === undefined) {
             this.$router.push({name: 'home'})
             }
+        store.getters.socket.onmessage = ({data}) => {
+            data = JSON.parse(data)
+
+            if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
+                store.commit('setMessenger');
+                store.commit('setChat');
+            }
+
+            console.log(data)
         }
+        let data = {
+            action: 'provider_facebook_am_i_logged'
+        }
+        store.getters.socket.send(JSON.stringify(data));
+        }
+        
     } 
-    
+
 </script>
 
 <style scoped>

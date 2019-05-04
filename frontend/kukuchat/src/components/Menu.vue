@@ -51,16 +51,9 @@ export default {
     mounted() {
         $('#add-account').modal();
         $('#settings').modal();
-        /*let data = {
-            action: 'provider_facebook_am_i_logged'
-        }
-        store.getters.socket.send(JSON.stringify(data));*/
     },
     beforeMount() {
-       /* store.getters.socket.onmessage = ({data}) => {
-                data = JSON.parse(data)
-                console.log(data)
-            };*/
+        
     },
     methods: {
         settings() {
