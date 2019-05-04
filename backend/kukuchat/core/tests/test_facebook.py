@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 from channels.db import database_sync_to_async
 
+from fbchat import ThreadType
 import pytest
 
 from core.tests.fixtures import *
@@ -162,8 +163,12 @@ async def test_can_receive_messages(logged_fb):
     fbchat.Client.return_value.fetchUserInfo.return_value = f
 
     await fbchat.Client.return_value.onMessage(
-        message_object=SimpleNamespace(text='hey man'),
+        message_object=SimpleNamespace(
+            text='hey man',
+            timestamp='1556834306289',
+        ),
         author_id='123',
+        thread_type=ThreadType.USER,
     )
 
     resp = await logged_fb.receive_json_from()
@@ -194,8 +199,16 @@ async def test_can_get_chat_messages(logged_fb):
 
     f = asyncio.Future()
     f.set_result([
-        SimpleNamespace(text='hey man', author='123'),
-        SimpleNamespace(text='whats up?', author='me'),
+        SimpleNamespace(
+            text='hey man',
+            author='123',
+            timestamp='1556834306289',
+        ),
+        SimpleNamespace(
+            text='whats up?',
+            author='me',
+            timestamp='1556834206289'
+        ),
     ])
     fbchat.Client.return_value.fetchThreadMessages.return_value = f
     fbchat.Client.return_value.uid = 'me'
@@ -216,11 +229,13 @@ async def test_can_get_chat_messages(logged_fb):
                 'provider': 'facebook',
                 'content': 'hey man',
                 'me': False,
+                'time': '2019-05-02 21:58:26+00:00',
             },
             {
                 'provider': 'facebook',
                 'content': 'whats up?',
                 'me': True,
+                'time': '2019-05-02 21:56:46+00:00',
             },
         ],
         'status': 'ok',

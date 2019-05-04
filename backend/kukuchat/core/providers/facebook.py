@@ -1,3 +1,6 @@
+from datetime import datetime
+import pytz
+
 import fbchat
 from fbchat.models import Message, ThreadType
 
@@ -55,11 +58,14 @@ class FacebookProvider(BaseProvider):
             return
         aid = kwargs['author_id']
         user = (await self.client.fetchUserInfo(aid))[aid]
+        ts = kwargs['message_object'].timestamp[:-3]
+        time = datetime.utcfromtimestamp(int(ts)).replace(tzinfo=pytz.UTC)
         await self.on_message_consumer(
             provider='facebook',
             author_uid=kwargs['author_id'],
             content=kwargs['message_object'].text,
             author_name=user.name,
+            time=time,
         )
 
     async def send_message(self, uid, content):
@@ -73,6 +79,8 @@ class FacebookProvider(BaseProvider):
                 'provider': 'facebook',
                 'content': m.text,
                 'me': m.author == self.client.uid,
+                'time': datetime.utcfromtimestamp(int(m.timestamp[:-3])).
+                replace(tzinfo=pytz.UTC),
             }
             for m in msgs
         ]

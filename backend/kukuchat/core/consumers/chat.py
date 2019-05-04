@@ -1,4 +1,6 @@
+from datetime import datetime as dt
 import pathlib
+import pytz
 import tempfile
 
 from django.contrib.auth import authenticate
@@ -26,13 +28,16 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         pass
 
-    async def on_message_consumer(self, provider, author_uid, author_name, content):
+    async def on_message_consumer(self, provider, author_uid, author_name, content, time=None):
+        if not time:
+            time = dt.utcnow().replace(tzinfo=pytz.UTC)
         chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name)
         await self.send_json({
             'action': 'new_message',
             'chat_id': chat.id,
             'provider': provider,
             'content': content,
+            'time': str(time),
         })
 
     async def receive_json(self, data):
@@ -53,7 +58,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 method = getattr(self, action)
                 resp = await method(data)
         except Exception as e:
-            await self.send_json({
+            return await self.send_json({
                 'action': action,
                 'status': 'error',
                 'msg': str(e),
@@ -103,6 +108,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     'content': m['content'],
                     'provider': m['provider'],
                     'me': m['me'],
+                    'time': str(m['time']),
                 }
                 for m in ret
             ]
