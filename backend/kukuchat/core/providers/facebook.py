@@ -72,6 +72,7 @@ class FacebookProvider(BaseProvider):
             {
                 'provider': 'facebook',
                 'content': m.text,
+                'me': m.author == self.client.uid,
             }
             for m in msgs
         ]

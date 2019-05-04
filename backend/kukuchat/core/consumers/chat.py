@@ -86,7 +86,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def get_messages(self, data):
         chat = await database_sync_to_async(models.Chat.objects.get)(
-            pk=data['chat_id']
+            pk=data['chat_id'],
         )
         ret = []
         for contact in chat.contact_set.all():
@@ -99,7 +99,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return {
             'chat_id': chat.id,
             'messages': [
-                {'content': m['content'], 'provider': m['provider']}
+                {
+                    'content': m['content'],
+                    'provider': m['provider'],
+                    'me': m['me'],
+                }
                 for m in ret
             ]
         }
