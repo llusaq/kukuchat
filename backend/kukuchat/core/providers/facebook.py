@@ -33,7 +33,7 @@ class FacebookProvider(BaseProvider):
         return {'msg': 'Successfuly logged into Facebook'}
 
     async def am_i_logged(self, data):
-        is_logged = self.client is not None and self.client.isLoggedIn()
+        is_logged = self.client is not None and await self.client.isLoggedIn()
         return {'is_logged': is_logged}
 
     async def get_chats(self, data):
