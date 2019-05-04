@@ -1,5 +1,5 @@
 import fbchat
-from fbchat.models import Message
+from fbchat.models import Message, ThreadType
 
 from core.providers.provider import BaseProvider
 from core import utils
@@ -51,6 +51,8 @@ class FacebookProvider(BaseProvider):
         pass
 
     async def on_message(self, *args, **kwargs):
+        if kwargs['thread_type'] != ThreadType.USER:
+            return
         aid = kwargs['author_id']
         user = (await self.client.fetchUserInfo(aid))[aid]
         await self.on_message_consumer(
@@ -66,5 +68,11 @@ class FacebookProvider(BaseProvider):
 
     async def get_last_messages(self, uid, count):
         msgs = await self.client.fetchThreadMessages(uid, limit=count)
-        msgs = [{'provider': 'facebook', 'content': m.text} for m in msgs]
+        msgs = [
+            {
+                'provider': 'facebook',
+                'content': m.text,
+            }
+            for m in msgs
+        ]
         return msgs
