@@ -55,7 +55,7 @@ export default {
                 if (data.action === 'provider_facebook_get_chats')
                     this.contacts = data.chats
 
-                if (data.action === 'new_message')
+                //if (data.action === 'new_message')
                     
             };
         }

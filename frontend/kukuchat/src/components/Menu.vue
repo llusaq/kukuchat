@@ -12,6 +12,7 @@
             <a class="settings-btn modal-trigger" href="#add-account" @click="settings()">Add account</a>
             <a class="settings-btn modal-trigger" href="#settings" @click="settings()">Settings</a>
             <a class="settings-btn" @click="logout()">Log out</a>
+            <a class="settings-btn" @click="logout()">Am I logged</a>
         </div>
         <div class="back-btn" @click="toContacts()" v-if="currentChat != '' && width <= 600">  
             <i class="material-icons">arrow_back</i>
@@ -70,6 +71,12 @@ export default {
         },
         toContacts() {
             this.$parent.currentChat = '';
+        },
+        checkLogin() {
+            let data = {
+                        action: 'am_i_logged'
+                    }
+                    store.getters.socket.send(JSON.stringify(data));
         }
     },
     props: ['currentChat'],

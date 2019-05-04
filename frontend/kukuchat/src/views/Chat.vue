@@ -9,7 +9,6 @@
             <h5 v-if="!isChat">Add chat service to see something</h5>
         </div>
     </div>
-
 </template>
 
 <script>
@@ -58,9 +57,9 @@ export default {
     }
     },
     beforeMount() {
-        if (store.getters.socket === undefined) {
+        /*if (store.getters.socket === undefined) {
             this.$router.push({name: 'home'})
-        }
+        }*/
     }
     
 }
