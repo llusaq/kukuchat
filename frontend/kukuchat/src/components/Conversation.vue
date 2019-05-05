@@ -170,7 +170,19 @@
                     </form>
                 </div>
 
+
                 <div class="sendbtnarea">
+
+                    <div class="w3-dropdown-hover">
+                        <button class="w3-button">Hover Over Me!</button>
+                        <div class="w3-dropdown-content w3-bar-block w3-border">
+                            <a href="#" class="w3-bar-item w3-button">Link 1</a>
+                            <a href="#" class="w3-bar-item w3-button">Link 2</a>
+                            <a href="#" class="w3-bar-item w3-button">Link 3</a>
+                        </div>
+                    </div>
+
+
                     <button @click="send()" class="btn waves-effect waves-light blue" type="submit" name="action">SEND
                         <i class="material-icons right">send</i>
                     </button>
@@ -186,7 +198,14 @@
 </template>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('.dropdown-trigger');
+        var instances = M.Dropdown.init(elems, options);
+    });
+
     export default {
+
+
         name: 'conversation',
 
 
@@ -212,6 +231,7 @@
         },
 
         methods: {
+
 
             send() {
                 var today = new Date();
@@ -242,6 +262,26 @@
 </script>
 
 <style scoped>
+
+
+    .dropdown {
+
+
+        float: left;
+        margin-bottom: 5px;
+    }
+
+    .dropbtn:hover, .dropbtn:focus {
+        background-color: #2980B9;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
     .col {
         height: 100%;
     }
