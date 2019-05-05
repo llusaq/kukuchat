@@ -110,6 +110,7 @@ export default {
             store.getters.socket.send(JSON.stringify(data));
             store.getters.socket.onmessage = ({data}) => {
                 data = JSON.parse(data)
+                console.log(data)
                 if (data.password) {
                     this.passwordField = true;
                     this.passwordHelp = data.password.help;
@@ -142,7 +143,7 @@ export default {
             };
         },
         login(choosenAccount) {
-            if (choosenAccount == 'Messenger') {
+            if (choosenAccount === 'Messenger') {
                 this.preload = true
                 let data = {
                     action: 'provider_facebook_login',
@@ -166,7 +167,7 @@ export default {
                     }
                 };
             }
-            if (choosenAccount == 'Skype') {
+            if (choosenAccount === 'Skype') {
 
                 this.preload = true
                 let data = {
