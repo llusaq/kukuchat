@@ -23,4 +23,7 @@ yarn-error.log*
 *.sw*
 db.sqlite3
 
+#token&cache
 .token-skype-app
+.pytest_cache
+telegram_session.session
