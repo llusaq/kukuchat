@@ -4,6 +4,8 @@ import pytz
 import fbchat
 from fbchat.models import Message, ThreadType
 
+from channels.auth import get_user
+
 from core.providers.provider import BaseProvider
 from core import utils
 
@@ -19,6 +21,7 @@ class FacebookProvider(BaseProvider):
 
     def __init__(self, scope, on_message_consumer):
         self.on_message_consumer = on_message_consumer
+        self.scope = scope
         self.client = None
 
     async def get_required_credentials(self, data):
@@ -28,9 +31,15 @@ class FacebookProvider(BaseProvider):
         username = data['username']
         password = data['password']
 
-        self.client = fbchat.Client()
+        self.client = fbchat.Client(
+            user_agent=(
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3)'
+                'AppleWebKit/601.1.10 (KHTML, like Gecko    )'
+                'Version/8.0.5 Safari/601.1.10'
+            )
+        )
         await self.client.start(username, password)
-        self.client.onMessage = self.on_message
+        self.client.onMessage = self._on_message
         self.client.listen(markAlive=True)
 
         return {'msg': 'Successfuly logged into Facebook'}
@@ -47,13 +56,14 @@ class FacebookProvider(BaseProvider):
             lambda c: c.uid,
             lambda c: c.name,
             'facebook',
+            user=await get_user(self.scope),
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
 
     async def post_login_action(self, data):
         pass
 
-    async def on_message(self, *args, **kwargs):
+    async def _on_message(self, *args, **kwargs):
         if kwargs['thread_type'] != ThreadType.USER:
             return
         aid = kwargs['author_id']
