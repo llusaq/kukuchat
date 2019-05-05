@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 from channels.db import database_sync_to_async
+from channels.auth import get_user
 
 from fbchat import ThreadType
 import pytest
@@ -123,7 +124,8 @@ async def test_can_send_messages(logged_fb):
     dariusz = await database_sync_to_async(Contact.objects.create)(
         provider='facebook',
         uid=dariusz_uid,
-        chat=await database_sync_to_async(Chat.objects.create)(name='Dariusz')
+        chat=await database_sync_to_async(Chat.objects.create)(name='Dariusz'),
+        owner=await get_user(logged_fb.instance.scope),
     )
 
     await logged_fb.send_json_to({
@@ -195,6 +197,7 @@ async def test_can_get_chat_messages(logged_fb):
         provider='facebook',
         uid='123',
         chat=chat,
+        owner=await get_user(logged_fb.instance.scope),
     )
 
     f = asyncio.Future()
