@@ -19,13 +19,27 @@ from core.tests.fixtures import *
 from core.models import Chat, Contact
 
 class SkypeContactsMock:
+    def getMsg(self):
+        return [
+            SimpleNamespace(
+                content='hey man',
+                userId='123',
+                timestamp='1556834306289',
+            ),
+            SimpleNamespace(
+                content='whats up?',
+                userId='me',
+                timestamp='1556834206289',
+            ),
+        ]
+
     contacts = [
          SimpleNamespace(
             id='123',
             name=SimpleNamespace(
                 first='Tomasz',
                 last='jD',
-            )
+            ),
         )
     ]
 
@@ -39,6 +53,7 @@ class SkypeContactsMock:
     def __getitem__(self, idx):
         for c in self.contacts:
             if c.id == idx:
+                c.getMsg = self.getMsg
                 return c
 
 @pytest.fixture(autouse=True)
@@ -171,7 +186,8 @@ async def test_can_send_messages(logged_skype):
     andrzej = await database_sync_to_async(Contact.objects.create)(
         provider = 'skype',
         uid = andrzej_uid,
-        chat = await database_sync_to_async(Chat.objects.create)(name='Andrzej')
+        chat = await database_sync_to_async(Chat.objects.create)(name='Andrzej'),
+        owner=await get_user(logged_skype.instance.scope),
     )
     await logged_skype.send_json_to({
         'action': 'send_message',
@@ -239,23 +255,16 @@ async def test_can_get_chat_messages(logged_skype):
         provider='skype',
         uid='123',
         chat=chat,
+        owner=await get_user(logged_skype.instance.scope),
+
     )    
     
     f = asyncio.Future()
     f.set_result([
-        SimpleNamespace(
-            content='hey man',
-            userId='123',
-            timestamp='1556834306289',
-        ),
-        SimpleNamespace(
-            content='whats up?',
-            userId='me',
-            timestamp='1556834206289'
-        ),
+       
     ])
 
-    skpy.Skype.return_value.getMsg.return_value=f
+    skpy.Skype.return_value.getMsg.return_value = f
     skpy.Skype.return_value.userId = 'me'
 
     await logged_skype.send_json_to({

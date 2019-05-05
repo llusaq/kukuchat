@@ -59,7 +59,8 @@ class SkypeProvider(BaseProvider):
             active_contacts,
             lambda c: c.id,
             lambda c: f'{c.name.first} {c.name.last}',
-            'skype'
+            'skype',
+            user=await get_user(self.scope),
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
 
@@ -72,11 +73,12 @@ class SkypeProvider(BaseProvider):
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
+        breakpoint()
         msgs = self.sk.chats[uid].getMsg()
         msgs = [{
             'provider': 'skype',
-            'content': m.text,
-            'me': m.author == self.skpy.contacts.userId,
+            'content': m.content,
+            'me': m.userId == self.userId,
             'time': datetime.utcfromtimestamp(int(m.timestamp[:-3])).
                 replace(tzinfo=pytz.UTC)
                 }
