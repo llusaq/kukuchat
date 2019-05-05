@@ -1,5 +1,6 @@
 from pathlib import Path
 import tempfile
+from datetime import datetime
 
 from channels.auth import get_user
 from threading import Thread
@@ -71,8 +72,15 @@ class SkypeProvider(BaseProvider):
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
-        msgs = await self.sk.chats[uid].getMsg()
-        msgs = [{'provider': 'skype', 'content': m.text} for m in msgs]
+        msgs = self.sk.chats[uid].getMsg()
+        msgs = [{
+            'provider': 'skype',
+            'content': m.text,
+            'me': m.author == self.skpy.contacts.userId,
+            'time': datetime.utcfromtimestamp(int(m.timestamp[:-3])).
+                replace(tzinfo=pytz.UTC)
+                }
+                for m in msgs]
         return msgs
 
     def _on_event(self, event):

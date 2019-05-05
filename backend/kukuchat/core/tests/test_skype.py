@@ -230,3 +230,60 @@ async def test_can_receive_messages(logged_skype):
 
     await logged_skype.disconnect()
 
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_can_get_chat_messages(logged_skype):
+    skpy.Skype.return_value.chats = SkypeContactsMock()
+    chat = Chat.objects.create(name='Tomasz Dul')
+    Contact.objects.create(
+        provider='skype',
+        uid='123',
+        chat=chat,
+    )    
+    
+    f = asyncio.Future()
+    f.set_result([
+        SimpleNamespace(
+            content='hey man',
+            userId='123',
+            timestamp='1556834306289',
+        ),
+        SimpleNamespace(
+            content='whats up?',
+            userId='me',
+            timestamp='1556834206289'
+        ),
+    ])
+
+    skpy.Skype.return_value.getMsg.return_value=f
+    skpy.Skype.return_value.userId = 'me'
+
+    await logged_skype.send_json_to({
+        'action': 'get_messages',
+        'chat_id': chat.id,
+    })
+
+    resp = await logged_skype.receive_json_from()
+
+    assert resp == {
+        'action': 'get_messages',
+        'chat_id': chat.id,
+        'messages': [
+            {
+                'provider': 'skype',
+                'content': 'whats up',
+                'me': False,
+                'time': '2019-05-05 21:58:26+00:00',
+            },
+            {
+                'provider': 'skype',
+                'content': 'I am fine',
+                'me': True,
+                'time': '2019-05-05 21:58:26+00:00',
+            },
+        ],
+        'status':'ok'
+    }
+    breakpoint()
+
+    await logged_skype.disconnect()

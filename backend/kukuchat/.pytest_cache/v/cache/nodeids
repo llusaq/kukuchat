@@ -1,0 +1,9 @@
+[
+  "core/tests/test_skype.py::test_can_log_to",
+  "core/tests/test_skype.py::test_required_cred",
+  "core/tests/test_skype.py::test_can_list_chats",
+  "core/tests/test_skype.py::test_store_creds",
+  "core/tests/test_skype.py::test_can_send_messages",
+  "core/tests/test_skype.py::test_can_receive_messages",
+  "core/tests/test_skype.py::test_can_get_chat_messages"
+]
