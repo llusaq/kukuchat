@@ -31,7 +31,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def on_message_consumer(self, provider, author_uid, author_name, content, time=None):
         if not time:
             time = dt.utcnow().replace(tzinfo=pytz.UTC)
-        chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name)
+        chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name, await get_user(self.scope))
         await self.send_json({
             'action': 'new_message',
             'chat_id': chat.id,

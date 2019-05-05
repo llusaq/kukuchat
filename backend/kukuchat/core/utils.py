@@ -24,11 +24,12 @@ async def store_creds(user, prov_inst, data):
     user.save()
 
 
-async def get_chat_for_provider_contact(prov_name, uid, name):
+async def get_chat_for_provider_contact(prov_name, uid, name, user):
     try:
         contact = await database_sync_to_async(Contact.objects.get)(
             provider=prov_name,
             uid=uid,
+            owner=user,
         )
     except Contact.DoesNotExist:
         chat = await database_sync_to_async(Chat.objects.create)(
@@ -38,13 +39,14 @@ async def get_chat_for_provider_contact(prov_name, uid, name):
             provider=prov_name,
             uid=uid,
             chat=chat,
+            owner=user,
         )
     else:
         chat = contact.chat
     return chat
 
 
-async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_name):
+async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_name, user):
     ret = []
     for c in contact:
         uid = uid_func(c)
@@ -55,6 +57,7 @@ async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_n
                 contact = Contact.objects.get(
                     provider=prov_name,
                     uid=uid,
+                    owner=user,
                 )
             except Contact.DoesNotExist:
                 chat = Chat.objects.create(
@@ -64,6 +67,7 @@ async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_n
                     provider=prov_name,
                     uid=uid,
                     chat=chat,
+                    owner=user,
                 )
             else:
                 chat = contact.chat
