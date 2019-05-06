@@ -29,9 +29,9 @@
                 </div>
             </div>
             <div class="row" v-if="choosenAccount !== ''">
-                 <div class="input-field col s12" v-if="usernameField">
-                        <label for="login">{{ usernameHelp }}</label>
-                        <input type="text" v-model="username" @keyup.enter="login()" @keyup="editLogin()" :class="validateLogin" name="login" id="login"/>
+                <div class="input-field col s12" v-if="usernameField">
+                    <label for="login">{{ usernameHelp }}</label>
+                    <input type="text" v-model="username" @keyup.enter="login()" @keyup="editLogin()" :class="validateLogin" name="login" id="login"/>
                 </div>
                 <div class="input-field col s12" v-if="passwordField">
                     <label for="password">{{ passwordHelp }} </label>
@@ -54,6 +54,7 @@ import { store } from '@/store'
 import Preloader from './Preloader'
 import { close } from 'fs';
 import { mapState } from 'vuex';
+import { constants } from 'crypto';
 
 export default {
     name: 'addAccount',
@@ -99,48 +100,19 @@ export default {
         close() {
             this.choosenAccount = ''
         },
-
-
         skypeLogin() {
             this.choosenAccount = 'Skype';
             let data = {
                 action: 'provider_skype_get_required_credentials'
             }
-
             store.getters.socket.send(JSON.stringify(data));
-            store.getters.socket.onmessage = ({data}) => {
-                data = JSON.parse(data)
-                console.log(data)
-                if (data.password) {
-                    this.passwordField = true;
-                    this.passwordHelp = data.password.help;
-                }
-                if (data.username) {
-                    this.usernameField = true;
-                    this.usernameHelp = data.username.help;
-                }
-            };
         },
-
-
-
         massengerLogin() {
             this.choosenAccount = 'Messenger';
             let data = {
                     action: 'provider_facebook_get_required_credentials'
                 }
             store.getters.socket.send(JSON.stringify(data));
-            store.getters.socket.onmessage = ({data}) => {
-                data = JSON.parse(data)
-                if (data.password) {
-                    this.passwordField = true;
-                    this.passwordHelp = data.password.help;
-                }
-                if (data.username) {
-                    this.usernameField = true;
-                    this.usernameHelp = data.username.help;
-                }
-            };
         },
         login(choosenAccount) {
             if (choosenAccount === 'Messenger') {
@@ -151,24 +123,8 @@ export default {
                     password: this.password,
                 }
                 store.getters.socket.send(JSON.stringify(data));
-                store.getters.socket.onmessage = ({data}) => {
-                    data = JSON.parse(data)
-                    console.log(data)
-                    if (data.status === 'error') {
-                        M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                        this.preload = false;
-                    }
-                    if (data.status === 'ok') {
-                        this.preload = false;
-                        this.close();
-                        M.toast({html: 'Messenger added', classes: 'green darken-2'})
-                        this.messenger = true;
-                        store.commit('setChat');
-                    }
-                };
             }
             if (choosenAccount === 'Skype') {
-
                 this.preload = true
                 let data = {
                     action: 'provider_skype_login',
@@ -176,27 +132,43 @@ export default {
                     password: this.password,
                 }
                 store.getters.socket.send(JSON.stringify(data));
-                store.getters.socket.onmessage = ({data}) => {
-                    data = JSON.parse(data)
-                    console.log(data)
-                    if (data.status === 'error') {
-                        M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                        this.preload = false;
-                    }
-                    if (data.status === 'ok') {
-                        this.preload = false;
-                        this.close();
-                        M.toast({html: 'Skype added', classes: 'green darken-2'})
-                        this.skype = true;
-                        store.commit('setChat');
-                    }
-                };
-
-
             }
         }
+    },
+    beforeMount() {
+        store.getters.socket.onmessage = ({data}) => {
+                data = JSON.parse(data)
+                console.log(data)
+                if ((data.action === 'provider_facebook_get_required_credentials' && data.password) ||
+                    (data.action === 'provider_skype_get_required_credentials' && data.password)) {
+                    this.passwordField = true;
+                    this.passwordHelp = data.password.help;
+                }
+                if ((data.action === 'provider_facebook_get_required_credentials' && data.username) ||
+                    (data.action === 'provider_skype_get_required_credentials' && data.username)) {
+                    this.usernameField = true;
+                    this.usernameHelp = data.username.help;
+                }
+                if (data.status === 'error') {
+                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                    this.preload = false;
+                }
 
-
+                if (data.action === 'provider_facebook_login' && data.status === 'ok') {
+                    this.preload = false;
+                    this.close();
+                    M.toast({html: 'Messenger added', classes: 'green darken-2'})
+                    this.messenger = true;
+                    store.commit('setChat');
+                }
+                if (data.action === 'provider_skype_login' && data.status === 'ok') {
+                    this.preload = false;
+                    this.close();
+                    M.toast({html: 'Skype added', classes: 'green darken-2'})
+                    this.skype = true;
+                    store.commit('setChat');
+                }
+            };
     }
 }
 </script>
