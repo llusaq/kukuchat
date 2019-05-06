@@ -22,12 +22,12 @@ class SkypeContactsMock:
     def getMsg(self):
         return [
             SimpleNamespace(
-                content='hey man',
+                content='whats up',
                 userId='123',
                 timestamp='1556834306289',
             ),
             SimpleNamespace(
-                content='whats up?',
+                content='I am fine',
                 userId='me',
                 timestamp='1556834206289',
             ),
@@ -265,7 +265,7 @@ async def test_can_get_chat_messages(logged_skype):
     ])
 
     skpy.Skype.return_value.getMsg.return_value = f
-    skpy.Skype.return_value.userId = 'me'
+    skpy.Skype.return_value.user.id = 'me'
 
     await logged_skype.send_json_to({
         'action': 'get_messages',
@@ -282,17 +282,16 @@ async def test_can_get_chat_messages(logged_skype):
                 'provider': 'skype',
                 'content': 'whats up',
                 'me': False,
-                'time': '2019-05-05 21:58:26+00:00',
+                'time': '2019-05-02 21:58:26+00:00',
             },
             {
                 'provider': 'skype',
                 'content': 'I am fine',
                 'me': True,
-                'time': '2019-05-05 21:58:26+00:00',
+                'time': '2019-05-02 21:56:46+00:00',
             },
         ],
         'status':'ok'
     }
-    breakpoint()
-
+    
     await logged_skype.disconnect()

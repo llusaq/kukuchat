@@ -6,6 +6,7 @@ from channels.auth import get_user
 from threading import Thread
 
 import skpy
+import pytz
 
 from asgiref.sync import sync_to_async, async_to_sync
 
@@ -18,7 +19,7 @@ class SkypeProvider(BaseProvider):
     name = 'skype'
 
     _required_credentials = {
-        'username': {'type': 'text', 'help': 'Email or phone number'},
+        'username': {'type': 'text', 'help': 'Nickname or phone number'},
         'password': {'type': 'password', 'help': 'Password'},
     }
 
@@ -73,12 +74,11 @@ class SkypeProvider(BaseProvider):
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
-        breakpoint()
         msgs = self.sk.chats[uid].getMsg()
         msgs = [{
             'provider': 'skype',
             'content': m.content,
-            'me': m.userId == self.userId,
+            'me': m.userId == self.sk.user.id,
             'time': datetime.utcfromtimestamp(int(m.timestamp[:-3])).
                 replace(tzinfo=pytz.UTC)
                 }
