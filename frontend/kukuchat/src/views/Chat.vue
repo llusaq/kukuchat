@@ -1,12 +1,13 @@
 <template>
-    <div class="wrapper" @keyup.esc="escape()">
+    <div class="wrapper">
         <Menu :current-chat="currentChat"></Menu>
         <div class="row chat">
             <Contacts v-if="currentChat == '' && width <= 600 && isChat"></Contacts>
             <Contacts v-else-if="width > 600 && isChat"></Contacts>
-            <Conversation v-if="currentChat != '' && width <= 600"></Conversation>
-            <Conversation v-else-if=" currentChat != '' && width > 600"></Conversation>
+            <Conversation :current-chat="currentChat" v-if="currentChat != '' && width <= 600"></Conversation>
+            <Conversation :current-chat="currentChat" v-else-if=" currentChat != '' && width > 600"></Conversation>
             <h5 v-if="!isChat">Add chat service to see something</h5>
+            <h5 v-if="currentChat == '' && isChat">Choose contact to start conversation</h5>
         </div>
     </div>
 </template>
@@ -33,6 +34,7 @@ export default {
     data() {
         return {
             currentChat: '',
+            currentChatId: '',
             width: window.innerWidth,
             messages: [],
         }
@@ -93,8 +95,12 @@ export default {
 }
 
 h5 {
-    display: table;
+    display: inline-block;
     margin: 200px auto 0 auto;
+}
+
+.chat {
+    text-align: center;
 }
 
 </style>
