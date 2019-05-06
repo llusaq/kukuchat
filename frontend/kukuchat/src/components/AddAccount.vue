@@ -11,19 +11,19 @@
                     <img src="@/assets/messenger.png" alt="messenger">
                     <p> <b>Messenger</b> </p>
                 </div>
-                <div v-if="!skype" class="col l2 m2" @click="accountLogin('Skype')">
+                <div v-if="!skype" class="col l2 m2" @click="skypeLogin()">
                     <img src="@/assets/skype.png" alt="skype">
                     <p> <b>Skype</b> </p>
                 </div>
-                <div v-if="!viber" class="col l2 m2" @click="accountLogin('Viber')">
+                <div v-if="!viber" class="col l2 m2">
                     <img src="@/assets/viber.png" alt="viber">
                     <p> <b>Viber</b> </p>
                 </div>
-                <div v-if="!gmail" class="col l2 m2" @click="accountLogin('Gmail')">
+                <div v-if="!gmail" class="col l2 m2">
                     <img src="@/assets/gmail.png" alt="gmail">
                     <p> <b>Gmail</b> </p>
                 </div>
-                <div v-if="!telegram" class="col l2 m2" @click="accountLogin('Telegram')">
+                <div v-if="!telegram" class="col l2 m2">
                     <img src="@/assets/telegram.png" alt="telegram">
                     <p> <b>Telegram</b> </p>
                 </div>
@@ -39,7 +39,8 @@
                     <i class="material-icons" @click="switchVisibility()">{{ passwordFieldText }}</i>
                 </div>
                 <div class="col s4 logbtn">
-                    <a @click="login()" class="btn green darken-2 waves-effect waves-light col s12">Log In </a>
+                    <a @click="login(choosenAccount)" class="btn green darken-2 waves-effect waves-light col s12">Log
+                        In </a>
                 </div>
             </div>
         </div>
@@ -57,7 +58,7 @@ import { mapState } from 'vuex';
 export default {
     name: 'addAccount',
     components: {
-      Preloader  
+        Preloader
     },
     data() {
         return {
@@ -73,7 +74,7 @@ export default {
             passwordField: false,
             passwordHelp: '',
             preload: false
-            
+
         }
     },
     computed: mapState([
@@ -98,6 +99,31 @@ export default {
         close() {
             this.choosenAccount = ''
         },
+
+
+        skypeLogin() {
+            this.choosenAccount = 'Skype';
+            let data = {
+                action: 'provider_skype_get_required_credentials'
+            }
+
+            store.getters.socket.send(JSON.stringify(data));
+            store.getters.socket.onmessage = ({data}) => {
+                data = JSON.parse(data)
+                console.log(data)
+                if (data.password) {
+                    this.passwordField = true;
+                    this.passwordHelp = data.password.help;
+                }
+                if (data.username) {
+                    this.usernameField = true;
+                    this.usernameHelp = data.username.help;
+                }
+            };
+        },
+
+
+
         massengerLogin() {
             this.choosenAccount = 'Messenger';
             let data = {
@@ -116,30 +142,60 @@ export default {
                 }
             };
         },
-        login() {
-            this.preload = true
-            let data = {
-                action: 'provider_facebook_login',
-                username: this.username,
-                password: this.password,
+        login(choosenAccount) {
+            if (choosenAccount === 'Messenger') {
+                this.preload = true
+                let data = {
+                    action: 'provider_facebook_login',
+                    username: this.username,
+                    password: this.password,
+                }
+                store.getters.socket.send(JSON.stringify(data));
+                store.getters.socket.onmessage = ({data}) => {
+                    data = JSON.parse(data)
+                    console.log(data)
+                    if (data.status === 'error') {
+                        M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                        this.preload = false;
+                    }
+                    if (data.status === 'ok') {
+                        this.preload = false;
+                        this.close();
+                        M.toast({html: 'Messenger added', classes: 'green darken-2'})
+                        this.messenger = true;
+                        store.commit('setChat');
+                    }
+                };
             }
-            store.getters.socket.send(JSON.stringify(data));
-            store.getters.socket.onmessage = ({data}) => {
-                data = JSON.parse(data)
-                console.log(data)
-                if (data.status === 'error') {
-                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                    this.preload = false;
+            if (choosenAccount === 'Skype') {
+
+                this.preload = true
+                let data = {
+                    action: 'provider_skype_login',
+                    username: this.username,
+                    password: this.password,
                 }
-                if (data.status === 'ok') {
-                    this.preload = false;
-                    this.close();
-                    M.toast({html: 'Messenger added', classes: 'green darken-2'})
-                    this.messenger = true;
-                    store.commit('setChat');
-                }
-            };
+                store.getters.socket.send(JSON.stringify(data));
+                store.getters.socket.onmessage = ({data}) => {
+                    data = JSON.parse(data)
+                    console.log(data)
+                    if (data.status === 'error') {
+                        M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                        this.preload = false;
+                    }
+                    if (data.status === 'ok') {
+                        this.preload = false;
+                        this.close();
+                        M.toast({html: 'Skype added', classes: 'green darken-2'})
+                        this.skype = true;
+                        store.commit('setChat');
+                    }
+                };
+
+
+            }
         }
+
 
     }
 }

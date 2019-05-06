@@ -20,6 +20,7 @@ class Chat(models.Model):
 
 
 class Contact(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     provider = models.CharField(max_length=255)
     uid = models.CharField(max_length=255)
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
