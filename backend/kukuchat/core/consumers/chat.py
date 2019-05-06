@@ -4,6 +4,7 @@ import pytz
 import tempfile
 
 from django.contrib.auth import authenticate
+from django.db.models import Case, When
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.auth import login, get_user, logout
@@ -27,6 +28,24 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, code):
         pass
+
+    async def merge_chats(self, data):
+        ids = data['chat_ids']
+        to_delete = ids[1:]
+        order = Case(*[When(id=pk, then=i) for i, pk in enumerate(ids)])
+        user = await get_user(self.scope)
+        chats = models.Chat.objects.filter(id__in=ids).order_by(order)
+        for c in chats:
+            for owner in (con.owner for con in c.contact_set.all()):
+                if not owner == user:
+                    raise Exception('You dont own some of contacts')
+        first, *rest = chats
+        for c in chats:
+            for con in c.contact_set.all():
+                con.chat = first
+                await database_sync_to_async(con.save)()
+        models.Chat.objects.filter(pk__in=to_delete).delete()
+        return {'from_ids': ids, 'chat_id': first.id, 'chat_name': first.name}
 
     async def on_message_consumer(self, provider, author_uid, author_name, content, time=None):
         if not time:

@@ -48,6 +48,9 @@ class FacebookProvider(BaseProvider):
         is_logged = self.client is not None and await self.client.isLoggedIn()
         return {'is_logged': is_logged}
 
+    async def post_login_action(self, data):
+        pass
+
     async def get_chats(self, data):
         all_contacts = await self.client.fetchAllUsers()
         active_contacts = [c for c in all_contacts if c.uid]
@@ -59,9 +62,6 @@ class FacebookProvider(BaseProvider):
             user=await get_user(self.scope),
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
-
-    async def post_login_action(self, data):
-        pass
 
     async def _on_message(self, *args, **kwargs):
         if kwargs['thread_type'] != ThreadType.USER:
