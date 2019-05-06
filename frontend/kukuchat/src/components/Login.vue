@@ -92,7 +92,7 @@ export default {
                         console.log(data);
                         if (data.is_logged) {
                             this.$router.push({name: 'chat'})
-                        } 
+                        }
                         if (data.action === 'login' && data.status === 'error') {
                             M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
                         }

@@ -49,15 +49,13 @@ export default {
             this.clicked = name;
             this.search = '';
         },
-        load: async function() {
+        load() {
             let data = {
                 action: 'provider_facebook_get_chats',
             }
             store.getters.socket.send(JSON.stringify(data));
             store.getters.socket.onmessage = ({data}) => {
-               // store.getters.socket.onmessage = undefinied
                 data = JSON.parse(data)
-                console.log(data)
                 if (data.action === 'provider_facebook_get_chats') {
                     this.contacts = data.chats
                     for (let contact of this.contacts) {
@@ -66,7 +64,6 @@ export default {
                             chat_id: contact.id,
                             count: 1
                         }
-                        console.log(data)
                         store.getters.socket.send(JSON.stringify(data));
                     }
                 }
@@ -81,9 +78,6 @@ export default {
     },
     beforeMount() {
         this.load();
-    },
-    mounted() {
-        console.log(this.messages)
     },
     computed: {
         selectedContact() {
@@ -106,6 +100,7 @@ export default {
     float: left;
     padding: 0;
     background-color: #f5f5f5;
+    text-align: left;
 }
 
 .contacts {
