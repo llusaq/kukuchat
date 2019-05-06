@@ -26,6 +26,9 @@ export const store = new Vuex.Store({
     },
     setMessenger (state) {
       state.messenger = true;
+    },
+    setSkype(state) {
+      state.skype = true;
     }
 
   },

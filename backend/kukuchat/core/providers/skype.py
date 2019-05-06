@@ -1,10 +1,12 @@
 from pathlib import Path
 import tempfile
+from datetime import datetime
 
 from channels.auth import get_user
 from threading import Thread
 
 import skpy
+import pytz
 
 from asgiref.sync import sync_to_async, async_to_sync
 
@@ -58,7 +60,8 @@ class SkypeProvider(BaseProvider):
             active_contacts,
             lambda c: c.id,
             lambda c: f'{c.name.first} {c.name.last}',
-            'skype'
+            'skype',
+            user=await get_user(self.scope),
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
 
@@ -71,8 +74,15 @@ class SkypeProvider(BaseProvider):
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
-        msgs = await self.sk.chats[uid].getMsg()
-        msgs = [{'provider': 'skype', 'content': m.text} for m in msgs]
+        msgs = self.sk.chats[uid].getMsg()
+        msgs = [{
+            'provider': 'skype',
+            'content': m.content,
+            'me': m.userId == self.sk.user.id,
+            'time': datetime.utcfromtimestamp(int(m.timestamp[:-3])).
+                replace(tzinfo=pytz.UTC)
+                }
+                for m in msgs]
         return msgs
 
     def _on_event(self, event):
