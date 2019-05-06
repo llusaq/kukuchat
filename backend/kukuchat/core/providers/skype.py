@@ -19,7 +19,7 @@ class SkypeProvider(BaseProvider):
     name = 'skype'
 
     _required_credentials = {
-        'username': {'type': 'text', 'help': 'Email or phone number'},
+        'username': {'type': 'text', 'help': 'Nickname or phone number'},
         'password': {'type': 'password', 'help': 'Password'},
     }
 
