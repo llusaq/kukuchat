@@ -31,13 +31,7 @@ class FacebookProvider(BaseProvider):
         username = data['username']
         password = data['password']
 
-        self.client = fbchat.Client(
-            user_agent=(
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3)'
-                'AppleWebKit/601.1.10 (KHTML, like Gecko    )'
-                'Version/8.0.5 Safari/601.1.10'
-            )
-        )
+        self.client = fbchat.Client()
         await self.client.start(username, password)
         self.client.onMessage = self._on_message
         self.client.listen(markAlive=True)
