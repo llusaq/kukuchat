@@ -167,7 +167,7 @@ async def test_can_receive_messages(logged_fb):
     await fbchat.Client.return_value.onMessage(
         message_object=SimpleNamespace(
             text='hey man',
-            timestamp='1556834306289',
+            timestamp=1556834306289,
         ),
         author_id='123',
         thread_type=ThreadType.USER,
