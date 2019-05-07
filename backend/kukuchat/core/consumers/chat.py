@@ -109,7 +109,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return {'msg': 'Logged in successfully'}
 
     async def get_messages(self, data):
-        chat = await database_sync_to_async(models.Chat.objects.get)(
+        chats = await database_sync_to_async(models.Chat.objects.prefetch_related)('contact_set')
+        chat = await database_sync_to_async(chats.get)(
             pk=data['chat_id'],
         )
         ret = []
