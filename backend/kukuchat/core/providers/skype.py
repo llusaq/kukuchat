@@ -28,6 +28,7 @@ class SkypeProvider(BaseProvider):
     def __init__(self, scope, on_message_consumer):
         self.sk = skpy.Skype(connect=False)
         self.scope = scope
+        self.user = None
         self.on_message_consumer = on_message_consumer
 
     async def get_required_credentials(self, data):
@@ -37,8 +38,9 @@ class SkypeProvider(BaseProvider):
         username = data['username']
         password = data['password']
 
-        user_self = await get_user(self.scope)
-        temp = tempfile.gettempdir() / Path(user_self.temp_dir)
+        self.user = await get_user(self.scope)
+
+        temp = tempfile.gettempdir() / Path(self.user.temp_dir)
         self._token_path = str(temp / 'token-skype-app')
         self.sk.conn.setTokenFile(self._token_path)
 
@@ -63,7 +65,7 @@ class SkypeProvider(BaseProvider):
             lambda c: c.id,
             lambda c: f'{c.name.first} {c.name.last}',
             'skype',
-            user=await get_user(self.scope),
+            user=self.user,
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
 
@@ -99,10 +101,10 @@ class SkypeProvider(BaseProvider):
                 'author_uid': event.msg.userId,
                 'content': event.msg.content,
                 'author_name': name,
+                'user': self.user,
             }
         )
-        t.start()      
-        
+        t.start()
 
     def _start_listening(self):
         loop = skpy.SkypeEventLoop(tokenFile=self._token_path, autoAck=True)
