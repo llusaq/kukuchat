@@ -218,7 +218,7 @@ async def test_can_get_chat_messages(logged_fb):
 
     await logged_fb.send_json_to({
         'action': 'get_messages',
-        'chat_id': chat.id,
+        'chat_ids': [chat.id],
         'count': 50,
     })
 
@@ -226,21 +226,23 @@ async def test_can_get_chat_messages(logged_fb):
 
     assert resp == {
         'action': 'get_messages',
-        'chat_id': chat.id,
-        'messages': [
-            {
-                'provider': 'facebook',
-                'content': 'hey man',
-                'me': False,
-                'time': '2019-05-02 21:58:26+00:00',
-            },
-            {
-                'provider': 'facebook',
-                'content': 'whats up?',
-                'me': True,
-                'time': '2019-05-02 21:56:46+00:00',
-            },
-        ],
+        'chats': [{
+            'id': chat.id,
+            'messages': [
+                {
+                    'provider': 'facebook',
+                    'content': 'hey man',
+                    'me': False,
+                    'time': '2019-05-02 21:58:26+00:00',
+                },
+                {
+                    'provider': 'facebook',
+                    'content': 'whats up?',
+                    'me': True,
+                    'time': '2019-05-02 21:56:46+00:00',
+                },
+            ],
+        }],
         'status': 'ok',
     }
 

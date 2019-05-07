@@ -1,4 +1,6 @@
+from collections.abc import Sequence
 from datetime import datetime as dt
+import itertools
 import pathlib
 import pytz
 import tempfile
@@ -109,28 +111,34 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return {'msg': 'Logged in successfully'}
 
     async def get_messages(self, data):
-        chats = await database_sync_to_async(models.Chat.objects.prefetch_related)('contact_set')
-        chat = await database_sync_to_async(chats.get)(
-            pk=data['chat_id'],
+        chats = await database_sync_to_async(models.Chat.objects.filter)(
+            pk__in=data['chat_ids'],
         )
-        ret = []
-        for contact in chat.contact_set.all():
+        chats = await database_sync_to_async(chats.prefetch_related)('contact_set')
+        ret = {}
+        for contact in itertools.chain(*[c.contact_set.all() for c in chats]):
             provider = getattr(self, contact.provider)
+            messages = ret.setdefault(contact.chat.id, [])
             msgs = await provider.get_last_messages(
                 uid=contact.uid,
                 count=data.get('count', 20)
             )
-            ret.extend(msgs)
+            messages.extend(msgs)
         return {
-            'chat_id': chat.id,
-            'messages': [
+            'chats': [
                 {
-                    'content': m['content'],
-                    'provider': m['provider'],
-                    'me': m['me'],
-                    'time': str(m['time']),
+                    'id': c_id,
+                    'messages': [
+                        {
+                            'content': m['content'],
+                            'provider': m['provider'],
+                            'me': m['me'],
+                            'time': str(m['time']),
+                        }
+                        for m in msgs
+                    ]
                 }
-                for m in ret
+                for c_id, msgs in ret.items()
             ]
         }
 
