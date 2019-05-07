@@ -1,3 +1,5 @@
+import asyncio
+import functools
 from collections.abc import Sequence
 from datetime import datetime as dt
 import itertools
@@ -110,20 +112,28 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         return {'msg': 'Logged in successfully'}
 
+    async def _get_messages_from_contacts(self, contact, count):
+        provider = getattr(self, contact.provider)
+        msgs = await provider.get_last_messages(
+            uid=contact.uid,
+            count=count,
+        )
+        return (contact.chat.id, msgs)
+
     async def get_messages(self, data):
         chats = await database_sync_to_async(models.Chat.objects.filter)(
             pk__in=data['chat_ids'],
         )
         chats = await database_sync_to_async(chats.prefetch_related)('contact_set')
-        ret = {}
-        for contact in itertools.chain(*[c.contact_set.all() for c in chats]):
-            provider = getattr(self, contact.provider)
-            messages = ret.setdefault(contact.chat.id, [])
-            msgs = await provider.get_last_messages(
-                uid=contact.uid,
-                count=data.get('count', 20)
+        coros = (
+            self._get_messages_from_contacts(
+                contact,
+                data.get('count', 20),
             )
-            messages.extend(msgs)
+            for chat in chats
+            for contact in chat.contact_set.all()
+        )
+        contact_msgs = await asyncio.gather(*coros)
         return {
             'chats': [
                 {
@@ -138,7 +148,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                         for m in msgs
                     ]
                 }
-                for c_id, msgs in ret.items()
+                for c_id, msgs in contact_msgs
             ]
         }
 
@@ -160,6 +170,5 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         chat = await database_sync_to_async(models.Chat.objects.get)(pk=data['chat_id'])
         contact = await database_sync_to_async(chat.contact_set.get)(provider=data['provider'])
         provider_inst = getattr(self, data['provider'])
-        print(contact.uid)
         result = await provider_inst.send_message(uid=contact.uid, content=data['content'])
         return {'chat_id': chat.id, 'content': data['content'], **result}
