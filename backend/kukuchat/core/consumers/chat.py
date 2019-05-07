@@ -51,10 +51,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         models.Chat.objects.filter(pk__in=to_delete).delete()
         return {'from_ids': ids, 'chat_id': first.id, 'chat_name': first.name}
 
-    async def on_message_consumer(self, provider, author_uid, author_name, content, time=None):
+    async def on_message_consumer(self, provider, author_uid, author_name, content, user, time=None):
         if not time:
             time = dt.utcnow().replace(tzinfo=pytz.UTC)
-        chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name, await get_user(self.scope))
+        chat = await utils.get_chat_for_provider_contact(provider, author_uid, author_name, user)
         await self.send_json({
             'action': 'new_message',
             'chat_id': chat.id,

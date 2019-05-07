@@ -23,6 +23,7 @@ class FacebookProvider(BaseProvider):
         self.on_message_consumer = on_message_consumer
         self.scope = scope
         self.client = None
+        self.user = None
 
     async def get_required_credentials(self, data):
         return self._required_credentials
@@ -30,6 +31,8 @@ class FacebookProvider(BaseProvider):
     async def login(self, data):
         username = data['username']
         password = data['password']
+
+        self.user = await get_user(self.scope)
 
         self.client = fbchat.Client()
         await self.client.start(username, password)
@@ -53,7 +56,7 @@ class FacebookProvider(BaseProvider):
             lambda c: c.uid,
             lambda c: c.name,
             'facebook',
-            user=await get_user(self.scope),
+            user=self.user,
         )
         return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
 
@@ -70,6 +73,7 @@ class FacebookProvider(BaseProvider):
             content=kwargs['message_object'].text,
             author_name=user.name,
             time=time,
+            user=self.user,
         )
 
     async def send_message(self, uid, content):
