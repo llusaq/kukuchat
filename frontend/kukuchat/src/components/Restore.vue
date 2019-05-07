@@ -12,7 +12,7 @@
                     </div>
                     <div class="col s12">
                         <a @click="restore()" class="btn green darken-2 waves-effect waves-light col s4">Reset now </a>
-                        <a @click="login()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Go
+                        <a @click="back()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Go
                             back </a>
 
                     </div>
@@ -41,7 +41,7 @@
             }
         },
         methods: {
-            login() {
+            back() {
                 this.$parent.dynamicComponent = 'login';
             },
             editLogin() {
@@ -78,45 +78,6 @@
 
                 }
             },
-
-
-            signup() {
-                if (this.username === '') {
-                    this.validateLogin = 'invalid'
-                    M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
-                } else if (this.password === '') {
-                    this.validatePassword = 'invalid'
-                    M.toast({html: 'Password must not be empty', classes: 'red darken-2'})
-                } else if (this.password2 === '') {
-                    this.validatePassword2 = 'invalid'
-                    M.toast({html: 'Accept password must not be empty', classes: 'red darken-2'})
-                } else if (this.password != this.password2) {
-                    this.validatePassword2 = 'invalid'
-                    M.toast({html: 'Passwords doesn`t match', classes: 'red darken-2'})
-                } else if (this.email === '') {
-                    this.validateEmail = 'invalid'
-                    M.toast({html: 'Email must not be empty', classes: 'red darken-2'})
-                } else if (!this.validEmail(this.email)) {
-                    this.validateEmail = 'invalid'
-                    M.toast({html: 'Email is not correct', classes: 'red darken-2'})
-                } else {
-                    let data = {
-                        username: this.username,
-                        password: this.password,
-                        email: this.email
-                    }
-
-                    http.post('/api/register/', data)
-                        .then(res => {
-                            M.toast({html: 'Registration successful', classes: 'green darken-2'})
-                            this.$parent.dynamicComponent = 'login';
-                        })
-                        .catch(err => {
-                            M.toast({html: 'Registration failed', classes: 'red darken-2'})
-                            console.log(err)
-                        });
-                }
-            }
         }
     }
 </script>

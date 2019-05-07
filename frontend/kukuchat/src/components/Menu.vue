@@ -53,12 +53,15 @@ export default {
         $('#settings').modal();
     },
     beforeMount() {
-        
+                
     },
     methods: {
         settings() {
             this.icon = this.icon === 'menu' ? 'clear' : 'menu';
             this.opened = !this.opened;
+            if (store.getters.socket === undefined) {
+                this.$router.push({name: 'home'})
+            }
         },
         logout() {
             this.$router.push({name: 'home'})

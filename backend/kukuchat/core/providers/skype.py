@@ -7,6 +7,8 @@ from threading import Thread
 
 import skpy
 import pytz
+from skpy import SkypeAuthException
+from skpy import SkypeNewMessageEvent
 
 from asgiref.sync import sync_to_async, async_to_sync
 
@@ -19,7 +21,7 @@ class SkypeProvider(BaseProvider):
     name = 'skype'
 
     _required_credentials = {
-        'username': {'type': 'text', 'help': 'Email or phone number'},
+        'username': {'type': 'text', 'help': 'Nickname or phone number'},
         'password': {'type': 'password', 'help': 'Password'},
     }
 
@@ -86,6 +88,8 @@ class SkypeProvider(BaseProvider):
         return msgs
 
     def _on_event(self, event):
+        if not isinstance(event, SkypeNewMessageEvent):
+            return
         user = self.sk.contacts[event.msg.userId]
         name = f'{user.name.first} {user.name.last}'
         t = Thread(
@@ -97,9 +101,11 @@ class SkypeProvider(BaseProvider):
                 'author_name': name,
             }
         )
-        t.start()        
+        t.start()      
+        
 
     def _start_listening(self):
         loop = skpy.SkypeEventLoop(tokenFile=self._token_path, autoAck=True)
         loop.onEvent = self._on_event
-        loop.loop()
+        t = Thread(target=loop.loop)
+        t.start()

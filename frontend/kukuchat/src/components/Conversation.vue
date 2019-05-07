@@ -113,7 +113,7 @@ export default {
 
     .message span {
         max-width: 70%;
-        display: inline-block;д
+        display: inline-block;
     }
 
     .notMe > .message > span {

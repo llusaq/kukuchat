@@ -28,6 +28,7 @@
 
 import { http } from '@/plugins/axios'
 import { store } from '@/store'
+import { constants } from 'crypto';
 
 export default {
     name: 'Login',
@@ -73,46 +74,10 @@ export default {
                     username: this.username,
                     password: this.password,
                 }
-
-                 store.getters.socket.send(JSON.stringify(data));
-
-                data = {
-                    action: 'am_i_logged'
-                }
                 store.getters.socket.send(JSON.stringify(data));
-                
             }
-        },
-        connect() {
-            if (store.getters.socket === undefined) {
-                store.getters.socket = new WebSocket("ws://localhost:8000/ws/chat/");
-                store.getters.socket.onopen = () => {
-                    store.getters.socket.onmessage = ({data}) => {
-                        data = JSON.parse(data);
-                        console.log(data);
-                        if (data.is_logged) {
-                            this.$router.push({name: 'chat'})
-                        }
-                        if (data.action === 'login' && data.status === 'error') {
-                            M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                        }
-                    };
-                    let data = {
-                        action: 'am_i_logged'
-                    }
-                    store.getters.socket.send(JSON.stringify(data));
-                };
-            }
-            else {
-                this.$router.push({name: 'chat'})
-            }
-            
         }
-    },
-    beforeMount() {
-        this.connect();
     }
-
 }
 </script>
 

@@ -28,7 +28,6 @@ export default {
         Contacts,
         Menu,
         Conversation,
-        //  CreateMessage
     },
 
     data() {
@@ -57,26 +56,25 @@ export default {
         }
     },
     beforeMount() {
-        if (store.getters.socket === undefined) {
-            this.$router.push({name: 'home'})
-            }
         store.getters.socket.onmessage = ({data}) => {
             data = JSON.parse(data)
+            console.log(data)
 
             if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
                 store.commit('setMessenger');
                 store.commit('setChat');
             }
 
-            console.log(data)
-        }
+            if (data.action === 'am_i_logged' && !data.is_logged) {
+                this.$router.push({name: 'home'})
+            }
+        };
         let data = {
-            action: 'provider_facebook_am_i_logged'
+            action: 'am_i_logged'
         }
         store.getters.socket.send(JSON.stringify(data));
-        }
-        
-    } 
+    }
+} 
 
 </script>
 
