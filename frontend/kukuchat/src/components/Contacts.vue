@@ -24,7 +24,7 @@
 <script>
 
 import { store } from '@/store'
-import { constants } from 'crypto';
+import { mapState } from 'vuex';
 
 export default {
     name: 'contacts',
@@ -33,18 +33,11 @@ export default {
             randcolor: '',
             clicked: '',
             search: '',
-            contacts: [
-                {
-                    id: '',
-                    name: '',
-                    provider: '',
-                    lastMsg: '',
-                }
-            ],
         }
     },
-    props: {
-    },
+    computed: mapState([
+        'contacts'
+    ]),
     methods: {
         select(name) {
             this.$parent.currentChat = name;
@@ -53,32 +46,6 @@ export default {
         },
     },
     beforeMount() {
-        store.getters.socket.onmessage = ({data}) => {
-            data = JSON.parse(data)
-            console.log(data)
-
-            if (data.action === 'provider_facebook_get_chats') {
-                this.contacts = data.chats
-                /*for (let contact of this.contacts) {
-                    let data = {
-                        action: 'get_messages',
-                        chat_id: contact.id,
-                        count: 1
-                    }
-                    store.getters.socket.send(JSON.stringify(data));
-                }*/
-                this.contacts = Array.from(this.contacts);
-            }
-
-            if (data.action === 'get_messages' && data.messages.length === 1) {
-                this.contacts[data.chat_id - 1].provider = data.messages[0].provider
-                this.contacts[data.chat_id - 1].lastMsg = data.messages[0].content
-                this.contacts = Array.from(this.contacts);
-            }
-
-
-        };
-
             let data = {
                 action: 'provider_facebook_get_chats',
             }
@@ -94,8 +61,6 @@ export default {
                 if (contact.name !== undefined) {
                     return contact.name.toLowerCase().includes(this.search.toLowerCase())
                 }
-
-                    
             })
         }
     }

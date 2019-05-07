@@ -59,9 +59,6 @@ export default {
         settings() {
             this.icon = this.icon === 'menu' ? 'clear' : 'menu';
             this.opened = !this.opened;
-            if (store.getters.socket === undefined) {
-                this.$router.push({name: 'home'})
-            }
         },
         logout() {
             this.$router.push({name: 'home'})
@@ -71,8 +68,6 @@ export default {
             store.getters.socket.send(JSON.stringify(data));
             store.getters.socket.close();
             store.getters.socket = undefined;
-
-            
         },
         toContacts() {
             this.$parent.currentChat = '';

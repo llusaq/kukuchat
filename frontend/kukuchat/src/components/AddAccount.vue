@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <Preloader v-if="preload"></Preloader>
+        <Preloader v-if="preloader"></Preloader>
     </div>
 </template>
 
@@ -70,12 +70,6 @@ export default {
             passwordFieldText: 'visibility_off',
             validateLogin: '',
             validatePassword: '',
-            usernameField: false,
-            usernameHelp: '',
-            passwordField: false,
-            passwordHelp: '',
-            preload: false
-
         }
     },
     computed: mapState([
@@ -84,7 +78,12 @@ export default {
         'skype',
         'viber',
         'gmail',
-        'telegram'
+        'telegram',
+        'usernameField',
+        'usernameHelp',
+        'passwordField',
+        'passwordHelp',
+        'preloader'
     ]),
     methods: {
         editLogin() {
@@ -116,7 +115,7 @@ export default {
         },
         login(choosenAccount) {
             if (choosenAccount === 'Messenger') {
-                this.preload = true
+               store.commit('setPreloader', true);
                 let data = {
                     action: 'provider_facebook_login',
                     username: this.username,
@@ -124,8 +123,9 @@ export default {
                 }
                 store.getters.socket.send(JSON.stringify(data));
             }
+
             if (choosenAccount === 'Skype') {
-                this.preload = true
+                store.commit('setPreloader', true);
                 let data = {
                     action: 'provider_skype_login',
                     username: this.username,
@@ -134,41 +134,6 @@ export default {
                 store.getters.socket.send(JSON.stringify(data));
             }
         }
-    },
-    beforeMount() {
-        store.getters.socket.onmessage = ({data}) => {
-                data = JSON.parse(data)
-                console.log(data)
-                if ((data.action === 'provider_facebook_get_required_credentials' && data.password) ||
-                    (data.action === 'provider_skype_get_required_credentials' && data.password)) {
-                    this.passwordField = true;
-                    this.passwordHelp = data.password.help;
-                }
-                if ((data.action === 'provider_facebook_get_required_credentials' && data.username) ||
-                    (data.action === 'provider_skype_get_required_credentials' && data.username)) {
-                    this.usernameField = true;
-                    this.usernameHelp = data.username.help;
-                }
-                if (data.status === 'error') {
-                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                    this.preload = false;
-                }
-
-                if (data.action === 'provider_facebook_login' && data.status === 'ok') {
-                    this.preload = false;
-                    this.close();
-                    M.toast({html: 'Messenger added', classes: 'green darken-2'})
-                    store.commit('setMessenger');
-                    store.commit('setChat');
-                }
-                if (data.action === 'provider_skype_login' && data.status === 'ok') {
-                    this.preload = false;
-                    this.close();
-                    M.toast({html: 'Skype added', classes: 'green darken-2'})
-                    store.commit('setSkype');
-                    store.commit('setChat');
-                }
-            };
     }
 }
 </script>

@@ -45,25 +45,22 @@
 
 import { store } from '@/store'
 import moment from 'moment'
+import { mapState } from 'vuex';
 
 export default {
     name: 'conversation',
     data() {
         return {
-            messages: [
-                {
-                    content: '',
-                    time: '',
-                    provider: '',
-                    me: false
-                }
-            ],
+            
             message: '',
         }
     },
     props: {
         currentChat: ''
     },
+    computed: mapState([
+        'messages'
+    ]),
     methods: {
         send() {
             this.messages.push({
@@ -98,21 +95,6 @@ export default {
     updated() {
         var container = this.$el.querySelector("#messages");
         container.scrollTop = container.scrollHeight;
-    },
-    mounted() {
-        store.getters.socket.onmessage = ({data}) => {
-            data = JSON.parse(data)
-            console.log(data)
-
-            if (data.action === 'get_messages' && data.messages.length !== 1) {
-                this.messages = data.messages.reverse();
-            }
-
-            if (data.action === 'new_message' && data.chat_id === this.currentChat.id) {
-                this.messages.push(data)
-            }
-        };
-       
     }
 }
 </script>

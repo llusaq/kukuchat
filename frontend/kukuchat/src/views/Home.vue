@@ -28,7 +28,6 @@ export default {
         }
     },
     beforeMount() {
-        if (store.getters.socket === undefined) {
             store.getters.socket = new WebSocket("ws://localhost:8000/ws/chat/");
             store.getters.socket.onopen = () => {
                store.getters.socket.onmessage = ({data}) => {
@@ -41,28 +40,23 @@ export default {
                     if (data.action === 'login' && data.status === 'error') {
                         M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
                     }
+
+                    if (data.action === 'login' && data.status === 'ok') {
+                        this.$router.push({name: 'chat'})
+                    }
+
+                    if (data.action === 'am_i_logged' && data.is_logged) {
+                        this.$router.push({name: 'chat'})
+                    }
                 };
                 let data = {
                     action: 'am_i_logged'
                 }
                 store.getters.socket.send(JSON.stringify(data));
             };
-        }
     },
     mounted() {
         if (store.getters.socket.readyState !== 0) {
-            store.getters.socket.onmessage = ({data}) => {
-                data = JSON.parse(data);
-                if (data.action === 'login' && data.status === 'ok') {
-                    this.$router.push({name: 'chat'})
-                }
-
-                if (data.action === 'am_i_logged' && data.is_logged) {
-                    this.$router.push({name: 'chat'})
-                }
-
-                
-            };
             let data = {
                 action: 'am_i_logged'
             }

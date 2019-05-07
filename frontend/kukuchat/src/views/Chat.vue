@@ -33,13 +33,12 @@ export default {
             currentChat: '',
             currentChatId: '',
             width: window.innerWidth,
-            
         }
     },
     computed: mapState([
-            'isChat'
-        ]),
-
+        'isChat',
+        'contacts'
+    ]),
     created: function () {
         window.addEventListener('keyup', this.onkey)
     },
@@ -53,30 +52,90 @@ export default {
             }
         }
     },
-    mounted() {
-        store.getters.socket.onmessage = ({data}) => {
-            data = JSON.parse(data)
-            console.log(data)
-
-            if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
-                store.commit('setMessenger');
-                store.commit('setChat');
-            }
-
-            if (data.action === 'am_i_logged' && !data.is_logged) {
+    beforeMount() {
+        if (store.getters.socket === undefined) {
                 this.$router.push({name: 'home'})
-            }
-            
-        };
-        let data = {
-            action: 'am_i_logged'
         }
-        store.getters.socket.send(JSON.stringify(data));
+        else {
+            store.getters.socket.onmessage = ({data}) => {
+                data = JSON.parse(data)
+                console.log(data)
 
-        data = {
-            action: 'provider_facebook_am_i_logged'
+                if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
+                    store.commit('setMessenger');
+                    store.commit('setChat');
+                }
+
+                if (data.action === 'am_i_logged' && !data.is_logged) {
+                    this.$router.push({name: 'home'})
+                }
+
+                if ((data.action === 'provider_facebook_get_required_credentials' && data.password) ||
+                    (data.action === 'provider_skype_get_required_credentials' && data.password)) {
+                    store.commit('setPasswordField');
+                    store.commit('setPasswordHelp', data.password.help);
+                }
+                if ((data.action === 'provider_facebook_get_required_credentials' && data.username) ||
+                    (data.action === 'provider_skype_get_required_credentials' && data.username)) {
+                    store.commit('setUsernameField');
+                    store.commit('setUsernameHelp', data.username.help);
+                }
+                if (data.status === 'error') {
+                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                    store.commit('setPreloader', false);
+                }
+
+                if (data.action === 'provider_facebook_login' && data.status === 'ok') {
+                    store.commit('setPreloader', false);
+                    this.close();
+                    M.toast({html: 'Messenger added', classes: 'green darken-2'})
+                    store.commit('setMessenger');
+                    store.commit('setChat');
+                }
+                if (data.action === 'provider_skype_login' && data.status === 'ok') {
+                    store.commit('setPreloader', false);
+                    this.close();
+                    M.toast({html: 'Skype added', classes: 'green darken-2'})
+                    store.commit('setSkype');
+                    store.commit('setChat');
+                }
+
+                if (data.action === 'provider_facebook_get_chats') {
+                    store.commit('setContacts', data.chats);
+                    for (let contact of this.contacts) {
+                        let data = {
+                            action: 'get_messages',
+                            chat_id: contact.id,
+                            count: 1
+                        }
+                        store.getters.socket.send(JSON.stringify(data));
+                    }
+                }
+
+                /*if (data.action === 'get_messages' && data.messages.length === 1) {
+                    this.contacts[data.chat_id - 1].provider = data.messages[0].provider
+                    this.contacts[data.chat_id - 1].lastMsg = data.messages[0].content
+                    this.contacts = Array.from(this.contacts);
+                }*/
+                
+                if (data.action === 'get_messages' && data.messages.length !== 1) {
+                    store.commit('setMessages', data.messages.reverse());
+                }
+
+                if (data.action === 'new_message' && data.chat_id === this.currentChat.id) {
+                    store.commit('pushMessage', data);
+                }
+            };
+            let data = {
+                action: 'am_i_logged'
+            }
+            store.getters.socket.send(JSON.stringify(data));
+
+            data = {
+                action: 'provider_facebook_am_i_logged'
+            }
+            store.getters.socket.send(JSON.stringify(data));
         }
-        store.getters.socket.send(JSON.stringify(data));
     }
 } 
 
