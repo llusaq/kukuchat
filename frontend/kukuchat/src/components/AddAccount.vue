@@ -158,14 +158,14 @@ export default {
                     this.preload = false;
                     this.close();
                     M.toast({html: 'Messenger added', classes: 'green darken-2'})
-                    this.messenger = true;
+                    store.commit('setMessenger');
                     store.commit('setChat');
                 }
                 if (data.action === 'provider_skype_login' && data.status === 'ok') {
                     this.preload = false;
                     this.close();
                     M.toast({html: 'Skype added', classes: 'green darken-2'})
-                    this.skype = true;
+                    store.commit('setSkype');
                     store.commit('setChat');
                 }
             };
