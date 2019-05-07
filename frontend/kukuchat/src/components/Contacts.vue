@@ -30,6 +30,9 @@ export default {
     name: 'contacts',
     data() {
         return {
+            randcolor: '',
+            clicked: '',
+            search: '',
             contacts: [
                 {
                     id: '',
@@ -38,10 +41,9 @@ export default {
                     lastMsg: '',
                 }
             ],
-            randcolor: '',
-            clicked: '',
-            search: ''
         }
+    },
+    props: {
     },
     methods: {
         select(name) {
@@ -49,35 +51,38 @@ export default {
             this.clicked = name;
             this.search = '';
         },
-        load() {
+    },
+    beforeMount() {
+        store.getters.socket.onmessage = ({data}) => {
+            data = JSON.parse(data)
+            console.log(data)
+
+            if (data.action === 'provider_facebook_get_chats') {
+                this.contacts = data.chats
+                /*for (let contact of this.contacts) {
+                    let data = {
+                        action: 'get_messages',
+                        chat_id: contact.id,
+                        count: 1
+                    }
+                    store.getters.socket.send(JSON.stringify(data));
+                }*/
+                this.contacts = Array.from(this.contacts);
+            }
+
+            if (data.action === 'get_messages' && data.messages.length === 1) {
+                this.contacts[data.chat_id - 1].provider = data.messages[0].provider
+                this.contacts[data.chat_id - 1].lastMsg = data.messages[0].content
+                this.contacts = Array.from(this.contacts);
+            }
+
+
+        };
+
             let data = {
                 action: 'provider_facebook_get_chats',
             }
             store.getters.socket.send(JSON.stringify(data));
-            store.getters.socket.onmessage = ({data}) => {
-                data = JSON.parse(data)
-                if (data.action === 'provider_facebook_get_chats') {
-                    this.contacts = data.chats
-                    for (let contact of this.contacts) {
-                        let data = {
-                            action: 'get_messages',
-                            chat_id: contact.id,
-                            count: 1
-                        }
-                        store.getters.socket.send(JSON.stringify(data));
-                    }
-                }
-
-                if (data.action === 'get_messages' && data.status === 'ok') {
-                    this.contacts[data.chat_id - 1].provider = data.messages[0].provider
-                    this.contacts[data.chat_id - 1].lastMsg = data.messages[0].content
-                    this.contacts = Array.from(this.contacts);
-                }
-            };
-        }
-    },
-    beforeMount() {
-        this.load();
     },
     computed: {
         selectedContact() {
@@ -86,8 +91,11 @@ export default {
         filteredList() {
             if (this.contacts !== undefined)
             return this.contacts.filter(contact => {
-                if (contact.name !== undefined)
+                if (contact.name !== undefined) {
                     return contact.name.toLowerCase().includes(this.search.toLowerCase())
+                }
+
+                    
             })
         }
     }

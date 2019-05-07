@@ -2,7 +2,7 @@
     <div class="col l9 m8">
         <div class="msg_cont_area">
             <p class="text-secondary nomessages" v-if="messages === ''">No messages yet!</p>
-            <div class="messages">
+            <div class="messages" id="messages">
                 <div v-for="message in messages" :key="message.id" >
                     <div v-if="!message.me && messages.content !== '' && messages.content !== null" class="notMe">
                         <span class="author">{{currentChat.name}} </span>
@@ -21,12 +21,12 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="sendingsection">
+        <div class="sendingsection">
             <div class="row">
                 <form class="col s12" rows="4" cols="50">
                     <div class="row">
                         <div class="input-field col s12" rows="4" cols="50">
-                            <textarea id="textarea1" class="materialize-textarea"></textarea>
+                            <textarea v-model="message" id="textarea1" class="materialize-textarea"></textarea>
                             <label for="textarea1" rows="4" cols="50">Your message</label>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                     <i class="material-icons right">send</i>
                 </button>
             </div>
-        </div> -->
+        </div>
     </div>
 </template>
 
@@ -52,28 +52,37 @@ export default {
         return {
             messages: [
                 {
-                    message: '',
-                    timestamp: '',
-                    name: ''
+                    content: '',
+                    time: '',
+                    provider: '',
+                    me: false
                 }
-            ]
+            ],
+            message: '',
         }
+    },
+    props: {
+        currentChat: ''
     },
     methods: {
         send() {
-            var today = new Date();
-            var d = today.getDay();
-            var mo = today.getMonth();
-            var ye = today.getYear();
-            var h = today.getHours();
-            var m = today.getMinutes();
-            // this.messages.push({message:'my message',timestamp:"3:00",name:'me'});
             this.messages.push({
-                message: document.getElementById("textarea1").value,
-                timestamp: 'time: ' + h + ':' + m + ' date: ' + d + '.' + (mo + 1) + '.' + (1900 + ye),
-                name: 'me'
+                content: document.getElementById("textarea1").value,
+                time: moment().format(),
+                provider: 'facebook',
+                me: true
             });
-            document.getElementById("textarea1").value = " ";
+
+            let data = {
+                'action': 'send_message',
+                'provider': 'facebook',
+                'chat_id': this.currentChat.id,
+                'content': this.message,
+            }
+
+            store.getters.socket.send(JSON.stringify(data));
+
+            this.message = ''
         }
     },
     watch: {
@@ -86,16 +95,25 @@ export default {
             store.getters.socket.send(JSON.stringify(data));
         }
     },
-    beforeMount() {
+    updated() {
+        var container = this.$el.querySelector("#messages");
+        container.scrollTop = container.scrollHeight;
+    },
+    mounted() {
         store.getters.socket.onmessage = ({data}) => {
             data = JSON.parse(data)
             console.log(data)
-            this.messages = ''
-            if (data.action === 'get_messages' && data.status === 'ok')
+
+            if (data.action === 'get_messages' && data.messages.length !== 1) {
                 this.messages = data.messages.reverse();
+            }
+
+            if (data.action === 'new_message' && data.chat_id === this.currentChat.id) {
+                this.messages.push(data)
+            }
         };
-    },
-    props: ['currentChat'],
+       
+    }
 }
 </script>
 
@@ -109,6 +127,13 @@ export default {
 
     .message {
         margin: 0 0 10px 0;
+        
+    }
+
+    .messages {
+        overflow-y: scroll;
+        height: 70vh;
+        margin-left: 20px;
     }
 
     .message span {
@@ -137,7 +162,7 @@ export default {
     }
 
     .col {
-        overflow: scroll;
-        height: 100%;
+        padding: 0;
     }
+
 </style>

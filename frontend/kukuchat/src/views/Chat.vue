@@ -23,19 +23,17 @@ import { mapState } from 'vuex';
 export default {
     name: 'chat',
 
-    props: ['name'],
     components: {
         Contacts,
         Menu,
         Conversation,
     },
-
     data() {
         return {
             currentChat: '',
             currentChatId: '',
             width: window.innerWidth,
-            messages: [],
+            
         }
     },
     computed: mapState([
@@ -55,7 +53,7 @@ export default {
             }
         }
     },
-    beforeMount() {
+    mounted() {
         store.getters.socket.onmessage = ({data}) => {
             data = JSON.parse(data)
             console.log(data)
@@ -68,9 +66,15 @@ export default {
             if (data.action === 'am_i_logged' && !data.is_logged) {
                 this.$router.push({name: 'home'})
             }
+            
         };
         let data = {
             action: 'am_i_logged'
+        }
+        store.getters.socket.send(JSON.stringify(data));
+
+        data = {
+            action: 'provider_facebook_am_i_logged'
         }
         store.getters.socket.send(JSON.stringify(data));
     }

@@ -68,7 +68,7 @@ class FacebookProvider(BaseProvider):
             return
         aid = kwargs['author_id']
         user = (await self.client.fetchUserInfo(aid))[aid]
-        ts = kwargs['message_object'].timestamp[:-3]
+        ts = str(kwargs['message_object'].timestamp)[:-3]
         time = datetime.utcfromtimestamp(int(ts)).replace(tzinfo=pytz.UTC)
         await self.on_message_consumer(
             provider='facebook',

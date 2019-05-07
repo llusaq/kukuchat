@@ -151,5 +151,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         chat = await database_sync_to_async(models.Chat.objects.get)(pk=data['chat_id'])
         contact = await database_sync_to_async(chat.contact_set.get)(provider=data['provider'])
         provider_inst = getattr(self, data['provider'])
+        print(contact.uid)
         result = await provider_inst.send_message(uid=contact.uid, content=data['content'])
         return {'chat_id': chat.id, 'content': data['content'], **result}
