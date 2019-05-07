@@ -18,6 +18,17 @@ import skpy
 from core.tests.fixtures import *
 from core.models import Chat, Contact
 
+
+class MessageEvent(skpy.event.SkypeNewMessageEvent):
+    def __init__(self):
+        self.__dict__['msg'] = SimpleNamespace(
+            content='Priviet maniunia',
+            userId='123',
+            time=dt(2019, 5, 4, 10),
+        )
+            
+
+
 class SkypeContactsMock:
     def getMsg(self):
         return [
@@ -122,7 +133,7 @@ async def test_required_cred(comm):
     assert resp == {
         'status': 'ok',
         'action': 'provider_skype_get_required_credentials',
-        'username': {'type': 'text', 'help': 'Email or phone number'},
+        'username': {'type': 'text', 'help': 'Nickname or phone number'},
         'password': {'type': 'password', 'help': 'Password'}
     }
     await comm.disconnect()
@@ -222,14 +233,8 @@ async def test_can_receive_messages(logged_skype):
     skpy.Skype.return_value.contacts = SkypeContactsMock()
 
     skpy.SkypeEventLoop.return_value.onEvent(
-        SimpleNamespace(
-            msg=SimpleNamespace(
-                content='Priviet maniunia',
-                userId='123',
-                time=dt(2019, 5, 4, 10),
-            )
+        MessageEvent(),
         )
-    )
     
     resp = await logged_skype.receive_json_from()
 
