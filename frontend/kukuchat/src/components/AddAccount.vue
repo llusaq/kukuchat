@@ -138,7 +138,7 @@ export default {
     },
     watch: {
         addAccountForm() {
-            if (!addAccountForm) {
+            if (!this.addAccountForm) {
                 this.close();
             }
         }

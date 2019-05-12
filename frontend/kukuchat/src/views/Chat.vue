@@ -66,6 +66,11 @@ export default {
                     store.commit('setChat');
                 }
 
+                if (data.action === 'provider_skype_am_i_logged' && data.is_logged) {
+                    store.commit('setSkype');
+                    store.commit('setChat');
+                }
+
                 if (data.action === 'am_i_logged' && !data.is_logged) {
                     this.$router.push({name: 'home'})
                 }
@@ -97,7 +102,7 @@ export default {
 
                 if (data.action === 'provider_skype_login' && data.status === 'ok') {
                     store.commit('setPreloader', false);
-                    this.close();
+                    store.commit('changeAddAccountForm', false);
                     M.toast({html: 'Skype added', classes: 'green darken-2'})
                     store.commit('setSkype');
                     store.commit('setChat');
@@ -107,7 +112,7 @@ export default {
                     store.commit('setContacts', data.chats);
 
                     for (let contact of this.contacts) {
-                        
+
                     }
 
                     /*for (let contact of this.contacts) {
@@ -119,13 +124,17 @@ export default {
                         store.getters.socket.send(JSON.stringify(data));
                     }*/
                 }
+                if (data.action === 'provider_skype_get_chats') {
+                    store.commit('setContacts', data.chats);
+
+                }
 
                 if (data.action === 'get_messages' && data.chats[0].messages.length === 1) {
                     this.contacts[data.chat_id - 1].provider = data.chats[0].messages[0].provider
                     this.contacts[data.chat_id - 1].lastMsg = data.chats[0].messages[0].content
                     this.contacts = Array.from(this.contacts);
                 }
-                
+
                 if (data.action === 'get_messages' && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.messages.reverse());
                 }
@@ -143,9 +152,14 @@ export default {
                 action: 'provider_facebook_am_i_logged'
             }
             store.getters.socket.send(JSON.stringify(data));
+
+            data = {
+                action: 'provider_skype_am_i_logged'
+            }
+            store.getters.socket.send(JSON.stringify(data));
         }
     }
-} 
+}
 
 </script>
 
