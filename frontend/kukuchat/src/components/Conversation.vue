@@ -33,6 +33,8 @@
                 </form>
             </div>
             <div class="sendbtnarea">
+
+
                 <button @click="send()" class="btn waves-effect waves-light blue" type="submit" name="action">SEND
                     <i class="material-icons right">send</i>
                 </button>
@@ -51,7 +53,7 @@ export default {
     name: 'conversation',
     data() {
         return {
-            
+
             message: '',
         }
     },
@@ -104,12 +106,12 @@ export default {
 
     .author, .time {
         font-size: 12px;
-        color: #9e9e9e; 
+        color: #9e9e9e;
     }
 
     .message {
         margin: 0 0 10px 0;
-        
+
     }
 
     .messages {
