@@ -47,10 +47,17 @@ export default {
                 action: 'provider_facebook_get_chats',
             }
             store.getters.socket.send(JSON.stringify(data));
+
+        data = {
+            action: 'provider_skype_get_chats',
+        }
+        store.getters.socket.send(JSON.stringify(data));
+
+
     },
     computed: {
         selectedContact() {
-            return this.$parent.currentChat === '' ? '' : this.$parent.currentChat; 
+            return this.$parent.currentChat === '' ? '' : this.$parent.currentChat;
         },
         filteredList() {
             if (this.contacts !== undefined)
@@ -138,7 +145,7 @@ span {
 .info {
     float: left;
     display: contents;
-    
+
 }
 
 .clicked {
@@ -158,16 +165,16 @@ span {
 ::-webkit-scrollbar-track {
   border-radius: 10px;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #64b5f6; 
+    background: #64b5f6;
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #1e88e5; 
+    background: #1e88e5;
 }
 
 .nav-wrapper {

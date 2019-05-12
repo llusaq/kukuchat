@@ -66,6 +66,11 @@ export default {
                     store.commit('setChat');
                 }
 
+                if (data.action === 'provider_skype_am_i_logged' && data.is_logged) {
+                    store.commit('setSkype');
+                    store.commit('setChat');
+                }
+
                 if (data.action === 'am_i_logged' && !data.is_logged) {
                     this.$router.push({name: 'home'})
                 }
@@ -97,7 +102,7 @@ export default {
 
                 if (data.action === 'provider_skype_login' && data.status === 'ok') {
                     store.commit('setPreloader', false);
-                    this.close();
+                    store.commit('changeAddAccountForm', false);
                     M.toast({html: 'Skype added', classes: 'green darken-2'})
                     store.commit('setSkype');
                     store.commit('setChat');
@@ -128,7 +133,7 @@ export default {
                     }
                     
                 }
-                
+
                 if (data.action === 'get_messages' && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.chats[0].messages.reverse());
                 }
@@ -149,9 +154,14 @@ export default {
                 action: 'provider_facebook_am_i_logged'
             }
             store.getters.socket.send(JSON.stringify(data));
+
+            data = {
+                action: 'provider_skype_am_i_logged'
+            }
+            store.getters.socket.send(JSON.stringify(data));
         }
     }
-} 
+}
 
 </script>
 

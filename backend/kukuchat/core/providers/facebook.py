@@ -64,7 +64,8 @@ class FacebookProvider(BaseProvider):
                     'id': c.id,
                     'name': c.name,
                     'provider': 'facebook',
-                    'last_msg': '',
+                    'last_msg': None,
+                    'time': None,
                 }
                 for c in chats
             ]
