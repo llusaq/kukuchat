@@ -58,7 +58,17 @@ class FacebookProvider(BaseProvider):
             'facebook',
             user=self.user,
         )
-        return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
+        return {
+            'chats': [
+                {
+                    'id': c.id,
+                    'name': c.name,
+                    'provider': 'facebook',
+                    'last_msg': '',
+                }
+                for c in chats
+            ]
+        }
 
     async def _on_message(self, *args, **kwargs):
         if kwargs['thread_type'] != ThreadType.USER:
