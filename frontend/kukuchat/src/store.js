@@ -18,6 +18,7 @@ export const store = new Vuex.Store({
     passwordField: false,
     passwordHelp: '',
     preloader: false,
+    addAccountForm: true,
     contacts: [
         {
             id: '',
@@ -75,8 +76,8 @@ export const store = new Vuex.Store({
     pushMessage(state, value) {
       state.messages.push(value);
     },
-    set(state) {
-      state.skype = true;
+    changeAddAccountForm(state, value) {
+      state.addAccountForm = value;
     },
     set(state) {
       state.skype = true;
