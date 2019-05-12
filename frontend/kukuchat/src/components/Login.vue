@@ -28,6 +28,7 @@
 
 import { http } from '@/plugins/axios'
 import { store } from '@/store'
+import { constants } from 'crypto';
 
 export default {
     name: 'Login',
@@ -43,8 +44,6 @@ export default {
         }
     },
     methods: {
-
-
         restore() {
             this.$parent.dynamicComponent = 'restore';
         },
@@ -62,56 +61,22 @@ export default {
             this.passwordFieldText= this.passwordFieldText === 'visibility' ? 'visibility_off' : 'visibility'
         },
         login() {
-             if (this.username === '') {
+            if (this.username === '') {
                 this.validateLogin = 'invalid'
                 M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
-             }
+            }
             else if (this.password === '') {
                 this.validatePassword = 'invalid'
                 M.toast({html: 'Password must not be empty', classes: 'red darken-2'})
-             } else {
+            } else {
                 let data = {
                     action: 'login',
                     username: this.username,
                     password: this.password,
                 }
-
-                 store.getters.socket.send(JSON.stringify(data));
-
-                data = {
-                    action: 'am_i_logged'
-                }
-                 store.getters.socket.send(JSON.stringify(data));
-
+                store.getters.socket.send(JSON.stringify(data));
             }
-        },
-        connect() {
-            if (store.getters.socket === undefined) {
-                store.getters.socket = new WebSocket("ws://localhost:8000/ws/chat/");
-                store.getters.socket.onopen = () => {
-                    store.getters.socket.onmessage = ({data}) => {
-                        data = JSON.parse(data)
-                        if (data.is_logged) {
-                            this.$router.push({name: 'chat'})
-                        } 
-                        if (data.status === 'error') {
-                            M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                        }
-                    };
-                    let data = {
-                        action: 'am_i_logged'
-                    }
-                    store.getters.socket.send(JSON.stringify(data));
-                };
-            }
-            else {
-                this.$router.push({name: 'chat'})
-            }
-            
         }
-    },
-    beforeMount() {
-        this.connect();
     }
 }
 </script>
@@ -126,7 +91,6 @@ input:focus, .valid {
     border-bottom: 1px solid #1565c0 !important;
     box-shadow: 0 1px 0 0 #1565c0 !important;
 }
-
 
 a {
     color: #1565c0;

@@ -7,7 +7,7 @@ from jsonfield import JSONField
 
 
 def get_random_seq():
-    return secrets.token_hex(125)
+    return secrets.token_hex(20)
 
 
 class User(AbstractUser):
@@ -20,10 +20,7 @@ class Chat(models.Model):
 
 
 class Contact(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.PROTECT)
     provider = models.CharField(max_length=255)
     uid = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = 'provider', 'uid'

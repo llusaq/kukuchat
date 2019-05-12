@@ -6,16 +6,19 @@
 
 <script>
 import { store } from '@/store'
+import { mapState } from 'vuex';
 
 export default {
   data() {
     return {
-      isDark: store.getters.isDark,
       socket: ''
     }
   },
   methods: {
   },
+  computed: mapState([
+      'isDark'
+  ])
 
 
 }
@@ -125,6 +128,10 @@ html,body {
 
 .dark > .wrapper > .settings > .modal i {
   color: #bdbdbd;
+}
+
+.dark > .wrapper > .settings > .modal-overlay {
+ background: #1c1c1c !important;
 }
 
 #toast-container {

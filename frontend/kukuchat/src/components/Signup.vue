@@ -4,14 +4,11 @@
                 <div class="card-content">
                     <span class="card-title center-align">Sign Up</span>
                     <div class="row">
-
-
                         <div class="input-field col s12">
                             <label for="email">Email </label>
                             <input type="email" v-model="email" @keyup="editEmail()" :class="validateEmail" name="email"
                                    id="email"/>
                         </div>
-
                         <div class="input-field col s12">
                             <label for="login">Login</label>
                             <input type="text" @keyup="editLogin()" v-model="username" :class="validateLogin" name="login" id="login"/>
@@ -25,12 +22,9 @@
                             <label for="password2">Confirm password </label>
                             <input type="password" @keyup="editPassword2()" v-model="password2" :class="validatePassword2" name="password2" id="password2"/>
                         </div>
-
                         <div class="col s12">
-
                             <a @click="signup()" class="btn green darken-2 waves-effect waves-light col s4">Sign Up </a>
-
-                            <a @click="login()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Go
+                            <a @click="back()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Go
                                 back </a>
                         </div>
                     </div>
@@ -58,7 +52,7 @@ export default {
         }
     },
     methods: {
-        login() {
+        back() {
             this.$parent.dynamicComponent = 'login';
         },
         editLogin() {

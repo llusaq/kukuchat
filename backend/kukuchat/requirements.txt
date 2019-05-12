@@ -3,8 +3,7 @@ djangorestframework==3.7.7
 django-filter==2.1.0
 Markdown==3.0.1
 django-cors-headers==2.5.2
-Telethon==1.7.5
-fbchat==1.6.4
+fbchat-asyncio==0.1.0
 jsonfield==2.0.2
 channels==2.1.7
 pytest-asyncio==0.10.0
@@ -15,3 +14,4 @@ pywin32==224
 mysqlclient==1.4.2.post1
 Pyrogram==0.13.0.async
 tgcrypto==1.1.1
+

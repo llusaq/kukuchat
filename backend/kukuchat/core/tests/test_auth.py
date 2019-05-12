@@ -1,3 +1,6 @@
+import asyncio
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 
 from channels.testing import WebsocketCommunicator
@@ -5,13 +8,12 @@ from channels.db import database_sync_to_async
 
 import pytest
 
-from core.consumers.chat import ChatConsumer
 from kukuchat.routing import application
 
 
 @pytest.mark.django_db(transaction=True)
 def test_user_register(client):
-    user = client.post('/api/register/',{'username': 'user1','password': '12qwertyU','email': 'user1@yopmail.com'})
+    client.post('/api/register/', {'username': 'user1', 'password': '12qwertyU', 'email': 'user1@yopmail.com'})
     assert get_user_model().objects.all().count() == 1
     results = get_user_model().objects.all().values('username', 'email')
     results = list(results)
@@ -40,7 +42,10 @@ async def test_user_can_login():
 
     await communicator.send_json_to(data)
 
-    resp = await communicator.receive_json_from()
+    f = asyncio.Future()
+    f.set_result(None)
+    with patch('core.utils.autolog', return_value=f):
+        resp = await communicator.receive_json_from()
 
     assert resp == {'action': 'login', 'status': 'ok', 'msg': 'Logged in successfully'}
 

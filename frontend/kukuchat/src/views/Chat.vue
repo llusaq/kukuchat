@@ -1,14 +1,15 @@
 <template>
-    <div class="wrapper" @keyup.esc="escape()">
+    <div class="wrapper">
         <Menu :current-chat="currentChat"></Menu>
         <div class="row chat">
-            <Contacts v-if="currentChat == '' && width <= 600"></Contacts>
-            <Contacts v-else-if="width > 600"></Contacts>
-            <Conversation v-if="currentChat != '' && width <= 600"></Conversation>
-            <Conversation v-else-if=" currentChat != '' && width > 600"></Conversation>
+            <Contacts v-if="currentChat == '' && width <= 600 && isChat"></Contacts>
+            <Contacts v-else-if="width > 600 && isChat"></Contacts>
+            <Conversation :current-chat="currentChat" v-if="currentChat != '' && width <= 600"></Conversation>
+            <Conversation :current-chat="currentChat" v-else-if=" currentChat != '' && width > 600"></Conversation>
+            <h5 v-if="!isChat">Add chat service to see something</h5>
+            <h5 v-if="currentChat == '' && isChat">Choose contact to start conversation</h5>
         </div>
     </div>
-
 </template>
 
 <script>
@@ -16,34 +17,30 @@
 import Contacts from '@/components/Contacts.vue'
 import Menu from '@/components/Menu.vue'
 import Conversation from '@/components/Conversation.vue'
+import { store } from '@/store'
+import { mapState } from 'vuex';
 
 export default {
     name: 'chat',
 
-    props: ['name'],
     components: {
         Contacts,
         Menu,
         Conversation,
-        //  CreateMessage
     },
-
-
-
     data() {
         return {
             currentChat: '',
+            currentChatId: '',
             width: window.innerWidth,
-            messages: []
         }
     },
-
-
+    computed: mapState([
+        'isChat',
+        'contacts'
+    ]),
     created: function () {
         window.addEventListener('keyup', this.onkey)
-        //  let ref = baza.collection('messages').orderBy('timestamp');
-
-        //  ref.onSnapshot(snapshot)
     },
     beforeDestroy: function () {
         window.removeEventListener('keyup', this.onkey)
@@ -54,8 +51,102 @@ export default {
                 this.currentChat = '';
             }
         }
+    },
+    beforeMount() {
+        if (store.getters.socket === undefined) {
+                this.$router.push({name: 'home'})
+        }
+        else {
+            store.getters.socket.onmessage = ({data}) => {
+                data = JSON.parse(data)
+                console.log(data)
+
+                if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
+                    store.commit('setMessenger');
+                    store.commit('setChat');
+                }
+
+                if (data.action === 'am_i_logged' && !data.is_logged) {
+                    this.$router.push({name: 'home'})
+                }
+
+                if ((data.action === 'provider_facebook_get_required_credentials' && data.password) ||
+                    (data.action === 'provider_skype_get_required_credentials' && data.password)) {
+                    store.commit('setPasswordField');
+                    store.commit('setPasswordHelp', data.password.help);
+                }
+
+                if ((data.action === 'provider_facebook_get_required_credentials' && data.username) ||
+                    (data.action === 'provider_skype_get_required_credentials' && data.username)) {
+                    store.commit('setUsernameField');
+                    store.commit('setUsernameHelp', data.username.help);
+                }
+
+                if (data.status === 'error') {
+                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                    store.commit('setPreloader', false);
+                }
+
+                if (data.action === 'provider_facebook_login' && data.status === 'ok') {
+                    store.commit('setPreloader', false);
+                    store.commit('changeAddAccountForm', false);
+                    M.toast({html: 'Messenger added', classes: 'green darken-2'})
+                    store.commit('setMessenger');
+                    store.commit('setChat');
+                }
+
+                if (data.action === 'provider_skype_login' && data.status === 'ok') {
+                    store.commit('setPreloader', false);
+                    this.close();
+                    M.toast({html: 'Skype added', classes: 'green darken-2'})
+                    store.commit('setSkype');
+                    store.commit('setChat');
+                }
+
+                if (data.action === 'provider_facebook_get_chats') {
+                    store.commit('setContacts', data.chats);
+
+                    for (let contact of this.contacts) {
+                        
+                    }
+
+                    /*for (let contact of this.contacts) {
+                        let data = {
+                            action: 'get_messages',
+                            chat_ids: [contact.id],
+                            count: 1
+                        }
+                        store.getters.socket.send(JSON.stringify(data));
+                    }*/
+                }
+
+                if (data.action === 'get_messages' && data.chats[0].messages.length === 1) {
+                    this.contacts[data.chat_id - 1].provider = data.chats[0].messages[0].provider
+                    this.contacts[data.chat_id - 1].lastMsg = data.chats[0].messages[0].content
+                    this.contacts = Array.from(this.contacts);
+                }
+                
+                if (data.action === 'get_messages' && data.chats[0].messages.length !== 1) {
+                    store.commit('setMessages', data.messages.reverse());
+                }
+
+                if (data.action === 'new_message' && data.chat_id === this.currentChat.id) {
+                    store.commit('pushMessage', data);
+                }
+            };
+            let data = {
+                action: 'am_i_logged'
+            }
+            store.getters.socket.send(JSON.stringify(data));
+
+            data = {
+                action: 'provider_facebook_am_i_logged'
+            }
+            store.getters.socket.send(JSON.stringify(data));
+        }
     }
-}
+} 
+
 </script>
 
 <style scoped>
@@ -70,6 +161,15 @@ export default {
 
 .wrapper > .chat {
     height: 100%;
+}
+
+h5 {
+    display: inline-block;
+    margin: 200px auto 0 auto;
+}
+
+.chat {
+    text-align: center;
 }
 
 </style>

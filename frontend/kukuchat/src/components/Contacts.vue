@@ -7,13 +7,13 @@
                 </div>
             </div>
         <ul class="scroll">
-            <li v-for="contact in filteredList" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
+            <li v-for="contact in filteredList" :key="contact.id" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
                 <div class="icon">
-				    <span :style="{backgroundColor: randomColor()}">AV</span>
+				    <span>{{ contact.name.charAt(0) }}{{ contact.name.charAt(contact.name.indexOf(' ') + 1) }}</span>
                 </div>
                 <div class="info">
-                    <span class="user"> <b>{{ contact }}</b> </span><br>
-				    <span class="message">last message</span>
+                    <span class="user"> <b>{{ contact.name }}</b> </span><br>
+				    <span class="message">{{ contact.lastMsg }}</span>
                 </div>
                 <div class="clear"></div>
 		    </li>
@@ -22,49 +22,45 @@
 </template>
 
 <script>
+
+import { store } from '@/store'
+import { mapState } from 'vuex';
+
 export default {
     name: 'contacts',
     data() {
         return {
-            contacts: [
-                'Andro Vsmopasdasdasjd',
-                'Andro Vsmop2',
-                'Andro Vsmop3',
-                'Andro Vsmop4',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
-                'Andro Vsmop5',
-            ],
             randcolor: '',
             clicked: '',
-            search: ''
+            search: '',
         }
     },
     methods: {
-         randomColor() {
-            const h = Math.floor(Math.random() * 360),
-            s = Math.floor(Math.random() * 70 + 30) + '%',
-            l = Math.floor(Math.random() * 60 + 20) + '%';
-            return `hsl(${h},${s},${l})`;
-            console.log(`hsl(${h},${s},${l})`);
-        },
         select(name) {
             this.$parent.currentChat = name;
             this.clicked = name;
             this.search = '';
-        }
+        },
+    },
+    beforeMount() {
+            let data = {
+                action: 'provider_facebook_get_chats',
+            }
+            store.getters.socket.send(JSON.stringify(data));
     },
     computed: {
         selectedContact() {
             return this.$parent.currentChat === '' ? '' : this.$parent.currentChat; 
         },
         filteredList() {
+            if (this.contacts !== undefined)
             return this.contacts.filter(contact => {
-                return contact.toLowerCase().includes(this.search.toLowerCase())
+                if (contact.name !== undefined) {
+                    return contact.name.toLowerCase().includes(this.search.toLowerCase())
+                }
             })
-        }
+        },
+        ...mapState(['contacts']),
     }
 }
 </script>
@@ -75,6 +71,7 @@ export default {
     float: left;
     padding: 0;
     background-color: #f5f5f5;
+    text-align: left;
 }
 
 .contacts {
@@ -183,6 +180,10 @@ span {
 
 .active i {
     color: #64b5f6 !important;
+}
+
+.icon span {
+    background-color: #ffab40;
 }
 
 </style>

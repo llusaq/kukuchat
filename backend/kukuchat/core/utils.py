@@ -8,10 +8,10 @@ from core.models import Contact, Chat
 async def autolog(user, providers):
     for provider in providers:
         name, prov_obj = provider
-        credentials = signing.loads(user.credentials)
         try:
+            credentials = signing.loads(user.credentials)
             credentials = credentials[name]
-        except KeyError:
+        except Exception:
             continue
         await prov_obj.login(credentials)
 
@@ -24,7 +24,29 @@ async def store_creds(user, prov_inst, data):
     user.save()
 
 
-async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_name):
+async def get_chat_for_provider_contact(prov_name, uid, name, user):
+    try:
+        contact = await database_sync_to_async(Contact.objects.get)(
+            provider=prov_name,
+            uid=uid,
+            owner=user,
+        )
+    except Contact.DoesNotExist:
+        chat = await database_sync_to_async(Chat.objects.create)(
+            name=name,
+        )
+        await database_sync_to_async(Contact.objects.create)(
+            provider=prov_name,
+            uid=uid,
+            chat=chat,
+            owner=user,
+        )
+    else:
+        chat = contact.chat
+    return chat
+
+
+async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_name, user):
     ret = []
     for c in contact:
         uid = uid_func(c)
@@ -35,10 +57,17 @@ async def turn_provider_contacts_into_chats(contact, uid_func, name_func, prov_n
                 contact = Contact.objects.get(
                     provider=prov_name,
                     uid=uid,
+                    owner=user,
                 )
             except Contact.DoesNotExist:
                 chat = Chat.objects.create(
                     name=name,
+                )
+                Contact.objects.create(
+                    provider=prov_name,
+                    uid=uid,
+                    chat=chat,
+                    owner=user,
                 )
             else:
                 chat = contact.chat
