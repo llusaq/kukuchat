@@ -1,7 +1,7 @@
 from core.providers.provider import BaseProvider
 from core.models import Contact, Chat
 from core import utils
-from telethon import TelegramClient, sync
+from pyrogram import Client
 
 from channels.db import database_sync_to_async
 
@@ -23,12 +23,12 @@ class TelegramProvider(BaseProvider):
         return self._required_credentials
 
     async def login(self, data):
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
+        phone = '+48609523405'
         apiid = '873144'
         apihash = 'd7f230abfc4ec30c8323fa5fd2223161'
-        self.client = TelegramClient('telegram_session', apiid, apihash)
-        await self.client.start()
-        #import ipdb; ipdb.set_trace()
+        app = Client("new_telegram_session", phone, apiid, apihash)
+        await app.start()
 
         return {'msg': 'Succesfully logged into Telegram'}
 
