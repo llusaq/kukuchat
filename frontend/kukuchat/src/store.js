@@ -24,7 +24,8 @@ export const store = new Vuex.Store({
             id: '',
             name: '',
             provider: '',
-            lastMsg: '',
+            last_msg: '',
+            time: '',
         }
     ],
     messages: [
@@ -79,8 +80,11 @@ export const store = new Vuex.Store({
     changeAddAccountForm(state, value) {
       state.addAccountForm = value;
     },
-    set(state) {
-      state.skype = true;
+    setProvider(state, [id, value]) {
+      state.contacts[id].provider = value;
+    },
+    setLastMsg(state, [id, value]) {
+      state.contacts[id - 1].last_msg = value;
     },
     set(state) {
       state.skype = true;
@@ -106,16 +110,6 @@ export const store = new Vuex.Store({
     set(state) {
       state.skype = true;
     },
-    set(state) {
-      state.skype = true;
-    },
-    
-
-
-
-  },
-  actions: {
-
   },
   getters: {
     isDark: state => state.isDark,

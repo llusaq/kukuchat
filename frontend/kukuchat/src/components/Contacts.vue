@@ -7,13 +7,13 @@
                 </div>
             </div>
         <ul class="scroll">
-            <li v-for="contact in filteredList" :key="contact.id" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
+            <li v-for="contact in sortedList" :key="contact.id" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
                 <div class="icon">
 				    <span>{{ contact.name.charAt(0) }}{{ contact.name.charAt(contact.name.indexOf(' ') + 1) }}</span>
                 </div>
                 <div class="info">
                     <span class="user"> <b>{{ contact.name }}</b> </span><br>
-				    <span class="message">{{ contact.lastMsg }}</span>
+				    <span class="message">{{ contact.last_msg }}</span>
                 </div>
                 <div class="clear"></div>
 		    </li>
@@ -54,13 +54,22 @@ export default {
         },
         filteredList() {
             if (this.contacts !== undefined)
-            return this.contacts.filter(contact => {
-                if (contact.name !== undefined) {
-                    return contact.name.toLowerCase().includes(this.search.toLowerCase())
-                }
-            })
+            if (this.search !== '') {
+                return this.contacts.filter(contact => {
+                    if (contact.name !== undefined) {
+                        return contact.name.toLowerCase().includes(this.search.toLowerCase())
+                    }
+                })
+            }
+            return this.contacts;
         },
         ...mapState(['contacts']),
+        sortedList() {
+            this.filteredList.sort( ( a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            });
+                return this.filteredList;
+        }
     }
 }
 </script>

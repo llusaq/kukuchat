@@ -104,12 +104,11 @@ export default {
                 }
 
                 if (data.action === 'provider_facebook_get_chats') {
-                    store.commit('setContacts', data.chats);
 
-                    let ids = [];
-                    for (let contact of data.chats) {
+                    let ids = [0,1,2,3,4,5,6,7,8,9];
+                    /*for (let contact of data.chats) {
                         ids.push(contact.id);
-                    }
+                    }*/
                     console.log(ids);
                     let data2 = {
                         action: 'get_messages',
@@ -117,12 +116,17 @@ export default {
                         count: 1
                     }
                     store.getters.socket.send(JSON.stringify(data2));
+                    
+                    store.commit('setContacts', data.chats);
                     }
 
                 if (data.action === 'get_messages' && data.chats[0].messages.length === 1) {
-                    this.contacts[data.chat_id - 1].provider = data.chats[0].messages[0].provider
-                    this.contacts[data.chat_id - 1].lastMsg = data.chats[0].messages[0].content
-                    this.contacts = Array.from(this.contacts);
+                    for(let chat of data.chats) {
+                        store.commit('setProvider', [chat.id, chat.messages[0].provider]);
+                        store.commit('setLastMsg', [chat.id, chat.messages[0].content]);
+
+                    }
+                    
                 }
                 
                 if (data.action === 'get_messages' && data.chats[0].messages.length !== 1) {
