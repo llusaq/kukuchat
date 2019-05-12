@@ -26,6 +26,15 @@ class MessageEvent(skpy.event.SkypeNewMessageEvent):
             userId='123',
             time=dt(2019, 5, 4, 10),
         )
+
+    def __getattr__(self, name):
+        return self.__dict__['msg']
+
+    def __str__(self):
+        return ''
+
+    def __repr__(self):
+        return ''
             
 
 
@@ -234,7 +243,7 @@ async def test_can_receive_messages(logged_skype):
 
     skpy.SkypeEventLoop.return_value.onEvent(
         MessageEvent(),
-        )
+    )
     
     resp = await logged_skype.receive_json_from()
 
@@ -274,29 +283,33 @@ async def test_can_get_chat_messages(logged_skype):
 
     await logged_skype.send_json_to({
         'action': 'get_messages',
-        'chat_id': chat.id,
+        'chat_ids': [chat.id],
+        'count':50,
+
     })
 
     resp = await logged_skype.receive_json_from()
-
+    
     assert resp == {
         'action': 'get_messages',
-        'chat_id': chat.id,
-        'messages': [
-            {
-                'provider': 'skype',
-                'content': 'whats up',
-                'me': False,
-                'time': '2019-05-02 21:58:26+00:00',
-            },
-            {
-                'provider': 'skype',
-                'content': 'I am fine',
-                'me': True,
-                'time': '2019-05-02 21:56:46+00:00',
-            },
-        ],
-        'status':'ok'
+        'chats': [{
+            'id': chat.id,
+            'messages': [
+                {
+                    'provider': 'skype',
+                    'content': 'whats up',
+                    'me': False,
+                    'time': '2019-05-02 21:58:26+00:00',
+                },
+                {
+                    'provider': 'skype',
+                    'content': 'I am fine',
+                    'me': True,
+                    'time': '2019-05-02 21:56:46+00:00',
+                },
+            ],
+        }],
+        'status':'ok',
     }
     
     await logged_skype.disconnect()
