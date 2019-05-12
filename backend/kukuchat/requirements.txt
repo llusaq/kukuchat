@@ -14,3 +14,4 @@ ipdb==0.12
 pywin32==224
 mysqlclient==1.4.2.post1
 Pyrogram==0.13.0.async
+tgcrypto==1.1.1

@@ -27,8 +27,8 @@ class TelegramProvider(BaseProvider):
         phone = '+48609523405'
         apiid = '873144'
         apihash = 'd7f230abfc4ec30c8323fa5fd2223161'
-        app = Client("new_telegram_session", phone, apiid, apihash)
-        await app.start()
+        self.client = Client("new_telegram_session_test", apiid, apihash)
+        await self.client.start()
 
         return {'msg': 'Succesfully logged into Telegram'}
 
@@ -37,7 +37,15 @@ class TelegramProvider(BaseProvider):
         return {'is_logged': is_logged}
 
     async def get_chats(self, data):
-        pass
+        all_contacts = self.client.get_contacts()
+        active_contacts = [c for c in all_contacts if c.id]
+        chats = await utils.turn_provider_contacts_into_chats(
+            active_contacts,
+            lambda c: c.id,
+            lambda c: c.first_name,
+            'telegram',
+        )
+        return {'chats': [{'id': c.id, 'name': c.first_name} for c in chats]}
 
     async def post_login_action(self, data):
         pass
