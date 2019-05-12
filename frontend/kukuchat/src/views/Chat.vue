@@ -119,11 +119,11 @@ export default {
                     store.getters.socket.send(JSON.stringify(data2));
                     }
 
-                /*if (data.action === 'get_messages' && data.chats[0].messages.length === 1) {
+                if (data.action === 'get_messages' && data.chats[0].messages.length === 1) {
                     this.contacts[data.chat_id - 1].provider = data.chats[0].messages[0].provider
                     this.contacts[data.chat_id - 1].lastMsg = data.chats[0].messages[0].content
                     this.contacts = Array.from(this.contacts);
-                }*/
+                }
                 
                 if (data.action === 'get_messages' && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.chats[0].messages.reverse());
