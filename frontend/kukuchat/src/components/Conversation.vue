@@ -86,7 +86,7 @@ export default {
         currentChat() {
             let data = {
                 action: 'get_messages',
-                chat_id: this.currentChat.id,
+                chat_ids: [this.currentChat.id],
                 count: 50
             }
             store.getters.socket.send(JSON.stringify(data));

@@ -35,9 +35,6 @@ export default {
             search: '',
         }
     },
-    computed: mapState([
-        'contacts'
-    ]),
     methods: {
         select(name) {
             this.$parent.currentChat = name;
@@ -62,7 +59,8 @@ export default {
                     return contact.name.toLowerCase().includes(this.search.toLowerCase())
                 }
             })
-        }
+        },
+        ...mapState(['contacts']),
     }
 }
 </script>

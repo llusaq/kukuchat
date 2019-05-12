@@ -54,7 +54,6 @@ import { store } from '@/store'
 import Preloader from './Preloader'
 import { close } from 'fs';
 import { mapState } from 'vuex';
-import { constants } from 'crypto';
 
 export default {
     name: 'addAccount',
@@ -83,7 +82,8 @@ export default {
         'usernameHelp',
         'passwordField',
         'passwordHelp',
-        'preloader'
+        'preloader',
+        'addAccountForm'
     ]),
     methods: {
         editLogin() {
@@ -115,7 +115,8 @@ export default {
         },
         login(choosenAccount) {
             if (choosenAccount === 'Messenger') {
-               store.commit('setPreloader', true);
+                store.commit('changeAddAccountForm', true);
+                store.commit('setPreloader', true);
                 let data = {
                     action: 'provider_facebook_login',
                     username: this.username,
@@ -132,6 +133,13 @@ export default {
                     password: this.password,
                 }
                 store.getters.socket.send(JSON.stringify(data));
+            }
+        }
+    },
+    watch: {
+        addAccountForm() {
+            if (!addAccountForm) {
+                this.close();
             }
         }
     }

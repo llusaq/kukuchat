@@ -75,11 +75,13 @@ export default {
                     store.commit('setPasswordField');
                     store.commit('setPasswordHelp', data.password.help);
                 }
+
                 if ((data.action === 'provider_facebook_get_required_credentials' && data.username) ||
                     (data.action === 'provider_skype_get_required_credentials' && data.username)) {
                     store.commit('setUsernameField');
                     store.commit('setUsernameHelp', data.username.help);
                 }
+
                 if (data.status === 'error') {
                     M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
                     store.commit('setPreloader', false);
@@ -87,11 +89,12 @@ export default {
 
                 if (data.action === 'provider_facebook_login' && data.status === 'ok') {
                     store.commit('setPreloader', false);
-                    this.close();
+                    store.commit('changeAddAccountForm', false);
                     M.toast({html: 'Messenger added', classes: 'green darken-2'})
                     store.commit('setMessenger');
                     store.commit('setChat');
                 }
+
                 if (data.action === 'provider_skype_login' && data.status === 'ok') {
                     store.commit('setPreloader', false);
                     this.close();
@@ -102,23 +105,28 @@ export default {
 
                 if (data.action === 'provider_facebook_get_chats') {
                     store.commit('setContacts', data.chats);
+
                     for (let contact of this.contacts) {
+                        
+                    }
+
+                    /*for (let contact of this.contacts) {
                         let data = {
                             action: 'get_messages',
-                            chat_id: contact.id,
+                            chat_ids: [contact.id],
                             count: 1
                         }
                         store.getters.socket.send(JSON.stringify(data));
-                    }
+                    }*/
                 }
 
-                /*if (data.action === 'get_messages' && data.messages.length === 1) {
-                    this.contacts[data.chat_id - 1].provider = data.messages[0].provider
-                    this.contacts[data.chat_id - 1].lastMsg = data.messages[0].content
+                if (data.action === 'get_messages' && data.chats[0].messages.length === 1) {
+                    this.contacts[data.chat_id - 1].provider = data.chats[0].messages[0].provider
+                    this.contacts[data.chat_id - 1].lastMsg = data.chats[0].messages[0].content
                     this.contacts = Array.from(this.contacts);
-                }*/
+                }
                 
-                if (data.action === 'get_messages' && data.messages.length !== 1) {
+                if (data.action === 'get_messages' && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.messages.reverse());
                 }
 
