@@ -81,7 +81,10 @@ class FacebookProvider(BaseProvider):
         return {'provider': 'facebook'}
 
     async def get_last_messages(self, uid, count):
-        msgs = await self.client.fetchThreadMessages(uid, limit=count)
+        try:
+            msgs = await self.client.fetchThreadMessages(uid, limit=count)
+        except Exception:
+            return []
         msgs = [
             {
                 'provider': 'facebook',

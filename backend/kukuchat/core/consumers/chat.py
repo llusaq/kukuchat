@@ -148,7 +148,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                         for m in msgs
                     ]
                 }
-                for c_id, msgs in contact_msgs
+                for c_id, msgs in contact_msgs if msgs
             ]
         }
 
