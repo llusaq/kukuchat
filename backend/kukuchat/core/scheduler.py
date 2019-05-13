@@ -26,7 +26,7 @@ class Scheduler:
         func = functools.partial(self.consumer.get_messages, {'chat_ids': [chat_id], 'count': count})
         msgs = await self._try_few_times(func)
 
-        await self.consumer.send_json({'action': 'new_message', **msgs})
+        await self.consumer.send_json({'action': 'get_messages', **msgs})
 
     async def _get_messages(self, provider, data):
         for c_id in data['chat_ids']:
