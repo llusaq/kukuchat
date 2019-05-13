@@ -16,6 +16,7 @@ class Scheduler:
                 i += 1
                 if i < n:
                     return {}
+                await asyncio.sleep(0.3)
             else:
                 return res
 
