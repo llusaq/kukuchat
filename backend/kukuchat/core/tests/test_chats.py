@@ -1,9 +1,27 @@
+import asyncio
+
 import pytest
 
 from channels.auth import get_user
 
 from core.tests.fixtures import *
 from core.models import Contact, Chat
+from core.scheduler import Scheduler
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_can_schedule_task(comm, monkeypatch):
+    monkeypatch.setattr(Scheduler, 'add_task', MagicMock())
+    monkeypatch.setattr(asyncio, 'create_task', MagicMock())
+
+    data = {'action': 'schedule_foo'}
+    await comm.send_json_to(data)
+    resp = await comm.receive_json_from()
+    assert resp == {**data, 'status': 'ok', 'scheduled': True}
+    asyncio.create_task.assert_called_once_with(Scheduler.add_task.return_value)
+
+    await comm.disconnect()
 
 
 @pytest.mark.asyncio
