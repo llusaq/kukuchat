@@ -147,7 +147,16 @@ export default {
                     store.commit('pushMessage', data);
                 }
 
-                
+                if (data.action === 'send_message') {
+                    let msg = {
+                        action: 'get_messages',
+                        chat_ids: [data.chat_id],
+                        count: 100
+                    }
+                    store.getters.socket.send(JSON.stringify(msg));
+                }
+
+
             };
             let data = {
                 action: 'am_i_logged'
