@@ -73,7 +73,7 @@ export default {
         ...mapState(['contacts']),
         sortedList() {
             this.filteredList.sort( ( a, b) => {
-                return new Date(a.date) - new Date(b.date);
+                return new Date(b.time) - new Date(a.time);
             });
                 return this.filteredList;
         }

@@ -54,7 +54,7 @@ export default {
     },
     beforeMount() {
         if (store.getters.socket === undefined) {
-                this.$router.push({name: 'home'})
+            this.$router.push({name: 'home'})
         }
         else {
             store.getters.socket.onmessage = ({data}) => {
@@ -110,10 +110,11 @@ export default {
 
                 if (data.action === 'provider_facebook_get_chats') {
 
-                    let ids = [0,1,2,3,4,5,6,7,8,9];
-                    /*for (let contact of data.chats) {
+                    //let ids = [0,1,2,3,4,5,6,7,8,9];
+                    let ids = [];
+                    for (let contact of data.chats) {
                         ids.push(contact.id);
-                    }*/
+                    }
                     console.log(ids);
                     let data2 = {
                         action: 'get_messages',
@@ -125,16 +126,15 @@ export default {
                     store.commit('setContacts', data.chats);
                     }
 
-                if (data.action === 'get_messages' && data.chats[0].messages.length === 1) {
-                    for(let chat of data.chats) {
+                if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length === 1) {
+                    for (let chat of data.chats) {
                         store.commit('setProvider', [chat.id, chat.messages[0].provider]);
                         store.commit('setLastMsg', [chat.id, chat.messages[0].content]);
-
+                        store.commit('setTime', [chat.id, chat.messages[0].time]);
                     }
-                    
                 }
 
-                if (data.action === 'get_messages' && data.chats[0].messages.length !== 1) {
+                if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.chats[0].messages.reverse());
                 }
                 else {

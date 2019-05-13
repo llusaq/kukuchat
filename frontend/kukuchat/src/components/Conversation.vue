@@ -65,14 +65,16 @@ export default {
     ]),
     methods: {
         send() {
-            this.messages.push({
+            let data = {
                 content: document.getElementById("textarea1").value,
                 time: moment().format(),
                 provider: 'facebook',
                 me: true
-            });
+            }
 
-            let data = {
+            store.commit('pushMessage', data);
+
+            data = {
                 'action': 'send_message',
                 'provider': 'facebook',
                 'chat_id': this.currentChat.id,

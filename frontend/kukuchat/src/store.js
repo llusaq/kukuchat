@@ -75,16 +75,34 @@ export const store = new Vuex.Store({
       state.messages = value;
     },
     pushMessage(state, value) {
-      state.messages.push(value);
+      let msg = {
+        content: value.content,
+        time: value.time,
+        proveder: value.provider,
+        me: false
+      }
+      console.log(typeof state.messages)
+      //state.messages.push(msg);
     },
     changeAddAccountForm(state, value) {
       state.addAccountForm = value;
     },
     setProvider(state, [id, value]) {
-      state.contacts[id].provider = value;
+      if (state.contacts[id] != null)
+        state.contacts[id].provider = value;
     },
     setLastMsg(state, [id, value]) {
-      state.contacts[id - 1].last_msg = value;
+      if (value == null) {
+        value = 'No messages yet!'
+      }
+      if (value === "") {
+        value = '👍'
+      }
+      if (state.contacts[id] != null)
+        state.contacts[id - 1].last_msg = value;
+    },
+    setTime(state, [id, value]) {
+        state.contacts[id - 1].time = value;
     },
     set(state) {
       state.skype = true;
