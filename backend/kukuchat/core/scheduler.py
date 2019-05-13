@@ -2,6 +2,7 @@ import functools
 
 import asyncio
 
+
 class Scheduler:
 
     def __init__(self, consumer):
