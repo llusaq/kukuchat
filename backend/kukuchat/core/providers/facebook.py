@@ -94,7 +94,8 @@ class FacebookProvider(BaseProvider):
     async def get_last_messages(self, uid, count):
         try:
             msgs = await self.client.fetchThreadMessages(uid, limit=count)
-        except Exception:
+        except Exception as e:
+            print(str(e))
             return []
         msgs = [
             {
