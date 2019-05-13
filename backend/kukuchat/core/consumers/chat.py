@@ -19,6 +19,7 @@ from core.providers import skype
 from core.providers import telegram
 from core import utils
 from core import models
+from core import scheduler
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -29,6 +30,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.facebook = facebook.FacebookProvider(self.scope, self.on_message_consumer)
         self.skype = skype.SkypeProvider(self.scope, self.on_message_consumer)
         self.telegram = telegram.TelegramProvider(self.scope)
+
+        self.scheduler = scheduler.Scheduler(self)
 
     async def disconnect(self, code):
         pass
@@ -78,8 +81,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 if method_name == 'login':
                     await utils.store_creds(user, provider_instance, data)
             else:
-                method = getattr(self, action)
-                resp = await method(data)
+                if action == 'schedule':
+                    asyncio.create_task(self.scheduler.add_task(data))
+                    resp = {'scheduled': True}
+                else:
+                    method = getattr(self, action)
+                    resp = await method(data)
         except Exception as e:
             return await self.send_json({
                 'action': action,
