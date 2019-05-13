@@ -74,15 +74,11 @@ export const store = new Vuex.Store({
     setMessages(state, value) {
       state.messages = value;
     },
+    clearMessages(state) {
+      state.messages = [];
+    },
     pushMessage(state, value) {
-      let msg = {
-        content: value.content,
-        time: value.time,
-        proveder: value.provider,
-        me: false
-      }
-      console.log(typeof state.messages)
-      //state.messages.push(msg);
+      //state.messages.push(value);
     },
     changeAddAccountForm(state, value) {
       state.addAccountForm = value;

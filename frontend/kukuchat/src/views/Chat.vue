@@ -31,7 +31,6 @@ export default {
     data() {
         return {
             currentChat: '',
-            currentChatId: '',
             width: window.innerWidth,
         }
     },
@@ -87,11 +86,6 @@ export default {
                     store.commit('setUsernameHelp', data.username.help);
                 }
 
-                if (data.status === 'error') {
-                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                    store.commit('setPreloader', false);
-                }
-
                 if (data.action === 'provider_facebook_login' && data.status === 'ok') {
                     store.commit('setPreloader', false);
                     store.commit('changeAddAccountForm', false);
@@ -114,6 +108,12 @@ export default {
                     let ids = [];
                     for (let contact of data.chats) {
                         ids.push(contact.id);
+                        /*let data2 = {
+                            action: 'get_messages',
+                            chat_ids: [contact.id],
+                            count: 1
+                        }
+                        store.getters.socket.send(JSON.stringify(data2));*/
                     }
                     console.log(ids);
                     let data2 = {
@@ -131,11 +131,13 @@ export default {
                         store.commit('setProvider', [chat.id, chat.messages[0].provider]);
                         store.commit('setLastMsg', [chat.id, chat.messages[0].content]);
                         store.commit('setTime', [chat.id, chat.messages[0].time]);
+                        store.commit('setPreloader', false);
                     }
                 }
 
                 if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.chats[0].messages.reverse());
+                    store.commit('setPreloader', false);
                 }
                 else {
                     store.commit('setMessages', '');
@@ -144,6 +146,8 @@ export default {
                 if (data.action === 'new_message' && data.chat_id === this.currentChat.id) {
                     store.commit('pushMessage', data);
                 }
+
+                
             };
             let data = {
                 action: 'am_i_logged'
@@ -187,6 +191,8 @@ h5 {
 .chat {
     text-align: center;
 }
+
+
 
 </style>
 

@@ -36,10 +36,18 @@ export default {
         }
     },
     methods: {
-        select(name) {
-            this.$parent.currentChat = name;
-            this.clicked = name;
+        select(contact) {
+            this.$parent.currentChat = contact;
+            this.clicked = contact;
             this.search = '';
+            store.commit('clearMessages');
+            store.commit('setPreloader', true);
+            let data = {
+                action: 'get_messages',
+                chat_ids: [contact.id],
+                count: 100
+            }
+            store.getters.socket.send(JSON.stringify(data));
         },
     },
     beforeMount() {
@@ -52,8 +60,6 @@ export default {
             action: 'provider_skype_get_chats',
         }
         store.getters.socket.send(JSON.stringify(data));
-
-
     },
     computed: {
         selectedContact() {
@@ -71,6 +77,7 @@ export default {
             return this.contacts;
         },
         ...mapState(['contacts']),
+
         sortedList() {
             this.filteredList.sort( ( a, b) => {
                 return new Date(b.time) - new Date(a.time);
@@ -156,27 +163,6 @@ span {
     clear: both;
 }
 
-/* width */
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  border-radius: 10px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #64b5f6;
-  border-radius: 10px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #1e88e5;
-}
-
 .nav-wrapper {
     width: 90%;
     margin: 0 auto;
@@ -200,6 +186,27 @@ span {
 
 .icon span {
     background-color: #ffab40;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #64b5f6;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #1e88e5;
 }
 
 </style>

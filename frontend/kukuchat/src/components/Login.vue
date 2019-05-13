@@ -1,5 +1,6 @@
 <template>
     <div class="col card s12 m5 pull-m1 l4 pull-l1">
+        <Preloader v-if="preloader"></Preloader>
         <form @submit.prevent="pingServer">
             <div class="card-content">
                 <span class="card-title center-align">Log In</span>
@@ -18,9 +19,11 @@
                         <a @click="signup()" class="btn deep-orange darken-2 waves-effect waves-light col s4">Sign Up </a>
                         <a @click="restore()" class="restore">Forgot password?</a>
                     </div>
+
                 </div>
             </div>
         </form>
+
     </div>
 </template>
 
@@ -28,10 +31,14 @@
 
 import { http } from '@/plugins/axios'
 import { store } from '@/store'
-import { constants } from 'crypto';
+import { mapState } from 'vuex';
+import Preloader from './Preloader'
 
 export default {
     name: 'Login',
+    components: {
+        Preloader
+    },
     data() {
         return {
         username: '',
@@ -61,6 +68,7 @@ export default {
             this.passwordFieldText= this.passwordFieldText === 'visibility' ? 'visibility_off' : 'visibility'
         },
         login() {
+            store.commit('setPreloader', true);
             if (this.username === '') {
                 this.validateLogin = 'invalid'
                 M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
@@ -77,7 +85,10 @@ export default {
                 store.getters.socket.send(JSON.stringify(data));
             }
         }
-    }
+    },
+    computed: mapState([
+        'preloader',
+    ]),
 }
 </script>
 
@@ -125,6 +136,12 @@ i {
     right: 20px;
     cursor: pointer;
     z-index: 9999;
+}
+
+.preloader-wrapper {
+    position: absolute;
+    top: 7%;
+    left: 30%;
 }
 
 </style>

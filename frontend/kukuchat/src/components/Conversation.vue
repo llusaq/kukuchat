@@ -1,44 +1,49 @@
 <template>
     <div class="col l9 m8">
         <div class="msg_cont_area">
+            <Preloader v-if="preloader"></Preloader>
             <p class="text-secondary nomessages" v-if="messages === ''">No messages yet!</p>
             <div class="messages" id="messages">
-                <div v-for="message in messages" :key="message.id" >
-                    <div v-if="!message.me && messages.content !== '' && messages.content !== null" class="notMe">
+                <div v-for="message in messages" :key="message.id" class="msg-container">
+                    <div v-if="!message.me && messages.content !== null" class="notMe">
                         <span class="author">{{currentChat.name}} </span>
-                        <span class="time">{{ moment(message.time).format('YYYY-MM-DD  HH:mm')}}</span>
+                        <div class="tooltip">
+                            <span class="time">{{ moment(message.time).format('HH:mm')}}</span>
+                            <span class="tooltiptext time">{{ moment(message.time).format('YYYY:MM:DD  HH:mm')}}</span>
+                        </div>
                         <div class="message" v-if="message.content !== ''">
                             <span>{{message.content}}</span>
                         </div>
+                        <div class="message" v-else>
+                            <span>👍</span>
+                        </div>
                     </div>
-                    <div v-else-if="messages.content !== '' && messages.content !== null" class="me">
+                    <div v-else-if="messages.content !== null" class="me">
                         <span class="author">Me </span>
-                        <span class="time">{{moment(message.time).format('YYYY-MM-DD  HH:mm')}}</span>
-                        <div class="message">
+                        <div class="tooltip">
+                            <span class="time">{{ moment(message.time).format('HH:mm')}}</span>
+                            <span class="tooltiptext time">{{ moment(message.time).format('YYYY:MM:DD  HH:mm')}}</span>
+                        </div>
+                        <div class="message" v-if="message.content !== ''">
                             <span>{{message.content}}</span>
+                        </div>
+                        <div class="message" v-else>
+                            <span>👍</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="sendingsection">
-            <div class="row">
-                <form class="col s12" rows="4" cols="50">
-                    <div class="row">
-                        <div class="input-field col s12" rows="4" cols="50">
-                            <textarea v-model="message" id="textarea1" class="materialize-textarea"></textarea>
-                            <label for="textarea1" rows="4" cols="50">Your message</label>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="sendbtnarea">
-
-
-                <button @click="send()" class="btn waves-effect waves-light blue" type="submit" name="action">SEND
-                    <i class="material-icons right">send</i>
-                </button>
-            </div>
+            <form>
+                <div class="input-field col s12">
+                    <textarea v-model="message" id="textarea1" class="materialize-textarea"></textarea>
+                    <label for="textarea1">Your message</label>
+                </div>
+            </form>
+            <button @click="send()" class="btn waves-effect waves-light blue" type="submit" name="action">SEND
+                <i class="material-icons right">send</i>
+            </button>
         </div>
     </div>
 </template>
@@ -48,20 +53,25 @@
 import { store } from '@/store'
 import moment from 'moment'
 import { mapState } from 'vuex';
+import Preloader from './Preloader'
 
 export default {
     name: 'conversation',
+    components: {
+        Preloader
+    },
     data() {
         return {
-
             message: '',
+            hover: true
         }
     },
     props: {
         currentChat: ''
     },
     computed: mapState([
-        'messages'
+        'messages',
+        'preloader'
     ]),
     methods: {
         send() {
@@ -88,12 +98,7 @@ export default {
     },
     watch: {
         currentChat() {
-            let data = {
-                action: 'get_messages',
-                chat_ids: [this.currentChat.id],
-                count: 50
-            }
-            store.getters.socket.send(JSON.stringify(data));
+            
         }
     },
     updated() {
@@ -112,14 +117,14 @@ export default {
     }
 
     .message {
-        margin: 0 0 10px 0;
-
+        margin-bottom: 5px;
     }
 
     .messages {
         overflow-y: scroll;
         height: 70vh;
         margin-left: 20px;
+        padding-right: 10px;
     }
 
     .message span {
@@ -128,15 +133,15 @@ export default {
     }
 
     .notMe > .message > span {
-        padding: 10px 10px;
+        padding: 3px 10px;
         background-color: #a5d6a7;
-        border-radius: 1.3em;
+        border-radius: 0.8em;
     }
 
     .me > .message > span {
-        padding: 10px 10px;
+        padding: 3px 10px;
         background-color: #90caf9;
-        border-radius: 1.3em;
+        border-radius: 0.8em;
     }
 
     .notMe {
@@ -150,5 +155,103 @@ export default {
     .col {
         padding: 0;
     }
+
+    .preloader-wrapper {
+        position: absolute;
+        top: 40%;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    /* Tooltip container */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Tooltip text */
+    .notMe > .tooltip .tooltiptext {
+        visibility: hidden;
+        position: absolute;
+        width: 120px;
+        background-color: #9e9e9e;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+        margin-left: 10px;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .me > .tooltip .tooltiptext {
+        visibility: hidden;
+        position: absolute;
+        width: 120px;
+        background-color: #9e9e9e;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.3s;
+        top: -2px;
+        bottom: auto;
+        right: 128%;
+    }
+
+    /* Tooltip arrow */
+    .notMe > .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        margin-top: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent #9e9e9e transparent transparent;
+    }
+
+    .me > .tooltip .tooltiptext::after {
+       content: "";
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        margin-top: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent transparent #9e9e9e;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    /* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #64b5f6;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #1e88e5;
+}
 
 </style>
