@@ -24,11 +24,11 @@ async def test_can_schedule_get_messages(comm, monkeypatch):
     await comm.send_json_to(data)
     resp = await comm.receive_json_from()
     resp = await comm.receive_json_from()
-    assert resp == {'action': 'new_message', 'foo': 'bar'}
+    assert resp == {'action': 'get_messages', 'foo': 'bar'}
     resp = await comm.receive_json_from()
-    assert resp == {'action': 'new_message', 'foo': 'bar'}
+    assert resp == {'action': 'get_messages', 'foo': 'bar'}
     resp = await comm.receive_json_from()
-    assert resp == {'action': 'new_message', 'foo': 'bar'}
+    assert resp == {'action': 'get_messages', 'foo': 'bar'}
 
 
     await comm.disconnect()
