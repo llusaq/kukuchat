@@ -13,6 +13,7 @@ class Scheduler:
             try:
                 res = await func()
             except Exception as e:
+                print(e)
                 i += 1
                 if i < n:
                     return {}
