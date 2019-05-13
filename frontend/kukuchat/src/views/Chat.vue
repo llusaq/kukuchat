@@ -117,10 +117,13 @@ export default {
                     }
                     console.log(ids);
                     let data2 = {
-                        action: 'get_messages',
+                        action: 'schedule',
+                        provider: 'facebook',
+                        method: 'get_messages',
                         chat_ids: ids,
                         count: 1
                     }
+
                     store.getters.socket.send(JSON.stringify(data2));
                     
                     store.commit('setContacts', data.chats);
