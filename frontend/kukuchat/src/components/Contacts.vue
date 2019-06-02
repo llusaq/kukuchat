@@ -13,7 +13,9 @@
                 </div>
                 <div class="info">
                     <span class="user"> <b>{{ contact.name }}</b> </span><br>
-				    <span class="message">{{ contact.last_msg }}</span>
+				    <span v-if="contact.newMsg" class="message"><b>{{ contact.last_msg }}</b></span>
+				    <span v-else class="message">{{ contact.last_msg }}</span>
+                    <i v-if="contact.newMsg" class="material-icons lens">fiber_manual_record</i>
                 </div>
                 <div class="clear"></div>
 		    </li>
@@ -42,6 +44,7 @@ export default {
             this.search = '';
             store.commit('clearMessages');
             store.commit('setPreloader', true);
+            store.commit('setNewMsg', [contact.id, false]);
             let data = {
                 action: 'get_messages',
                 chat_ids: [contact.id],
@@ -51,15 +54,10 @@ export default {
         },
     },
     beforeMount() {
-            let data = {
-                action: 'provider_facebook_get_chats',
-            }
-            store.getters.socket.send(JSON.stringify(data));
+        
 
-        data = {
-            action: 'provider_skype_get_chats',
-        }
-        store.getters.socket.send(JSON.stringify(data));
+        
+        
     },
     computed: {
         selectedContact() {
@@ -207,6 +205,10 @@ span {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #1e88e5;
+}
+
+.lens {
+    color: red;
 }
 
 </style>

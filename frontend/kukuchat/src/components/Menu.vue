@@ -25,6 +25,7 @@
         </a>
             <AddAccount></AddAccount>
             <Settings></Settings>
+            <Premium></Premium>
     </div>
 </template>
 
@@ -32,12 +33,14 @@
 import { store } from '@/store'
 import AddAccount from './AddAccount'
 import Settings from './Settings'
+import Premium from './Premium'
 
 export default {
     name: 'dropdownmenu',
     components: {
       AddAccount,
-      Settings
+      Settings,
+      Premium
     },
     data() {
         return {
@@ -50,6 +53,7 @@ export default {
     mounted() {
         $('#add-account').modal();
         $('#settings').modal();
+        $('#premium').modal();
     },
     methods: {
         settings() {

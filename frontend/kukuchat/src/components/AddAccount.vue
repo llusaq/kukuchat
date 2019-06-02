@@ -15,15 +15,15 @@
                     <img src="@/assets/skype.png" alt="skype">
                     <p> <b>Skype</b> </p>
                 </div>
-                <div v-if="!viber" class="col l2 m2">
+                <div v-if="!viber" class="col l2 m2" @click="viberLogin()">
                     <img src="@/assets/viber.png" alt="viber">
                     <p> <b>Viber</b> </p>
                 </div>
-                <div v-if="!gmail" class="col l2 m2">
+                <div v-if="!gmail" class="col l2 m2" @click="gmailLogin()">
                     <img src="@/assets/gmail.png" alt="gmail">
                     <p> <b>Gmail</b> </p>
                 </div>
-                <div v-if="!telegram" class="col l2 m2">
+                <div v-if="!telegram" class="col l2 m2" @click="telegramLogin()">
                     <img src="@/assets/telegram.png" alt="telegram">
                     <p> <b>Telegram</b> </p>
                 </div>
@@ -45,6 +45,7 @@
             </div>
         </div>
         <Preloader v-if="preloader"></Preloader>
+        
     </div>
 </template>
 
@@ -52,13 +53,13 @@
 
 import { store } from '@/store'
 import Preloader from './Preloader'
-import { close } from 'fs';
+
 import { mapState } from 'vuex';
 
 export default {
     name: 'addAccount',
     components: {
-        Preloader
+        Preloader,
     },
     data() {
         return {
@@ -69,6 +70,7 @@ export default {
             passwordFieldText: 'visibility_off',
             validateLogin: '',
             validatePassword: '',
+            premiumForm: false
         }
     },
     computed: mapState([
@@ -113,6 +115,31 @@ export default {
                 }
             store.getters.socket.send(JSON.stringify(data));
         },
+        viberLogin() {
+            if (this.acountCount() < 2) {
+
+            }
+            else {
+                this.premiumForm = true;
+                $('#premium').modal('open');
+            }
+        },
+        gmailLogin() {
+            if (this.acountCount() < 2) {
+
+            }
+            else {
+
+            }
+        },
+        telegramLogin() {
+            if (this.acountCount() < 2) {
+
+            }
+            else {
+
+            }
+        },
         login(choosenAccount) {
             if (choosenAccount === 'Messenger') {
                 store.commit('changeAddAccountForm', true);
@@ -134,6 +161,25 @@ export default {
                 }
                 store.getters.socket.send(JSON.stringify(data));
             }
+        },
+        acountCount() {
+            let count = 0;
+            if (this.messenger) {
+                count++;
+            }
+            if (this.skype) {
+                count++;
+            }
+            if (this.telegram) {
+                count++;
+            }
+            if (this.viber) {
+                count++;
+            }
+            if (this.gmail) {
+                count++;
+            }
+            return count;
         }
     },
     watch: {
@@ -169,10 +215,6 @@ a, span {
 .modal {
     overflow: hidden;
     cursor: default;
-}
-
-.modal-close {
-    float: right;
 }
 
 .modal-content .col {

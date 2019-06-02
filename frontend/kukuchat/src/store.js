@@ -19,21 +19,20 @@ export const store = new Vuex.Store({
     passwordHelp: '',
     preloader: false,
     addAccountForm: true,
-    contacts: [
-        {
-            id: '',
-            name: '',
-            provider: '',
-            last_msg: '',
-            time: '',
-        }
-    ],
+    contacts: []/*[{
+          id: '',
+          name: '',
+          provider: '',
+          last_msg: '',
+          time: '',
+          newMsg: false,
+    }]*/,
     messages: [
         {
             content: '',
             time: '',
             provider: '',
-            me: false
+            me: false,
         }
     ],
   },
@@ -69,7 +68,7 @@ export const store = new Vuex.Store({
       state.preloader = value;
     },
     setContacts(state, value) {
-      state.contacts = value;
+      state.contacts = state.contacts.concat(value);
     },
     setMessages(state, value) {
       state.messages = value;
@@ -78,27 +77,36 @@ export const store = new Vuex.Store({
       state.messages = [];
     },
     pushMessage(state, value) {
-      //state.messages.push(value);
+      state.messages.push(value);
     },
     changeAddAccountForm(state, value) {
       state.addAccountForm = value;
     },
     setProvider(state, [id, value]) {
-      if (state.contacts[id] != null)
-        state.contacts[id].provider = value;
+      let result = state.contacts.find( contact => contact.id === id );
+      if (result != null)
+        result.provider = value;
     },
     setLastMsg(state, [id, value]) {
+      let result = state.contacts.find( contact => contact.id === id );
       if (value == null) {
-        value = 'No messages yet!'
+        result.last_msg = 'No messages yet!'
       }
       if (value === "") {
-        value = '👍'
+        result.last_msg = '👍'
       }
-      if (state.contacts[id] != null)
-        state.contacts[id - 1].last_msg = value;
+      else
+        result.last_msg = value;
     },
     setTime(state, [id, value]) {
-        state.contacts[id - 1].time = value;
+      let result = state.contacts.find( contact => contact.id === id );
+      if (result != null)
+        result.time = value;
+    },
+    setNewMsg(state, [id, value]) {
+      let result = state.contacts.find( contact => contact.id === id );
+      if (result != null)
+      result.newMsg = value;
     },
     set(state) {
       state.skype = true;

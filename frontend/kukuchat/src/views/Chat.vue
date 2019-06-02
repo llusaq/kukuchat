@@ -63,11 +63,19 @@ export default {
                 if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
                     store.commit('setMessenger');
                     store.commit('setChat');
+                    let data = {
+                        action: 'provider_facebook_get_chats',
+                    }
+                    store.getters.socket.send(JSON.stringify(data));
                 }
 
                 if (data.action === 'provider_skype_am_i_logged' && data.is_logged) {
                     store.commit('setSkype');
                     store.commit('setChat');
+                    let data = {
+                        action: 'provider_skype_get_chats',
+                    }
+                    store.getters.socket.send(JSON.stringify(data));
                 }
 
                 if (data.action === 'am_i_logged' && !data.is_logged) {
@@ -103,78 +111,83 @@ export default {
                 }
 
                 if (data.action === 'provider_facebook_get_chats') {
-
-                    //let ids = [0,1,2,3,4,5,6,7,8,9];
                     let ids = [];
                     for (let contact of data.chats) {
                         ids.push(contact.id);
-                        /*let data2 = {
-                            action: 'get_messages',
-                            chat_ids: [contact.id],
-                            count: 1
-                        }
-                        store.getters.socket.send(JSON.stringify(data2));*/
                     }
-                    console.log(ids);
                     let data2 = {
                         action: 'schedule',
                         provider: 'facebook',
                         method: 'get_messages',
                         chat_ids: ids,
-                        count: 1
+                        count: 2
                     }
 
                     store.getters.socket.send(JSON.stringify(data2));
-                    
                     store.commit('setContacts', data.chats);
-                    }
+                }
+
+                if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length === 2) {
+                    store.commit('setProvider', [data.chats[0].id, data.chats[0].messages[0].provider]);
+                    store.commit('setLastMsg', [data.chats[0].id, data.chats[0].messages[0].content]);
+                    store.commit('setTime', [data.chats[0].id, data.chats[0].messages[0].time]);
+                    store.commit('setPreloader', false);
+                    //store.commit('setNewMsg', [data.chats[0].id, true]);
+                } 
 
                 if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length === 1) {
-                    for (let chat of data.chats) {
-                        store.commit('setProvider', [chat.id, chat.messages[0].provider]);
-                        store.commit('setLastMsg', [chat.id, chat.messages[0].content]);
-                        store.commit('setTime', [chat.id, chat.messages[0].time]);
-                        store.commit('setPreloader', false);
-                    }
+                    store.commit('setProvider', [data.chats[0].id, data.chats[0].messages[0].provider]);
+                    store.commit('setLastMsg', [data.chats[0].id, data.chats[0].messages[0].content]);
+                    store.commit('setTime', [data.chats[0].id, data.chats[0].messages[0].time]);
+                    store.commit('setPreloader', false);
+                    store.commit('setNewMsg', [data.chats[0].id, true]);
                 }
 
                 if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.chats[0].messages.reverse());
                     store.commit('setPreloader', false);
                 }
-                else {
-                    store.commit('setMessages', '');
-                }
 
-                if (data.action === 'new_message' && data.chat_id === this.currentChat.id) {
-                    store.commit('pushMessage', data);
+                if (data.action === 'new_message') {
+                    if (data.chat_id === this.currentChat.id)
+                        store.commit('pushMessage', data);
+                    store.commit('setProvider', [data.chat_id, data.provider]);
+                    store.commit('setLastMsg', [data.chat_id, data.content]);
+                    store.commit('setTime', [data.chat_id, data.time]);
                 }
 
                 if (data.action === 'send_message') {
-                    let msg = {
-                        action: 'get_messages',
-                        chat_ids: [data.chat_id],
-                        count: 100
-                    }
-                    store.getters.socket.send(JSON.stringify(msg));
+                    data.me = true;
+                    store.commit('pushMessage', data);
                 }
 
+                if (data.action === 'provider_skype_get_chats') {
+                    console.log(data.chats);
+                    store.commit('setContacts', data.chats);
+                }
 
-            };
-            let data = {
+                
+
+            }
+            let query = {
                 action: 'am_i_logged'
             }
-            store.getters.socket.send(JSON.stringify(data));
+            store.getters.socket.send(JSON.stringify(query));
 
-            data = {
-                action: 'provider_facebook_am_i_logged'
+            query = {
+                action: 'provider_facebook_am_i_logged' 
             }
-            store.getters.socket.send(JSON.stringify(data));
+            store.getters.socket.send(JSON.stringify(query));
 
-            data = {
-                action: 'provider_skype_am_i_logged'
+            query = {
+                action: 'provider_skype_am_i_logged' 
             }
-            store.getters.socket.send(JSON.stringify(data));
+            store.getters.socket.send(JSON.stringify(query)); 
+        }
+    },
+    mounted() {
+        if (store.getters.socket != null) {
+            
         }
     }
 }

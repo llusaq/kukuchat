@@ -72,10 +72,12 @@ export default {
             if (this.username === '') {
                 this.validateLogin = 'invalid'
                 M.toast({html: 'Login must not be empty', classes: 'red darken-2'})
+                store.commit('setPreloader', false);
             }
             else if (this.password === '') {
                 this.validatePassword = 'invalid'
                 M.toast({html: 'Password must not be empty', classes: 'red darken-2'})
+                store.commit('setPreloader', false);
             } else {
                 let data = {
                     action: 'login',
