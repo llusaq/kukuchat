@@ -16,13 +16,19 @@
                     <!-- <i v-if="contact.newMsg" class="material-icons lens">fiber_manual_record</i> -->
                     <span v-if="contact.newMsg" class="message"><b>{{ contact.last_msg }}</b></span>
                     <span v-else class="message">{{ contact.last_msg }}</span>
+                        <img v-if="contact.msgProvider === 'facebook'" src="@/assets/messenger.png" alt="messanger">
+                        <img v-if="contact.msgProvider === 'skype'" src="@/assets/skype.png" alt="skype">
+                        <img v-if="contact.msgProvider === 'viber'" src="@/assets/viber.png" alt="viber">
+                        <img v-if="contact.msgProvider === 'gmail'" src="@/assets/gmail.png" alt="gmail">
+                        <img v-if="contact.msgProvider === 'telegram'" src="@/assets/telegram.png" alt="telegram">
+                    
                 </div>
                 <div class="services">
-                    <img v-if="messenger" src="@/assets/messenger.png" alt="messanger">
-                    <img v-if="skype" src="@/assets/skype.png" alt="messanger">
-                    <img v-if="viber" src="@/assets/viber.png" alt="messanger">
-                    <img v-if="gmail" src="@/assets/gmail.png" alt="messanger">
-                    <img v-if="telegram" src="@/assets/telegram.png" alt="messanger">
+                    <img v-if="contact.provider.includes('facebook')" src="@/assets/messenger.png" alt="messanger">
+                    <img v-if="contact.provider.includes('skype')" src="@/assets/skype.png" alt="skype">
+                    <img v-if="contact.provider.includes('viber')" src="@/assets/viber.png" alt="viber">
+                    <img v-if="contact.provider.includes('gmail')" src="@/assets/gmail.png" alt="gmail">
+                    <img v-if="contact.provider.includes('telegram')" src="@/assets/telegram.png" alt="telegram">
                 </div>
                 <div class="clear"></div>
 		    </li>
@@ -180,6 +186,11 @@ span {
     text-overflow: ellipsis;
 }
 
+.message {
+    width: calc(100% - 25px);
+    float: right;
+}
+
 .icon {
     float: left;
     margin-right: 10px;
@@ -287,6 +298,7 @@ span {
     width: 65px;
     float: right;
     margin-top: 8px;
+    margin-right: -20px;
 }
 
 .services img {
@@ -297,9 +309,14 @@ span {
 
 .text {
     float: left;
-    width: calc(100% - 150px);
+    width: calc(100% - 115px);
 }
 
+.text img {
+    width: 20px;
+    height: auto;
+    margin-top: 7px;
+}
 
 </style>
 

@@ -94,7 +94,7 @@ export const store = new Vuex.Store({
     setProvider(state, [id, value]) {
       let result = state.contacts.find( contact => contact.id === id );
       if (result != null)
-        result.provider = value;
+        result.msgProvider = value;
     },
     setLastMsg(state, [id, value]) {
       let result = state.contacts.find( contact => contact.id === id );
