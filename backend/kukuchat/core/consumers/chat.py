@@ -83,9 +83,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                         'time': None,
                     })
                 ids.add(c.id)
-            return {
-                'chats': ret,
-            }
+        return {
+            'chats': ret,
+        }
 
     async def on_message_consumer(self, provider, author_uid, author_name, content, user, time=None):
         if not time:
