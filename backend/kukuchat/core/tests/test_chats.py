@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -26,7 +27,39 @@ async def test_can_schedule_task(comm, monkeypatch):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
-async def test_can_log_in(comm):
+async def est_can_split_chats(comm):
+    user = await get_user(comm.instance.scope)
+
+    chat = Chat.objects.create(name='Łukasz Trojok')
+    contacts = [
+        Contact.objects.create(
+            provider='skype',
+            uid='123',
+            chat=chat,
+            owner=user,
+        ),
+        Contact.objects.create(
+            provider='facebook',
+            uid='123',
+            chat=chat,
+            owner=user,
+        ),
+    ]
+
+    await comm.send_json_to({
+        'action': 'split_chat',
+        'chat_id': chat.id,
+    })
+
+    resp = await comm.receive_json_from()
+
+    assert Contact.objects.values('provider', 'chat_id') == {
+    }
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db(transaction=True)
+async def test_can_merge_chats(comm):
     chats = [
         Chat.objects.create(
             name='Andrii Donets',

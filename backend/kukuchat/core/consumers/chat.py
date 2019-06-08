@@ -8,6 +8,7 @@ import pytz
 import tempfile
 
 from django.contrib.auth import authenticate
+from django.core import signing
 from django.db.models import Case, When
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
@@ -36,6 +37,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         pass
 
+    async def unmerge_chats(data):
+        pass
+
     async def merge_chats(self, data):
         ids = data['chat_ids']
         to_delete = ids[1:]
@@ -53,6 +57,35 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 await database_sync_to_async(con.save)()
         models.Chat.objects.filter(pk__in=to_delete).delete()
         return {'from_ids': ids, 'chat_id': first.id, 'chat_name': first.name}
+
+    async def get_chats(self, data):
+        user = await get_user(self.scope)
+        providers = signing.loads(user.credentials)
+        for prov in providers:
+            provider = getattr(self, prov)
+            contacts = await provider._get_active_contacts()
+            chats = await utils.turn_provider_contacts_into_chats(
+                contacts.contacts,
+                contacts.id_fun,
+                contacts.name_fun,
+                prov,
+                user=user,
+            )
+            ret = []
+            ids = set()
+            for c in chats:
+                if c.id not in ids:
+                    ret.append({
+                        'id': c.id,
+                        'name': c.name,
+                        'provider': list(c.contact_set.all().values_list('provider', flat=True)),
+                        'last_msg': None,
+                        'time': None,
+                    })
+                ids.add(c.id)
+            return {
+                'chats': ret
+            }
 
     async def on_message_consumer(self, provider, author_uid, author_name, content, user, time=None):
         if not time:

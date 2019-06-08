@@ -16,9 +16,5 @@ class BaseProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_chats(self, data):
-        pass
-
-    @abstractmethod
     async def post_login_action(self, data):
         pass

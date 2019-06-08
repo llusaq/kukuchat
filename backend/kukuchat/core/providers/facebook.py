@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime
 import json
 import pathlib
@@ -11,7 +10,7 @@ from fbchat.models import Message, ThreadType
 from channels.auth import get_user
 
 from core.providers.provider import BaseProvider
-from core import utils
+from core import models
 
 
 class FacebookProvider(BaseProvider):
@@ -73,28 +72,13 @@ class FacebookProvider(BaseProvider):
     async def post_login_action(self, data):
         pass
 
-    async def get_chats(self, data):
+    async def _get_active_contacts(self):
         all_contacts = await self.client.fetchAllUsers()
-        active_contacts = [c for c in all_contacts if c.uid]
-        chats = await utils.turn_provider_contacts_into_chats(
-            active_contacts,
-            lambda c: c.uid,
-            lambda c: c.name,
-            'facebook',
-            user=self.user,
+        return models.Contacts(
+            contacts=[c for c in all_contacts if c.uid],
+            id_fun=lambda c: c.uid,
+            name_fun=lambda c: c.name,
         )
-        return {
-            'chats': [
-                {
-                    'id': c.id,
-                    'name': c.name,
-                    'provider': list(c.contact_set.all().values_list('provider', flat=True)),
-                    'last_msg': None,
-                    'time': None,
-                }
-                for c in chats
-            ]
-        }
 
     async def _on_message(self, *args, **kwargs):
         if kwargs['thread_type'] != ThreadType.USER:
