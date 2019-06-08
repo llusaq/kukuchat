@@ -10,7 +10,6 @@ from channels.testing import WebsocketCommunicator
 
 import pytest
 import fbchat
-import skpy
 
 from kukuchat.routing import application
 
@@ -72,6 +71,7 @@ async def logged_fb(db, client, monkeypatch):
     f.set_result(None)
 
     fbchat.Client.return_value.start.return_value = f
+    fbchat.Client.return_value.getSession.return_value = {'key': 'value'}
 
     await comm.send_json_to({
         'action': 'provider_facebook_login',

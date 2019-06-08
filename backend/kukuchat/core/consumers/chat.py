@@ -83,7 +83,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             else:
                 if action == 'schedule':
                     asyncio.create_task(self.scheduler.add_task(data))
-                    resp = {'scheduled': True}
+                    resp = {'scheduled': True, 'method': data['method']}
                 else:
                     method = getattr(self, action)
                     resp = await method(data)
