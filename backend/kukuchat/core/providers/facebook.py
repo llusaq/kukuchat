@@ -42,6 +42,9 @@ class FacebookProvider(BaseProvider):
     async def get_required_credentials(self, data):
         return self._required_credentials
 
+    async def logout(self):
+        await self.client.logout()
+
     async def login(self, data):
         username = data['username']
         password = data['password']
