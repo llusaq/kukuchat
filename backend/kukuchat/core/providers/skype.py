@@ -74,7 +74,11 @@ class SkypeProvider(BaseProvider):
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
-        msgs = self.sk.chats[uid].getMsgs()
+        try:
+            msgs = self.sk.chats[uid].getMsgs()
+        except Exception as e:
+            print(str(e))
+            print(f'Could not get messages from {uid}')
         msgs = [{
             'provider': 'skype',
             'content': m.content,
