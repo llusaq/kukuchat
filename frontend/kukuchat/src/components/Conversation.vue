@@ -35,12 +35,7 @@
             </div>
         </div>
         <div class="sendingsection">
-            <form>
-                <div class="input-field col s12">
-                    <textarea v-model="message" rows="20" id="textarea" class="materialize-textarea"></textarea>
-                    <label for="textarea">Your message</label>
-                </div>
-            </form>
+            <textarea v-model="message" rows="20" id="textarea" class="message"></textarea>
             <a @click="send()" class="send-btn">Send</a>
         </div>
     </div>
