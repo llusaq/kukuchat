@@ -171,6 +171,7 @@ export default {
             }
 
             if (choosenAccount === 'Skype') {
+                store.commit('changeAddAccountForm', true);
                 store.commit('setPreloader', true);
                 let data = {
                     action: 'provider_skype_login',

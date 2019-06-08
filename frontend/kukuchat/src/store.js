@@ -73,6 +73,12 @@ export const store = new Vuex.Store({
     clearContacts(state) {
       state.contacts = [];
     },
+    removeContact(state, id) {
+      let index = state.contacts.indexOf(id);
+      if (index != -1) {
+        state.contacts.splice(index, 1);
+      }
+    },
     setMessages(state, value) {
       state.messages = value;
     },

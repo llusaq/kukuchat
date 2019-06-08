@@ -10,12 +10,19 @@
             <li v-for="contact in sortedList" :key="contact.id" @dblclick="select(contact)" @click="click(contact)" :class="{ clicked: selectedContact === contact, selected: mergeIds.includes(contact.id), mergeTo: mergeIds.indexOf(contact.id) === 0}" >
                 <div class="icon">
 				    <span>{{ contact.name.charAt(0) }}{{ contact.name.charAt(contact.name.indexOf(' ') + 1) }}</span>
-                </div>
-                <div class="info">
+                </div> 
+                <div class="text">
                     <span class="user"> <b>{{ contact.name }}</b> </span>
-                    <i v-if="contact.newMsg" class="material-icons lens">fiber_manual_record</i>
-				    <span v-if="contact.newMsg" class="message"><b>{{ contact.last_msg }}</b></span>
-				    <span v-else class="message">{{ contact.last_msg }}</span>
+                    <!-- <i v-if="contact.newMsg" class="material-icons lens">fiber_manual_record</i> -->
+                    <span v-if="contact.newMsg" class="message"><b>{{ contact.last_msg }}</b></span>
+                    <span v-else class="message">{{ contact.last_msg }}</span>
+                </div>
+                <div class="services">
+                    <img v-if="messenger" src="@/assets/messenger.png" alt="messanger">
+                    <img v-if="skype" src="@/assets/skype.png" alt="messanger">
+                    <img v-if="viber" src="@/assets/viber.png" alt="messanger">
+                    <img v-if="gmail" src="@/assets/gmail.png" alt="messanger">
+                    <img v-if="telegram" src="@/assets/telegram.png" alt="messanger">
                 </div>
                 <div class="clear"></div>
 		    </li>
@@ -84,6 +91,10 @@ export default {
             }
             store.getters.socket.send(JSON.stringify(data));
             M.toast({html: 'Contacts merged successfully', classes: 'green darken-2'})
+            for (let i = 1; i < this.mergeIds.length; i++) {
+                store.commit('removeContact', i);
+            }
+            this.cancelMerge();
         }
     },
     beforeMount() {
@@ -104,7 +115,14 @@ export default {
             }
             return this.contacts;
         },
-        ...mapState(['contacts']),
+        ...mapState([
+            'contacts',
+            'messenger',
+            'skype',
+            'viber',
+            'gmail',
+            'telegram'
+        ]),
 
         sortedList() {
             this.filteredList.sort( ( a, b) => {
@@ -153,13 +171,10 @@ span {
     width: 30px;
 }
 
-.user {
-    width: auto;
-}
 
 .user, .message {
     margin-top: 5px;
-    width: calc(100% - 70px);
+    width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -181,11 +196,6 @@ span {
     margin: 5px;
 }
 
-.info {
-    float: left;
-    display: contents;
-
-}
 
 .clicked {
     background-color: #dcdcdc;
@@ -271,6 +281,23 @@ span {
 .merge-form a:hover {
     font-size: 20px;
     padding: 12px 0;
+}
+
+.services {
+    width: 65px;
+    float: right;
+    margin-top: 8px;
+}
+
+.services img {
+    width: 20px;
+    height: auto;
+    margin: 0 3px;
+}
+
+.text {
+    float: left;
+    width: calc(100% - 150px);
 }
 
 
