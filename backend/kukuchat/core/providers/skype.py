@@ -10,10 +10,11 @@ import pytz
 from skpy import SkypeAuthException
 from skpy import SkypeNewMessageEvent
 
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import async_to_sync
 
 from core.providers.provider import BaseProvider
 from core import utils
+from core import models
 
 
 class SkypeProvider(BaseProvider):
@@ -57,28 +58,13 @@ class SkypeProvider(BaseProvider):
         is_logged = self.sk.conn.connected is True
         return {'is_logged': is_logged}
 
-    async def get_chats(self, data):
+    async def _get_active_contacts(self):
         all_contacts = self.sk.contacts
-        active_contacts = [c for c in all_contacts if c.id]
-        chats = await utils.turn_provider_contacts_into_chats(
-            active_contacts,
-            lambda c: c.id,
-            lambda c: f'{c.name.first} {c.name.last}',
-            'skype',
-            user=self.user,
+        return models.Contacts(
+            contacts=[c for c in all_contacts if c.id],
+            id_fun=lambda c: c.id,
+            name_fun=lambda c: f'{c.name.first} {c.name.last}',
         )
-        return {
-            'chats': [
-                {
-                    'id': c.id,
-                    'name': c.name,
-                    'provider': list(c.contact_set.all().values_list('provider', flat=True)),
-                    'last_msg': None,
-                    'time': None,
-                }
-                for c in chats
-            ]
-        }
 
     async def post_login_action(self, data):
         pass

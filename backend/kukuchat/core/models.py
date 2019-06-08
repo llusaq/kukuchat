@@ -1,9 +1,13 @@
+from collections import namedtuple
 import secrets
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 from jsonfield import JSONField
+
+
+Contacts = namedtuple('Contacts', 'contacts id_fun name_fun')
 
 
 def get_random_seq():

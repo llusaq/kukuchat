@@ -1,11 +1,9 @@
+import asyncio
 from datetime import datetime as dt
-from uuid import uuid4
 from unittest.mock import MagicMock
 import tempfile
 import os
-from pprint import pprint
 from types import SimpleNamespace
-from skpy import SkypeEventLoop
 
 
 from django.core import signing
@@ -53,7 +51,7 @@ class SkypeContactsMock:
         ]
 
     contacts = [
-         SimpleNamespace(
+        SimpleNamespace(
             id='123',
             name=SimpleNamespace(
                 first='Tomasz',
@@ -75,6 +73,7 @@ class SkypeContactsMock:
                 c.getMsgs = self.getMsgs
                 return c
 
+
 @pytest.fixture(autouse=True)
 @pytest.mark.asyncio
 def my_skype_chat(monkeypatch):
@@ -88,19 +87,18 @@ async def test_can_log_to(comm):
     await comm.send_json_to({
         'action': 'provider_skype_am_i_logged',
     })
-    
+
     resp = await comm.receive_json_from()
 
-    assert resp == {'status': 'ok', 'action': 'provider_skype_am_i_logged', 'is_logged':False}
+    assert resp == {'status': 'ok', 'action': 'provider_skype_am_i_logged', 'is_logged': False}
 
     await comm.send_json_to({
         'action': 'provider_skype_login',
         'username': '579631148',
         'password': '12qwertyU',
-    }) 
+    })
     f = asyncio.Future()
     f.set_result(None)
-    start_mock = MagicMock()
 
     resp = await comm.receive_json_from()
 
@@ -129,6 +127,7 @@ async def test_can_log_to(comm):
     assert resp == {'status': 'ok', 'action': 'provider_skype_am_i_logged', 'is_logged': True}
     await comm.disconnect()
 
+
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
 async def test_required_cred(comm):
@@ -151,9 +150,9 @@ async def test_required_cred(comm):
 @pytest.mark.django_db(transaction=True)
 async def test_can_list_chats(logged_skype):
     await logged_skype.send_json_to({
-        'action': 'provider_skype_get_chats',
+        'action': 'get_chats',
     })
-    f = [ 
+    f = [
         SimpleNamespace(
             name=SimpleNamespace(
                 first='Andrzej',
@@ -170,13 +169,14 @@ async def test_can_list_chats(logged_skype):
         ),
     ]
 
-    skpy.Skype.return_value.contacts = f 
+    skpy.Skype.return_value.contacts = f
     resp = await logged_skype.receive_json_from()
     chats = resp['chats']
 
     assert Chat.objects.all().count() == len(chats)
     assert 'Andrzej Pączek' in [c['name'] for c in resp['chats']]
     await logged_skype.disconnect()
+
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
@@ -197,15 +197,16 @@ async def test_store_creds(comm):
 
     await comm.disconnect()
 
+
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
 async def test_can_send_messages(logged_skype):
-    
+
     andrzej_uid = 'andriy5852'
     andrzej = await database_sync_to_async(Contact.objects.create)(
-        provider = 'skype',
-        uid = andrzej_uid,
-        chat = await database_sync_to_async(Chat.objects.create)(name='Andrzej'),
+        provider='skype',
+        uid=andrzej_uid,
+        chat=await database_sync_to_async(Chat.objects.create)(name='Andrzej'),
         owner=await get_user(logged_skype.instance.scope),
     )
     await logged_skype.send_json_to({
@@ -235,6 +236,7 @@ async def test_can_send_messages(logged_skype):
     }
     await logged_skype.disconnect()
 
+
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
 async def test_can_receive_messages(logged_skype):
@@ -243,7 +245,7 @@ async def test_can_receive_messages(logged_skype):
     skpy.SkypeEventLoop.return_value.onEvent(
         MessageEvent(),
     )
-    
+
     resp = await logged_skype.receive_json_from()
 
     chat = Contact.objects.get(chat__name='Tomasz jD')
@@ -251,13 +253,14 @@ async def test_can_receive_messages(logged_skype):
         'action': 'new_message',
         'content': 'Priviet maniunia',
         'userId': chat.id,
-        'provider':'skype',
+        'provider': 'skype',
     }
 
     assert resp['content'] == 'Priviet maniunia'
     assert resp['chat_id'] == chat.id
 
     await logged_skype.disconnect()
+
 
 @pytest.mark.asyncio
 @pytest.mark.django_db(transaction=True)
@@ -281,12 +284,11 @@ async def test_can_get_chat_messages(logged_skype):
     await logged_skype.send_json_to({
         'action': 'get_messages',
         'chat_ids': [chat.id],
-        'count':50,
-
+        'count': 50,
     })
 
     resp = await logged_skype.receive_json_from()
-    
+
     assert resp == {
         'action': 'get_messages',
         'chats': [{
@@ -306,7 +308,7 @@ async def test_can_get_chat_messages(logged_skype):
                 },
             ],
         }],
-        'status':'ok',
+        'status': 'ok',
     }
-    
+
     await logged_skype.disconnect()

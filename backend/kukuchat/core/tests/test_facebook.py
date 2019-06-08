@@ -1,7 +1,6 @@
 import asyncio
 from types import SimpleNamespace
 from unittest.mock import MagicMock
-import json
 
 from channels.db import database_sync_to_async
 from channels.auth import get_user
@@ -103,7 +102,7 @@ async def test_required_creds(comm):
 @pytest.mark.django_db(transaction=True)
 async def test_can_list_chats(logged_fb):
     await logged_fb.send_json_to({
-        'action': 'provider_facebook_get_chats',
+        'action': 'get_chats',
     })
 
     f = asyncio.Future()
