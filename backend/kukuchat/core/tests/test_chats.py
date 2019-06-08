@@ -15,7 +15,7 @@ async def test_can_schedule_task(comm, monkeypatch):
     monkeypatch.setattr(Scheduler, 'add_task', MagicMock())
     monkeypatch.setattr(asyncio, 'create_task', MagicMock())
 
-    data = {'action': 'schedule_foo'}
+    data = {'action': 'schedule', 'method': 'make_foo'}
     await comm.send_json_to(data)
     resp = await comm.receive_json_from()
     assert resp == {**data, 'status': 'ok', 'scheduled': True}

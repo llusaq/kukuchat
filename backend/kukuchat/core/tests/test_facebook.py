@@ -1,6 +1,7 @@
 import asyncio
 from types import SimpleNamespace
 from unittest.mock import MagicMock
+import json
 
 from channels.db import database_sync_to_async
 from channels.auth import get_user
@@ -43,19 +44,31 @@ async def test_can_log_in(comm):
 
     start_mock = fbchat.Client.return_value.start
 
+    fbchat.Client.return_value.getSession.return_value = {'key': 'value'}
+
     f = asyncio.Future()
     f.set_result(None)
     start_mock.return_value = f
 
     resp = await comm.receive_json_from()
 
-    start_mock.assert_called_once_with('579631148', '12qwertyU')
+    start_mock.assert_called_once_with('579631148', '12qwertyU', cookies=None)
 
     assert resp == {
         'action': 'provider_facebook_login',
         'status': 'ok',
         'msg': 'Successfuly logged into Facebook'
     }
+
+    await comm.send_json_to({
+        'action': 'provider_facebook_login',
+        'username': '579631148',
+        'password': '12qwertyU',
+    })
+
+    resp = await comm.receive_json_from()
+
+    start_mock.assert_called_with('579631148', '12qwertyU', cookies={'key': 'value'})
 
     await comm.send_json_to({
         'action': 'provider_facebook_am_i_logged',

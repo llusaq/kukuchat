@@ -1,6 +1,9 @@
 import asyncio
 from datetime import datetime
+import json
+import pathlib
 import pytz
+import tempfile
 
 import fbchat
 from fbchat.models import Message, ThreadType
@@ -26,6 +29,16 @@ class FacebookProvider(BaseProvider):
         self.client = None
         self.user = None
 
+    def _get_cookies(self, path: pathlib.Path):
+        if not path.exists():
+            return None
+        with open(path) as f:
+            return json.load(f)
+
+    def _save_cookies(self, path: pathlib.Path):
+        with open(path, 'w') as f:
+            json.dump(self.client.getSession(), f)
+
     async def get_required_credentials(self, data):
         return self._required_credentials
 
@@ -35,8 +48,16 @@ class FacebookProvider(BaseProvider):
 
         self.user = await get_user(self.scope)
 
+        cookie_path = pathlib.Path(tempfile.gettempdir()) /\
+            self.user.temp_dir / 'facebook_session.json'
+
+        cookies = self._get_cookies(cookie_path)
+
         self.client = fbchat.Client()
-        await self.client.start(username, password)
+        await self.client.start(username, password, cookies=cookies)
+
+        self._save_cookies(cookie_path)
+
         self.client.onMessage = self._on_message
         self.client.listen(markAlive=True)
 

@@ -30,5 +30,4 @@ async def test_can_schedule_get_messages(comm, monkeypatch):
     resp = await comm.receive_json_from()
     assert resp == {'action': 'get_messages', 'foo': 'bar'}
 
-
     await comm.disconnect()
