@@ -34,15 +34,13 @@ export default {
                     data = JSON.parse(data);
                     console.log(data);
                     if (data.action === 'login' && data.status === 'ok') {
+                        store.commit('setPreloader', false);
                         this.$router.push({name: 'chat'})
                     }
 
                     if (data.action === 'login' && data.status === 'error') {
+                        store.commit('setPreloader', false);
                         M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
-                    }
-
-                    if (data.action === 'login' && data.status === 'ok') {
-                        this.$router.push({name: 'chat'})
                     }
 
                     if (data.action === 'am_i_logged' && data.is_logged) {

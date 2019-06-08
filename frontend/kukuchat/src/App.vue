@@ -116,8 +116,17 @@ html,body {
   border-radius: 10px;
 }
 
+.dark > .wrapper > .chat > .col > .msg_cont_area > ::-webkit-scrollbar-thumb {
+  background: #424242; 
+  border-radius: 10px;
+}
+
 /* Handle on hover */
 .dark > .wrapper > .chat > ::-webkit-scrollbar-thumb:hover {
+  background: #616161; 
+}
+
+.dark > .wrapper > .chat > .col > .msg_cont_area > ::-webkit-scrollbar-thumb:hover {
   background: #616161; 
 }
 
@@ -134,10 +143,24 @@ html,body {
  background: #1c1c1c !important;
 }
 
+.dark > .wrapper> .chat > .contacts > .scroll > li > .icon span {
+  background-color: #ff9100;
+}
+
+.dark > .wrapper> .chat > .col > .msg_cont_area > .messages > .msg-container .notMe > .message span {
+  background-color: #66bb6a;
+}
+
+.dark > .wrapper> .chat > .col > .msg_cont_area > .messages > .msg-container .me > .message span {
+  background-color: #42a5f5;
+}
+
 #toast-container {
   position: fixed;
   top: 50px;
   height: fit-content;
 }
+
+
 
 </style>

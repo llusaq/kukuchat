@@ -7,13 +7,15 @@
                 </div>
             </div>
         <ul class="scroll">
-            <li v-for="contact in filteredList" :key="contact.id" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
+            <li v-for="contact in sortedList" :key="contact.id" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
                 <div class="icon">
 				    <span>{{ contact.name.charAt(0) }}{{ contact.name.charAt(contact.name.indexOf(' ') + 1) }}</span>
                 </div>
                 <div class="info">
                     <span class="user"> <b>{{ contact.name }}</b> </span><br>
-				    <span class="message">{{ contact.lastMsg }}</span>
+				    <span v-if="contact.newMsg" class="message"><b>{{ contact.last_msg }}</b></span>
+				    <span v-else class="message">{{ contact.last_msg }}</span>
+                    <i v-if="contact.newMsg" class="material-icons lens">fiber_manual_record</i>
                 </div>
                 <div class="clear"></div>
 		    </li>
@@ -36,24 +38,26 @@ export default {
         }
     },
     methods: {
-        select(name) {
-            this.$parent.currentChat = name;
-            this.clicked = name;
+        select(contact) {
+            this.$parent.currentChat = contact;
+            this.clicked = contact;
             this.search = '';
+            store.commit('clearMessages');
+            store.commit('setPreloader', true);
+            store.commit('setNewMsg', [contact.id, false]);
+            let data = {
+                action: 'get_messages',
+                chat_ids: [contact.id],
+                count: 100
+            }
+            store.getters.socket.send(JSON.stringify(data));
         },
     },
     beforeMount() {
-            let data = {
-                action: 'provider_facebook_get_chats',
-            }
-            store.getters.socket.send(JSON.stringify(data));
+        
 
-        data = {
-            action: 'provider_skype_get_chats',
-        }
-        store.getters.socket.send(JSON.stringify(data));
-
-
+        
+        
     },
     computed: {
         selectedContact() {
@@ -61,13 +65,23 @@ export default {
         },
         filteredList() {
             if (this.contacts !== undefined)
-            return this.contacts.filter(contact => {
-                if (contact.name !== undefined) {
-                    return contact.name.toLowerCase().includes(this.search.toLowerCase())
-                }
-            })
+            if (this.search !== '') {
+                return this.contacts.filter(contact => {
+                    if (contact.name !== undefined) {
+                        return contact.name.toLowerCase().includes(this.search.toLowerCase())
+                    }
+                })
+            }
+            return this.contacts;
         },
         ...mapState(['contacts']),
+
+        sortedList() {
+            this.filteredList.sort( ( a, b) => {
+                return new Date(b.time) - new Date(a.time);
+            });
+                return this.filteredList;
+        }
     }
 }
 </script>
@@ -147,27 +161,6 @@ span {
     clear: both;
 }
 
-/* width */
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  border-radius: 10px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #64b5f6;
-  border-radius: 10px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #1e88e5;
-}
-
 .nav-wrapper {
     width: 90%;
     margin: 0 auto;
@@ -191,6 +184,31 @@ span {
 
 .icon span {
     background-color: #ffab40;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #64b5f6;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #1e88e5;
+}
+
+.lens {
+    color: red;
 }
 
 </style>

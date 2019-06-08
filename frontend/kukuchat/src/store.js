@@ -19,20 +19,20 @@ export const store = new Vuex.Store({
     passwordHelp: '',
     preloader: false,
     addAccountForm: true,
-    contacts: [
-        {
-            id: '',
-            name: '',
-            provider: '',
-            lastMsg: '',
-        }
-    ],
+    contacts: []/*[{
+          id: '',
+          name: '',
+          provider: '',
+          last_msg: '',
+          time: '',
+          newMsg: false,
+    }]*/,
     messages: [
         {
             content: '',
             time: '',
             provider: '',
-            me: false
+            me: false,
         }
     ],
   },
@@ -68,10 +68,13 @@ export const store = new Vuex.Store({
       state.preloader = value;
     },
     setContacts(state, value) {
-      state.contacts = value;
+      state.contacts = state.contacts.concat(value);
     },
     setMessages(state, value) {
       state.messages = value;
+    },
+    clearMessages(state) {
+      state.messages = [];
     },
     pushMessage(state, value) {
       state.messages.push(value);
@@ -79,8 +82,31 @@ export const store = new Vuex.Store({
     changeAddAccountForm(state, value) {
       state.addAccountForm = value;
     },
-    set(state) {
-      state.skype = true;
+    setProvider(state, [id, value]) {
+      let result = state.contacts.find( contact => contact.id === id );
+      if (result != null)
+        result.provider = value;
+    },
+    setLastMsg(state, [id, value]) {
+      let result = state.contacts.find( contact => contact.id === id );
+      if (value == null) {
+        result.last_msg = 'No messages yet!'
+      }
+      if (value === "") {
+        result.last_msg = '👍'
+      }
+      else
+        result.last_msg = value;
+    },
+    setTime(state, [id, value]) {
+      let result = state.contacts.find( contact => contact.id === id );
+      if (result != null)
+        result.time = value;
+    },
+    setNewMsg(state, [id, value]) {
+      let result = state.contacts.find( contact => contact.id === id );
+      if (result != null)
+      result.newMsg = value;
     },
     set(state) {
       state.skype = true;
@@ -106,16 +132,6 @@ export const store = new Vuex.Store({
     set(state) {
       state.skype = true;
     },
-    set(state) {
-      state.skype = true;
-    },
-    
-
-
-
-  },
-  actions: {
-
   },
   getters: {
     isDark: state => state.isDark,
