@@ -35,11 +35,10 @@ class MessageEvent(skpy.event.SkypeNewMessageEvent):
 
     def __repr__(self):
         return ''
-            
 
 
 class SkypeContactsMock:
-    def getMsg(self):
+    def getMsgs(self):
         return [
             SimpleNamespace(
                 content='whats up',
@@ -73,7 +72,7 @@ class SkypeContactsMock:
     def __getitem__(self, idx):
         for c in self.contacts:
             if c.id == idx:
-                c.getMsg = self.getMsg
+                c.getMsgs = self.getMsgs
                 return c
 
 @pytest.fixture(autouse=True)
@@ -271,14 +270,12 @@ async def test_can_get_chat_messages(logged_skype):
         chat=chat,
         owner=await get_user(logged_skype.instance.scope),
 
-    )    
-    
-    f = asyncio.Future()
-    f.set_result([
-       
-    ])
+    )
 
-    skpy.Skype.return_value.getMsg.return_value = f
+    f = asyncio.Future()
+    f.set_result([])
+
+    skpy.Skype.return_value.getMsgs.return_value = f
     skpy.Skype.return_value.user.id = 'me'
 
     await logged_skype.send_json_to({

@@ -67,7 +67,18 @@ class SkypeProvider(BaseProvider):
             'skype',
             user=self.user,
         )
-        return {'chats': [{'id': c.id, 'name': c.name} for c in chats]}
+        return {
+            'chats': [
+                {
+                    'id': c.id,
+                    'name': c.name,
+                    'provider': list(c.contact_set.all().values_list('provider', flat=True)),
+                    'last_msg': None,
+                    'time': None,
+                }
+                for c in chats
+            ]
+        }
 
     async def post_login_action(self, data):
         pass
@@ -78,7 +89,7 @@ class SkypeProvider(BaseProvider):
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
-        msgs = self.sk.chats[uid].getMsg()
+        msgs = self.sk.chats[uid].getMsgs()
         msgs = [{
             'provider': 'skype',
             'content': m.content,

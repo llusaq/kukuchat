@@ -34,7 +34,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.scheduler = scheduler.Scheduler(self)
 
     async def disconnect(self, code):
-        self.facebook.logout()
+        pass
 
     async def merge_chats(self, data):
         ids = data['chat_ids']
