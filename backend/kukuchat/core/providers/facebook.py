@@ -88,7 +88,7 @@ class FacebookProvider(BaseProvider):
                 {
                     'id': c.id,
                     'name': c.name,
-                    'provider': 'facebook',
+                    'provider': list(c.contact_set.all().values_list('provider', flat=True)),
                     'last_msg': None,
                     'time': None,
                 }
