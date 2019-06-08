@@ -89,7 +89,7 @@ class SkypeProvider(BaseProvider):
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
-        msgs = self.sk.chats[uid].getMsg()
+        msgs = self.sk.chats[uid].getMsgs()
         msgs = [{
             'provider': 'skype',
             'content': m.content,
