@@ -263,4 +263,13 @@ textarea {
     color: red;
 }
 
+.sendingsection {
+    width: 100%;
+}
+
+.input-field {
+    width: calc(100% - 100px);
+}
+
+
 </style>

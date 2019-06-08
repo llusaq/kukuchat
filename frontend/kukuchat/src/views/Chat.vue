@@ -134,15 +134,23 @@ export default {
                     for (let contact of data.chats) {
                         ids.push(contact.id);
                     }
-                    let data2 = {
+                    let fbMsgRequest = {
                         action: 'schedule',
                         provider: 'facebook',
                         method: 'get_messages',
                         chat_ids: ids,
                         count: 2
                     }
+                    store.getters.socket.send(JSON.stringify(fbMsgRequest));
 
-                    store.getters.socket.send(JSON.stringify(data2));
+                    let skypeMsgRequest = {
+                        action: 'schedule',
+                        provider: 'skype',
+                        method: 'get_messages',
+                        chat_ids: ids,
+                        count: 2
+                    }
+                    store.getters.socket.send(JSON.stringify(skypeMsgRequest));
                     store.commit('setContacts', data.chats);
                 }
 
@@ -199,7 +207,7 @@ export default {
                 action: 'provider_skype_am_i_logged' 
             }
             store.getters.socket.send(JSON.stringify(query)); 
-            
+
             query = {
                 action: 'get_chats' 
             }
