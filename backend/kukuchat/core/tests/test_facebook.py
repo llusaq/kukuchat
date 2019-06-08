@@ -52,7 +52,7 @@ async def test_can_log_in(comm):
 
     resp = await comm.receive_json_from()
 
-    start_mock.assert_called_once_with('579631148', '12qwertyU', cookies=None)
+    start_mock.assert_called_once_with('579631148', '12qwertyU', session_cookies=None)
 
     assert resp == {
         'action': 'provider_facebook_login',
@@ -68,7 +68,7 @@ async def test_can_log_in(comm):
 
     resp = await comm.receive_json_from()
 
-    start_mock.assert_called_with('579631148', '12qwertyU', cookies={'key': 'value'})
+    start_mock.assert_called_with('579631148', '12qwertyU', session_cookies={'key': 'value'})
 
     await comm.send_json_to({
         'action': 'provider_facebook_am_i_logged',

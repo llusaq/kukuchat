@@ -57,7 +57,7 @@ class FacebookProvider(BaseProvider):
         cookies = self._get_cookies(cookie_path)
 
         self.client = fbchat.Client()
-        await self.client.start(username, password, cookies=cookies)
+        await self.client.start(username, password, session_cookies=cookies)
 
         self._save_cookies(cookie_path)
 
