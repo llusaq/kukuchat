@@ -37,13 +37,11 @@
         <div class="sendingsection">
             <form>
                 <div class="input-field col s12">
-                    <textarea v-model="message" id="textarea1" class="materialize-textarea"></textarea>
-                    <label class="active">Your message</label>
+                    <textarea v-model="message" rows="20" id="textarea" class="materialize-textarea"></textarea>
+                    <label for="textarea">Your message</label>
                 </div>
             </form>
-            <button @click="send()" class="btn waves-effect waves-light blue" type="submit" name="action">SEND
-                <i class="material-icons right">send</i>
-            </button>
+            <a @click="send()" class="send-btn">Send</a>
         </div>
     </div>
 </template>
@@ -254,6 +252,10 @@ export default {
     background: #1e88e5;
 }
 
+.active {
+    color: #1565c0  !important;
+}
+
 textarea:focus, .valid {
     border-bottom: 1px solid #1565c0 !important;
     box-shadow: 0 1px 0 0 #1565c0 !important;
@@ -265,10 +267,19 @@ textarea {
 
 .sendingsection {
     width: 100%;
+    padding: 10px;
 }
 
 .input-field {
-    width: calc(100% - 100px);
+    width: calc(100% - 100px) !important;
+}
+
+.send-btn {
+    display: inline-block;
+    margin: 10px;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
 }
 
 
