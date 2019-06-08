@@ -70,6 +70,9 @@ export const store = new Vuex.Store({
     setContacts(state, value) {
       state.contacts = state.contacts.concat(value);
     },
+    clearContacts(state) {
+      state.contacts = [];
+    },
     setMessages(state, value) {
       state.messages = value;
     },

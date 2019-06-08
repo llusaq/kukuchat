@@ -7,19 +7,23 @@
                 </div>
             </div>
         <ul class="scroll">
-            <li v-for="contact in sortedList" :key="contact.id" @click="select(contact)" :class="{ clicked: selectedContact === contact }">
+            <li v-for="contact in sortedList" :key="contact.id" @dblclick="select(contact)" @click="click(contact)" :class="{ clicked: selectedContact === contact, selected: mergeIds.includes(contact.id), mergeTo: mergeIds.indexOf(contact.id) === 0}" >
                 <div class="icon">
 				    <span>{{ contact.name.charAt(0) }}{{ contact.name.charAt(contact.name.indexOf(' ') + 1) }}</span>
                 </div>
                 <div class="info">
-                    <span class="user"> <b>{{ contact.name }}</b> </span><br>
+                    <span class="user"> <b>{{ contact.name }}</b> </span>
+                    <i v-if="contact.newMsg" class="material-icons lens">fiber_manual_record</i>
 				    <span v-if="contact.newMsg" class="message"><b>{{ contact.last_msg }}</b></span>
 				    <span v-else class="message">{{ contact.last_msg }}</span>
-                    <i v-if="contact.newMsg" class="material-icons lens">fiber_manual_record</i>
                 </div>
                 <div class="clear"></div>
 		    </li>
         </ul>
+        <div class="col l3 m4 s12 merge-form" v-if="isMerge">
+            <a class="col l6 m6" @click="mergeContacts()">Merge</a>
+            <a class="col l6 m6" @click="cancelMerge()">Cancel</a>
+        </div>
     </div>
 </template>
 
@@ -35,13 +39,15 @@ export default {
             randcolor: '',
             clicked: '',
             search: '',
+            mergeIds: [],
+            isMerge: false
         }
     },
     methods: {
-        select(contact) {
+        click(contact) {
             this.$parent.currentChat = contact;
             this.clicked = contact;
-            this.search = '';
+            //this.search = '';
             store.commit('clearMessages');
             store.commit('setPreloader', true);
             store.commit('setNewMsg', [contact.id, false]);
@@ -52,11 +58,35 @@ export default {
             }
             store.getters.socket.send(JSON.stringify(data));
         },
+        select(contact) {
+            if (this.mergeIds.includes(contact.id)) {
+                console.log('is')
+                let index = this.mergeIds.indexOf(contact.id);
+                if (index > -1) {
+                    this.mergeIds.splice(index, 1);
+                }
+            } else {
+                this.mergeIds.push(contact.id);
+                this.isMerge = true;
+            }
+            if (this.mergeIds.length === 0) {
+                this.isMerge = false;
+            }
+        },
+        cancelMerge() {
+            this.mergeIds = [];
+            this.isMerge = false;
+        },
+        mergeContacts() {
+            let data = {
+                action: 'merge_chats',
+                chat_ids: this.mergeIds
+            }
+            store.getters.socket.send(JSON.stringify(data));
+            M.toast({html: 'Contacts merged successfully', classes: 'green darken-2'})
+        }
     },
     beforeMount() {
-        
-
-        
         
     },
     computed: {
@@ -123,6 +153,10 @@ span {
     width: 30px;
 }
 
+.user {
+    width: auto;
+}
+
 .user, .message {
     margin-top: 5px;
     width: calc(100% - 70px);
@@ -155,6 +189,14 @@ span {
 
 .clicked {
     background-color: #dcdcdc;
+}
+
+.selected {
+    background-color: #9fa8da !important;
+}
+
+.mergeTo {
+    background-color: #7986cb !important;
 }
 
 .clear {
@@ -210,6 +252,27 @@ span {
 .lens {
     color: red;
 }
+
+.merge-form {
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+    height: 55px;
+    background-color: #d32f2f    ;
+}
+
+.merge-form a{
+    color: rgba(255, 255, 255, 0.90);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    padding: 17px 0;
+}
+
+.merge-form a:hover {
+    font-size: 20px;
+    padding: 12px 0;
+}
+
 
 </style>
 

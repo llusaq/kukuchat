@@ -93,6 +93,14 @@ html,body {
   background-color: #333333;
 }
 
+.dark > .wrapper > .chat > .contacts > .scroll > li.selected {
+  background-color: #5c6bc0 !important;
+}
+
+.dark > .wrapper > .chat > .contacts > .scroll > li.mergeTo {
+  background-color: #3949ab !important;
+}
+
 .dark > .wrapper > .chat > .contacts input {
   background-color: #121212;
   border: 1px solid #333333 !important;

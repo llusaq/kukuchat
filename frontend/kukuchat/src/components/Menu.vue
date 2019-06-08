@@ -61,6 +61,7 @@ export default {
             this.opened = !this.opened;
         },
         logout() {
+            store.commit('clearContacts');
             this.$router.push({name: 'home'})
             let data = {
                 action: 'logout'
