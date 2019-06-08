@@ -63,19 +63,19 @@ export default {
                 if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
                     store.commit('setMessenger');
                     store.commit('setChat');
-                    let data = {
-                        action: 'provider_facebook_get_chats',
+                    /*let data = {
+                        action: 'get_chats',
                     }
-                    store.getters.socket.send(JSON.stringify(data));
+                    store.getters.socket.send(JSON.stringify(data));*/
                 }
 
                 if (data.action === 'provider_skype_am_i_logged' && data.is_logged) {
                     store.commit('setSkype');
                     store.commit('setChat');
-                    let data = {
-                        action: 'provider_skype_get_chats',
+                    /*let data = {
+                        action: 'get_chats',
                     }
-                    store.getters.socket.send(JSON.stringify(data));
+                    store.getters.socket.send(JSON.stringify(data));*/
                 }
 
                 if (data.action === 'am_i_logged' && !data.is_logged) {
@@ -101,7 +101,7 @@ export default {
                     store.commit('setMessenger');
                     store.commit('setChat');
                     let data = {
-                        action: 'provider_facebook_get_chats',
+                        action: 'get_chats',
                     }
                     store.getters.socket.send(JSON.stringify(data));
                 }
@@ -119,7 +119,7 @@ export default {
                     store.commit('setSkype');
                     store.commit('setChat');
                     let data = {
-                        action: 'provider_skype_get_chats',
+                        action: 'get_chats',
                     }
                     store.getters.socket.send(JSON.stringify(data));
                 }
@@ -129,7 +129,7 @@ export default {
                     M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
                 }
 
-                if (data.action === 'provider_facebook_get_chats') {
+                if (data.action === 'get_chats') {
                     let ids = [];
                     for (let contact of data.chats) {
                         ids.push(contact.id);
@@ -180,9 +180,9 @@ export default {
                     store.commit('pushMessage', data);
                 }
 
-                if (data.action === 'provider_skype_get_chats') {
-                    store.commit('setContacts', data.chats);
-                }
+                // if (data.action === 'provider_skype_get_chats') {
+                //     store.commit('setContacts', data.chats);
+                // }
                
             }
             let query = {
@@ -199,6 +199,11 @@ export default {
                 action: 'provider_skype_am_i_logged' 
             }
             store.getters.socket.send(JSON.stringify(query)); 
+            
+            query = {
+                action: 'get_chats' 
+            }
+            store.getters.socket.send(JSON.stringify(query));
         }
     },
     mounted() {

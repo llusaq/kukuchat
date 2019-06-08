@@ -38,7 +38,7 @@
             <form>
                 <div class="input-field col s12">
                     <textarea v-model="message" id="textarea1" class="materialize-textarea"></textarea>
-                    <label for="textarea1">Your message</label>
+                    <label class="active">Your message</label>
                 </div>
             </form>
             <button @click="send()" class="btn waves-effect waves-light blue" type="submit" name="action">SEND
@@ -252,6 +252,15 @@ export default {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #1e88e5;
+}
+
+textarea:focus, .valid {
+    border-bottom: 1px solid #1565c0 !important;
+    box-shadow: 0 1px 0 0 #1565c0 !important;
+}
+
+textarea {
+    color: red;
 }
 
 </style>
