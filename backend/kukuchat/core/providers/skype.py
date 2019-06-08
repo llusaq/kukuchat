@@ -75,7 +75,7 @@ class SkypeProvider(BaseProvider):
 
     async def get_last_messages(self, uid, count):
         try:
-            msgs = self.sk.chats[uid].getMsgs()
+            msgs = self.sk.contacts[uid].chat.getMsgs()[:count]
         except Exception as e:
             print(str(e))
             print(f'Could not get messages from {uid}')
