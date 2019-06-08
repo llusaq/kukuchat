@@ -59,9 +59,8 @@ class SkypeProvider(BaseProvider):
         return {'is_logged': is_logged}
 
     async def _get_active_contacts(self):
-        all_contacts = self.sk.contacts
         return models.Contacts(
-            contacts=[c for c in all_contacts if c.id],
+            contacts=[c for c in self.sk.contacts if c.id],
             id_fun=lambda c: c.id,
             name_fun=lambda c: f'{c.name.first} {c.name.last}',
         )

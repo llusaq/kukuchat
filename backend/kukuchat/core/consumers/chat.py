@@ -61,6 +61,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def get_chats(self, data):
         user = await get_user(self.scope)
         providers = signing.loads(user.credentials)
+        ret = []
+        ids = set()
         for prov in providers:
             provider = getattr(self, prov)
             contacts = await provider._get_active_contacts()
@@ -71,8 +73,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 prov,
                 user=user,
             )
-            ret = []
-            ids = set()
             for c in chats:
                 if c.id not in ids:
                     ret.append({
@@ -84,7 +84,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     })
                 ids.add(c.id)
             return {
-                'chats': ret
+                'chats': ret,
             }
 
     async def on_message_consumer(self, provider, author_uid, author_name, content, user, time=None):
