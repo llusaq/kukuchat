@@ -10,7 +10,7 @@ import pytz
 from skpy import SkypeAuthException
 from skpy import SkypeNewMessageEvent
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 
 from core.providers.provider import BaseProvider
 from core import utils
@@ -75,7 +75,7 @@ class SkypeProvider(BaseProvider):
 
     async def get_last_messages(self, uid, count):
         try:
-            msgs = self.sk.contacts[uid].chat.getMsgs()[:count]
+            msgs = await sync_to_async(lambda: self.sk.contacts[uid].chat.getMsgs()[:count])
             print(f'Got {len(msgs)} from {uid}. {msgs}')
         except Exception as e:
             print(str(e))
