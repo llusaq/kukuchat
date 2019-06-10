@@ -80,14 +80,14 @@ class SkypeProvider(BaseProvider):
         except Exception as e:
             print(str(e))
             print(f'Could not get messages from {uid}')
+            return
         msgs = [{
             'provider': 'skype',
             'content': m.content,
             'me': m.userId == self.sk.user.id,
-            'time': datetime.utcfromtimestamp(int(m.timestamp[:-3])).
-                replace(tzinfo=pytz.UTC)
-                }
-                for m in msgs]
+            'time': m.time.replace(tzinfo=pytz.UTC)
+        }
+            for m in msgs]
         return msgs
 
     def _on_event(self, event):
