@@ -7,14 +7,17 @@
         <div class="modal-content">
             <div class="row" >
                 <h6>Theme</h6>
-            <div class="switch">
-                <label >
-                    Light
-                <input @click="changeTheme()" type="checkbox">
-                <span class="lever"></span>
-                    Dark
-                </label>
+                <div class="switch">
+                    <label >
+                        Light
+                    <input @click="changeTheme()" type="checkbox">
+                    <span class="lever"></span>
+                        Dark
+                    </label>
+                </div>
             </div>
+            <div class="row premium">
+                <a @click="getPremium()">Get premium</a>
             </div>
         </div>
     </div>
@@ -36,6 +39,9 @@ export default {
     methods: {
         changeTheme() {
             store.commit('changeTheme');
+        },
+        getPremium() {
+            $('#premium').modal('open');
         }
     },
     computed: mapState([
@@ -53,7 +59,7 @@ export default {
 }
 
 .row {
-    min-height: 200px;
+    min-height: 50px;
 }
 
 a, span {
@@ -145,6 +151,13 @@ input:focus, .valid {
 
 .switch label input[type=checkbox]:checked+.lever:after {
     background-color: white
+}
+
+.premium a {
+    margin: 10px;
+    display: inline-block;
+    padding: 10px;
+    border: 1px solid;
 }
 
 

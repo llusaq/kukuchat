@@ -1,6 +1,5 @@
 <template>
-    <div class="col l9 m8">
-        <div class="msg_cont_area">
+    <div class="col l9 m8 conv">
             <Preloader v-if="preloader"></Preloader>
             <p class="text-secondary nomessages" v-if="messages === ''">No messages yet!</p>
             <div class="messages" id="messages">
@@ -12,6 +11,11 @@
                             <span class="tooltiptext time">{{ moment(message.time).format('YYYY:MM:DD  HH:mm')}}</span>
                         </div>
                         <div class="message" v-if="message.content !== ''">
+                            <img v-if="message.provider === 'facebook'" src="@/assets/messenger.png" alt="messanger">
+                            <img v-if="message.provider === 'skype'" src="@/assets/skype.png" alt="skype">
+                            <img v-if="message.provider === 'viber'" src="@/assets/viber.png" alt="viber">
+                            <img v-if="message.provider === 'gmail'" src="@/assets/gmail.png" alt="gmail">
+                            <img v-if="message.provider === 'telegram'" src="@/assets/telegram.png" alt="telegram">
                             <span>{{message.content}}</span>
                         </div>
                         <div class="message" v-else>
@@ -25,7 +29,12 @@
                             <span class="tooltiptext time">{{ moment(message.time).format('YYYY:MM:DD  HH:mm')}}</span>
                         </div>
                         <div class="message" v-if="message.content !== ''">
-                            <span>{{message.content}}</span>
+                            <img v-if="message.provider === 'facebook'" src="@/assets/messenger.png" alt="messanger">
+                            <img v-if="message.provider === 'skype'" src="@/assets/skype.png" alt="skype">
+                            <img v-if="message.provider === 'viber'" src="@/assets/viber.png" alt="viber">
+                            <img v-if="message.provider === 'gmail'" src="@/assets/gmail.png" alt="gmail">
+                            <img v-if="message.provider === 'telegram'" src="@/assets/telegram.png" alt="telegram">
+                            <span>{{message.content }}</span>
                         </div>
                         <div class="message" v-else>
                             <span>👍</span>
@@ -33,10 +42,26 @@
                     </div>
                 </div>
             </div>
-        </div>
         <div class="sendingsection">
-            <textarea v-model="message" rows="6" id="textarea" class="message-box"></textarea>
+            <textarea v-model="message" rows="4" class="message-box" placeholder="Write a message..." @keyup.enter="send()"></textarea>
             <a @click="send()" class="send-btn">Send</a>
+
+            <div v-show="anotherSendServices" class="another-send-service">
+                <img v-if="currentChat.provider.includes('facebook') && sendService !== 'facebook'" @click="chooseAnotherService('facebook')" src="@/assets/messenger.png" alt="messanger">
+                <img v-if="currentChat.provider.includes('skype') && sendService !== 'skype'" @click="chooseAnotherService('skype')" src="@/assets/skype.png" alt="skype">
+                <img v-if="currentChat.provider.includes('skype') && sendService !== 'skype'" @click="chooseAnotherService('skype')" src="@/assets/skype.png" alt="skype">
+                <img v-if="currentChat.provider.includes('viber') && sendService !== 'viber'" @click="chooseAnotherService('viber')" src="@/assets/viber.png" alt="viber">
+                <img v-if="currentChat.provider.includes('gmail') && sendService !== 'gmail'" @click="chooseAnotherService('gmail')" src="@/assets/gmail.png" alt="gmail">
+                <img v-if="currentChat.provider.includes('telegram') && sendService !== 'telegram'" @click="chooseAnotherService('telegram')" src="@/assets/telegram.png" alt="telegram">
+            </div> 
+            <div class="send-service">
+                <img v-if="currentChat.provider.includes('facebook') && sendService === 'facebook'" @click="showAvailableServices()" src="@/assets/messenger.png" alt="messanger">
+                <img v-if="currentChat.provider.includes('skype') && sendService === 'skype'" @click="showAvailableServices()" src="@/assets/skype.png" alt="skype">
+                <img v-if="currentChat.provider.includes('viber') && sendService === 'viber'" @click="showAvailableServices()" src="@/assets/viber.png" alt="viber">
+                <img v-if="currentChat.provider.includes('gmail') && sendService === 'gmail'" @click="showAvailableServices()" src="@/assets/gmail.png" alt="gmail">
+                <img v-if="currentChat.provider.includes('telegram') && sendService === 'telegram'" @click="showAvailableServices()" src="@/assets/telegram.png" alt="telegram">
+            </div> 
+            <div class="clear"></div>
         </div>
     </div>
 </template>
@@ -47,6 +72,7 @@ import { store } from '@/store'
 import moment from 'moment'
 import { mapState } from 'vuex';
 import Preloader from './Preloader'
+import { truncate } from 'fs';
 
 export default {
     name: 'conversation',
@@ -56,7 +82,9 @@ export default {
     data() {
         return {
             message: '',
-            hover: true
+            hover: true,
+            sendService: this.currentChat.msgProvider,
+            anotherSendServices: false
         }
     },
     props: {
@@ -68,25 +96,37 @@ export default {
     ]),
     methods: {
         send() {
-            /*let data = {
-                content: document.getElementById("textarea1").value,
-                time: moment().format(),
-                provider: 'facebook',
-                me: true
+            this.currentChat.last_msg = this.message;
+            this.currentChat.msgProvider = this.sendService;
+            let data;
+            if (this.sendService === 'facebook') {
+                data = {
+                    'action': 'send_message',
+                    'provider': 'facebook',
+                    'chat_id': this.currentChat.id,
+                    'content': this.message,
+                }
             }
-
-            store.commit('pushMessage', data);*/
-
-            let data = {
-                'action': 'send_message',
-                'provider': 'facebook',
-                'chat_id': this.currentChat.id,
-                'content': this.message,
+            
+            if (this.sendService === 'skype') {
+                data = {
+                    'action': 'send_message',
+                    'provider': 'skype',
+                    'chat_id': this.currentChat.id,
+                    'content': this.message,
+                }
             }
 
             store.getters.socket.send(JSON.stringify(data));
 
             this.message = ''
+        },
+        showAvailableServices() {
+            this.anotherSendServices = this.anotherSendServices ? false : true;
+        },
+        chooseAnotherService(service) {
+            this.anotherSendServices = false;
+            this.sendService = service;
         }
     },
     watch: {
@@ -115,7 +155,7 @@ export default {
 
     .messages {
         overflow-y: scroll;
-        height: 70vh;
+        height: 75%;
         margin-left: 20px;
         padding-right: 10px;
     }
@@ -247,11 +287,6 @@ export default {
     background: #1e88e5;
 }
 
-textarea {
-    color: red;
-    border-bottom: 2px solid red;
-}
-
 .active {
     border: none;
 }
@@ -261,18 +296,23 @@ textarea {
     border-bottom: 2px solid #64b5f6;
     resize: none;
     width: calc(100% - 100px);
+    float: left;
+    height: 100%;
+    font-weight: 400;
+    letter-spacing: 1px;
+    cursor: text;
 }
 
 textarea:focus, textarea:active, textarea:focus:active {
     border: none;
-    border-bottom: 2px solid #64b5f6;
+    border-bottom: 2px solid #2196f3;
     box-shadow: none !important;
     outline: 0;
-    
 }
 
 .sendingsection {
     width: 100%;
+    height: 17vh;
     padding: 10px;
 }
 
@@ -288,5 +328,56 @@ textarea:focus, textarea:active, textarea:focus:active {
     cursor: pointer;
 }
 
+.clear {
+    clear: both;
+}
+
+.conv {
+    height: 100vh;
+
+}
+
+.message img {
+    width: 20px;
+    height: auto;
+    margin: 0 3px -4px 0;
+}
+
+.send-service img {
+    width: 50px;
+    height: auto;
+    margin-top: 25px;
+    cursor: pointer;
+}
+
+.another-send-service {
+    width: 50px;
+    position: absolute;
+    right: 35px;
+    bottom: 120px;
+    transition: all 0.2s;
+}
+
+.another-send-service img {
+    width: 50px;
+    height: auto;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.another-send-service img:hover {
+    width: 70px;
+    height: auto;
+    margin-left: -10px;
+}
+
+@media only screen and (max-width: 600px) {
+    .send-service img {
+        margin-top: 0px;
+    }
+    .another-send-service {
+        bottom: 60px;
+    }
+}
 
 </style>

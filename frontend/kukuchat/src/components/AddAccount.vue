@@ -292,5 +292,10 @@ input:focus, .valid {
     margin: 0 !important;
 }
 
+@media only screen and (max-width: 600px) {
+    .col img {
+        width: 50px;
+    }
+}
 
 </style>

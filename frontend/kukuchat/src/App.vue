@@ -55,6 +55,14 @@ html,body {
   background-color: #333333 !important;
 }
 
+.dark > .wrapper > .settings > .back-btn {
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.dark > .wrapper > .settings > .back-btn:hover {
+  background-color: #616161;
+}
+
 .dark > .wrapper > .settings > .col {
   background-color: #272727;
   color: rgba(255, 255, 255, 0.90);
