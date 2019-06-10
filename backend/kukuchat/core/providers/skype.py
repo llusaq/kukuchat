@@ -70,7 +70,7 @@ class SkypeProvider(BaseProvider):
 
     async def send_message(self, uid, content):
         ch = await sync_to_async(lambda: self.sk.contacts[uid].chat)()
-        await sync_to_async(ch.sendMsg(content))()
+        await sync_to_async(lambda: ch.sendMsg(content))()
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
