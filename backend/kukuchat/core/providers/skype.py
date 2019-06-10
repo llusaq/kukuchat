@@ -91,7 +91,7 @@ class SkypeProvider(BaseProvider):
             for m in msgs]
         return msgs
 
-    async def _msg_received(self, event, **kwargs):
+    async def _msg_received(self, event):
         user = await sync_to_async(lambda: self.sk.contacts[event.msg.userId])()
         name = f'{user.name.first} {user.name.last}'
         await self.on_message_consumer(
@@ -105,7 +105,7 @@ class SkypeProvider(BaseProvider):
     def _on_event(self, event):
         if not isinstance(event, SkypeNewMessageEvent):
             return
-        asyncio.create_task(self._msg_received())
+        asyncio.create_task(self._msg_received(event))
 
     def _start_listening(self):
         loop = skpy.SkypeEventLoop(tokenFile=self._token_path, autoAck=True)
