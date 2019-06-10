@@ -3,7 +3,7 @@
         <Preloader v-if="preloader"></Preloader>
         <form @submit.prevent="pingServer">
             <div class="card-content">
-                <span class="card-title center-align">Log In</span>
+                <span @click="playSound()" class="card-title center-align">Log In</span>
                 <div class="row">
                     <div class="input-field col s12">
                         <label for="login">Login</label>
@@ -86,6 +86,10 @@ export default {
                 }
                 store.getters.socket.send(JSON.stringify(data));
             }
+        },
+        playSound() {
+            var audio = new Audio('http://soundbible.com/mp3/Air Plane Ding-SoundBible.com-496729130.mp3');
+            const playPromise = audio.play();
         }
     },
     computed: mapState([

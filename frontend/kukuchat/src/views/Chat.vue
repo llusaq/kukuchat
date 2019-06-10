@@ -3,7 +3,7 @@
         <Menu :current-chat="currentChat"></Menu>
         <div class="row chat">
             <Contacts v-if="currentChat == '' && width <= 600 && isChat"></Contacts>
-            <Contacts v-else-if="width > 600 && isChat"></Contacts>
+            <Contacts @click="playSound()" v-else-if="width > 600 && isChat"></Contacts>
             <Conversation :current-chat="currentChat" v-if="currentChat != '' && width <= 600"></Conversation>
             <Conversation :current-chat="currentChat" v-else-if=" currentChat != '' && width > 600"></Conversation>
             <h5 v-if="!isChat">Add chat service to see something</h5>
@@ -49,6 +49,10 @@ export default {
             if (event.keyCode == 27) {
                 this.currentChat = '';
             }
+        },
+        playSound() {
+            var audio = new Audio('http://soundbible.com/mp3/Air Plane Ding-SoundBible.com-496729130.mp3');
+            audio.play();
         }
     },
     beforeMount() {
@@ -181,6 +185,7 @@ export default {
                     store.commit('setLastMsg', [data.chat_id, data.content]);
                     store.commit('setTime', [data.chat_id, data.time]);
                     store.commit('setNewMsg', [data.chat_id, true]);
+                    //this.playSound();
                 }
 
                 if (data.action === 'send_message') {
