@@ -93,7 +93,7 @@ class SkypeProvider(BaseProvider):
     def _on_event(self, event):
         if not isinstance(event, SkypeNewMessageEvent):
             return
-        user = await sync_to_async(lambda: self.sk.contacts[event.msg.userId])()
+        user = self.sk.contacts[event.msg.userId]
         name = f'{user.name.first} {user.name.last}'
         t = Thread(
             target=async_to_sync(self.on_message_consumer),
