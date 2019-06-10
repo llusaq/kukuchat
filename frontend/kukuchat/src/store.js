@@ -70,6 +70,15 @@ export const store = new Vuex.Store({
     setContacts(state, value) {
       state.contacts = state.contacts.concat(value);
     },
+    clearContacts(state) {
+      state.contacts = [];
+    },
+    removeContact(state, id) {
+      let index = state.contacts.indexOf(id);
+      if (index != -1) {
+        state.contacts.splice(index, 1);
+      }
+    },
     setMessages(state, value) {
       state.messages = value;
     },
@@ -85,7 +94,7 @@ export const store = new Vuex.Store({
     setProvider(state, [id, value]) {
       let result = state.contacts.find( contact => contact.id === id );
       if (result != null)
-        result.provider = value;
+        result.msgProvider = value;
     },
     setLastMsg(state, [id, value]) {
       let result = state.contacts.find( contact => contact.id === id );

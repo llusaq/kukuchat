@@ -61,6 +61,7 @@ export default {
             this.opened = !this.opened;
         },
         logout() {
+            store.commit('clearContacts');
             this.$router.push({name: 'home'})
             let data = {
                 action: 'logout'
@@ -150,11 +151,7 @@ a {
     top: 0px;
     cursor: pointer;
     padding: 15px;
-    color: rgba(255, 255, 255, 0.90);
-}
-
-.back-btn:hover {
-    background-color: #616161;
+    color: rgba(0,0,0,0.80);
 }
 
 </style>

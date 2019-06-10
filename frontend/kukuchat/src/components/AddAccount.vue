@@ -99,21 +99,37 @@ export default {
             this.passwordFieldText= this.passwordFieldText === 'visibility' ? 'visibility_off' : 'visibility'
         },
         close() {
-            this.choosenAccount = ''
+            this.choosenAccount = '';
+            this.username = '';
+            this.password = '';
         },
         skypeLogin() {
-            this.choosenAccount = 'Skype';
-            let data = {
-                action: 'provider_skype_get_required_credentials'
+            if (this.acountCount() < 2) {
+                this.choosenAccount = 'Skype';
+                let data = {
+                    action: 'provider_skype_get_required_credentials'
+                }
+                store.getters.socket.send(JSON.stringify(data));
             }
-            store.getters.socket.send(JSON.stringify(data));
+            else {
+                this.premiumForm = true;
+                $('#premium').modal('open');
+            }
         },
         massengerLogin() {
-            this.choosenAccount = 'Messenger';
-            let data = {
-                    action: 'provider_facebook_get_required_credentials'
-                }
-            store.getters.socket.send(JSON.stringify(data));
+            if (this.acountCount() < 2) {
+                this.choosenAccount = 'Messenger';
+                let data = {
+                        action: 'provider_facebook_get_required_credentials'
+                    }
+                store.getters.socket.send(JSON.stringify(data));
+            }
+            else {
+                this.premiumForm = true;
+                $('#premium').modal('open');
+            }
+
+            
         },
         viberLogin() {
             if (this.acountCount() < 2) {
@@ -129,7 +145,8 @@ export default {
 
             }
             else {
-
+                this.premiumForm = true;
+                $('#premium').modal('open');
             }
         },
         telegramLogin() {
@@ -137,7 +154,8 @@ export default {
 
             }
             else {
-
+                this.premiumForm = true;
+                $('#premium').modal('open');
             }
         },
         login(choosenAccount) {
@@ -153,6 +171,7 @@ export default {
             }
 
             if (choosenAccount === 'Skype') {
+                store.commit('changeAddAccountForm', true);
                 store.commit('setPreloader', true);
                 let data = {
                     action: 'provider_skype_login',
@@ -273,5 +292,10 @@ input:focus, .valid {
     margin: 0 !important;
 }
 
+@media only screen and (max-width: 600px) {
+    .col img {
+        width: 50px;
+    }
+}
 
 </style>

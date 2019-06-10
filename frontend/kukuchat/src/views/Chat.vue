@@ -63,19 +63,19 @@ export default {
                 if (data.action === 'provider_facebook_am_i_logged' && data.is_logged) {
                     store.commit('setMessenger');
                     store.commit('setChat');
-                    let data = {
-                        action: 'provider_facebook_get_chats',
+                    /*let data = {
+                        action: 'get_chats',
                     }
-                    store.getters.socket.send(JSON.stringify(data));
+                    store.getters.socket.send(JSON.stringify(data));*/
                 }
 
                 if (data.action === 'provider_skype_am_i_logged' && data.is_logged) {
                     store.commit('setSkype');
                     store.commit('setChat');
-                    let data = {
-                        action: 'provider_skype_get_chats',
+                    /*let data = {
+                        action: 'get_chats',
                     }
-                    store.getters.socket.send(JSON.stringify(data));
+                    store.getters.socket.send(JSON.stringify(data));*/
                 }
 
                 if (data.action === 'am_i_logged' && !data.is_logged) {
@@ -100,6 +100,16 @@ export default {
                     M.toast({html: 'Messenger added', classes: 'green darken-2'})
                     store.commit('setMessenger');
                     store.commit('setChat');
+                    let data = {
+                        action: 'get_chats',
+                    }
+                    store.getters.socket.send(JSON.stringify(data));
+                }
+
+                if (data.action === 'provider_facebook_login' && data.status === 'error') {
+                    store.commit('setPreloader', false);
+                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+
                 }
 
                 if (data.action === 'provider_skype_login' && data.status === 'ok') {
@@ -108,22 +118,39 @@ export default {
                     M.toast({html: 'Skype added', classes: 'green darken-2'})
                     store.commit('setSkype');
                     store.commit('setChat');
+                    let data = {
+                        action: 'get_chats',
+                    }
+                    store.getters.socket.send(JSON.stringify(data));
                 }
 
-                if (data.action === 'provider_facebook_get_chats') {
+                if (data.action === 'provider_skype_login' && data.status === 'error') {
+                    store.commit('setPreloader', false);
+                    M.toast({html: 'Logging failed. Invalid login or password', classes: 'red darken-2'})
+                }
+
+                if (data.action === 'get_chats') {
                     let ids = [];
                     for (let contact of data.chats) {
                         ids.push(contact.id);
                     }
-                    let data2 = {
+                    let fbMsgRequest = {
                         action: 'schedule',
                         provider: 'facebook',
                         method: 'get_messages',
                         chat_ids: ids,
                         count: 2
                     }
+                    store.getters.socket.send(JSON.stringify(fbMsgRequest));
 
-                    store.getters.socket.send(JSON.stringify(data2));
+                    let skypeMsgRequest = {
+                        action: 'schedule',
+                        provider: 'skype',
+                        method: 'get_messages',
+                        chat_ids: ids,
+                        count: 2
+                    }
+                    store.getters.socket.send(JSON.stringify(skypeMsgRequest));
                     store.commit('setContacts', data.chats);
                 }
 
@@ -132,7 +159,6 @@ export default {
                     store.commit('setLastMsg', [data.chats[0].id, data.chats[0].messages[0].content]);
                     store.commit('setTime', [data.chats[0].id, data.chats[0].messages[0].time]);
                     store.commit('setPreloader', false);
-                    //store.commit('setNewMsg', [data.chats[0].id, true]);
                 } 
 
                 if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length === 1) {
@@ -140,12 +166,12 @@ export default {
                     store.commit('setLastMsg', [data.chats[0].id, data.chats[0].messages[0].content]);
                     store.commit('setTime', [data.chats[0].id, data.chats[0].messages[0].time]);
                     store.commit('setPreloader', false);
-                    store.commit('setNewMsg', [data.chats[0].id, true]);
                 }
 
                 if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length !== 1) {
                     store.commit('setMessages', data.chats[0].messages.reverse());
                     store.commit('setPreloader', false);
+                    store.commit('setNewMsg', [data.chats[0].id, false]);
                 }
 
                 if (data.action === 'new_message') {
@@ -154,6 +180,7 @@ export default {
                     store.commit('setProvider', [data.chat_id, data.provider]);
                     store.commit('setLastMsg', [data.chat_id, data.content]);
                     store.commit('setTime', [data.chat_id, data.time]);
+                    store.commit('setNewMsg', [data.chat_id, true]);
                 }
 
                 if (data.action === 'send_message') {
@@ -161,13 +188,10 @@ export default {
                     store.commit('pushMessage', data);
                 }
 
-                if (data.action === 'provider_skype_get_chats') {
-                    console.log(data.chats);
-                    store.commit('setContacts', data.chats);
-                }
-
-                
-
+                // if (data.action === 'provider_skype_get_chats') {
+                //     store.commit('setContacts', data.chats);
+                // }
+               
             }
             let query = {
                 action: 'am_i_logged'
@@ -183,12 +207,14 @@ export default {
                 action: 'provider_skype_am_i_logged' 
             }
             store.getters.socket.send(JSON.stringify(query)); 
+
+            query = {
+                action: 'get_chats' 
+            }
+            store.getters.socket.send(JSON.stringify(query));
         }
     },
     mounted() {
-        if (store.getters.socket != null) {
-            
-        }
     }
 }
 

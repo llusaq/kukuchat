@@ -55,6 +55,14 @@ html,body {
   background-color: #333333 !important;
 }
 
+.dark > .wrapper > .settings > .back-btn {
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.dark > .wrapper > .settings > .back-btn:hover {
+  background-color: #616161;
+}
+
 .dark > .wrapper > .settings > .col {
   background-color: #272727;
   color: rgba(255, 255, 255, 0.90);
@@ -91,6 +99,14 @@ html,body {
 
 .dark > .wrapper > .chat > .contacts li:hover {
   background-color: #333333;
+}
+
+.dark > .wrapper > .chat > .contacts > .scroll > li.selected {
+  background-color: #5c6bc0 !important;
+}
+
+.dark > .wrapper > .chat > .contacts > .scroll > li.mergeTo {
+  background-color: #3949ab !important;
 }
 
 .dark > .wrapper > .chat > .contacts input {
