@@ -67,7 +67,7 @@ export default {
             let data = {
                 action: 'get_messages',
                 chat_ids: [contact.id],
-                count: 100
+                count: 200
             }
             store.getters.socket.send(JSON.stringify(data));
         },

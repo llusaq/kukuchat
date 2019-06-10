@@ -147,14 +147,14 @@ export default {
                     }
                     store.getters.socket.send(JSON.stringify(fbMsgRequest));
 
-                    let skypeMsgRequest = {
-                        action: 'schedule',
-                        provider: 'skype',
-                        method: 'get_messages',
-                        chat_ids: ids,
-                        count: 2
-                    }
-                    store.getters.socket.send(JSON.stringify(skypeMsgRequest));
+                    // let skypeMsgRequest = {
+                    //     action: 'schedule',
+                    //     provider: 'skype',
+                    //     method: 'get_messages',
+                    //     chat_ids: ids,
+                    //     count: 2
+                    // }
+                    // store.getters.socket.send(JSON.stringify(skypeMsgRequest));
                     store.commit('setContacts', data.chats);
                 }
 
@@ -173,7 +173,14 @@ export default {
                 }
 
                 if (data.action === 'get_messages' && data.chats[0] != null && data.chats[0].messages.length !== 1) {
-                    store.commit('setMessages', data.chats[0].messages.reverse());
+                    let msgs = [];
+                    for (let chat of data.chats) {
+                        msgs = msgs.concat(chat.messages);
+                    }
+                    msgs.sort( ( a, b) => {
+                        return new Date(b.time) - new Date(a.time);
+                    });
+                    store.commit('setMessages', msgs.reverse());
                     store.commit('setPreloader', false);
                     store.commit('setNewMsg', [data.chats[0].id, false]);
                 }
@@ -185,7 +192,7 @@ export default {
                     store.commit('setLastMsg', [data.chat_id, data.content]);
                     store.commit('setTime', [data.chat_id, data.time]);
                     store.commit('setNewMsg', [data.chat_id, true]);
-                    //this.playSound();
+                    this.playSound();
                 }
 
                 if (data.action === 'send_message') {
