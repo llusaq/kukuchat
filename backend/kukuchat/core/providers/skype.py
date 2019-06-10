@@ -55,12 +55,12 @@ class SkypeProvider(BaseProvider):
         return {'msg': 'Successfully logged into Skype'}
 
     async def am_i_logged(self, data):
-        is_logged = self.sk.conn.connected is True
+        is_logged = await sync_to_async(lambda: self.sk.conn.connected)() is True
         return {'is_logged': is_logged}
 
     async def _get_active_contacts(self):
         return models.Contacts(
-            contacts=[c for c in self.sk.contacts if c.id],
+            contacts=[c for c in await sync_to_async(lambda: self.sk.contacts)() if c.id],
             id_fun=lambda c: c.id,
             name_fun=lambda c: f'{c.name.first} {c.name.last}',
         )
@@ -69,8 +69,8 @@ class SkypeProvider(BaseProvider):
         pass
 
     async def send_message(self, uid, content):
-        ch = self.sk.contacts[uid].chat
-        ch.sendMsg(content)
+        ch = await sync_to_async(lambda: self.sk.contacts[uid].chat)()
+        await sync_to_async(ch.sendMsg(content))()
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
@@ -93,7 +93,7 @@ class SkypeProvider(BaseProvider):
     def _on_event(self, event):
         if not isinstance(event, SkypeNewMessageEvent):
             return
-        user = self.sk.contacts[event.msg.userId]
+        user = await sync_to_async(lambda: self.sk.contacts[event.msg.userId])()
         name = f'{user.name.first} {user.name.last}'
         t = Thread(
             target=async_to_sync(self.on_message_consumer),
