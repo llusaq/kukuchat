@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 import tempfile
 from datetime import datetime
@@ -71,7 +70,7 @@ class SkypeProvider(BaseProvider):
 
     async def send_message(self, uid, content):
         ch = await sync_to_async(lambda: self.sk.contacts[uid].chat)()
-        await sync_to_async(lambda: ch.sendMsg(content))()
+        await sync_to_async(ch.sendMsg(content))()
         return {'provider': 'skype'}
 
     async def get_last_messages(self, uid, count):
@@ -91,21 +90,22 @@ class SkypeProvider(BaseProvider):
             for m in msgs]
         return msgs
 
-    async def _msg_received(self, event):
-        user = await sync_to_async(lambda: self.sk.contacts[event.msg.userId])()
-        name = f'{user.name.first} {user.name.last}'
-        await self.on_message_consumer(
-            provider='skype',
-            author_uid=event.msg.userId,
-            content=event.msg.content,
-            author_name=name,
-            user=self.user,
-        )
-
     def _on_event(self, event):
         if not isinstance(event, SkypeNewMessageEvent):
             return
-        asyncio.create_task(self._msg_received(event))
+        user = self.sk.contacts[event.msg.userId]
+        name = f'{user.name.first} {user.name.last}'
+        t = Thread(
+            target=async_to_sync(self.on_message_consumer),
+            kwargs={
+                'provider': 'skype',
+                'author_uid': event.msg.userId,
+                'content': event.msg.content,
+                'author_name': name,
+                'user': self.user,
+            }
+        )
+        t.start()
 
     def _start_listening(self):
         loop = skpy.SkypeEventLoop(tokenFile=self._token_path, autoAck=True)
