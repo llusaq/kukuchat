@@ -49,7 +49,6 @@
             <div v-show="anotherSendServices" class="another-send-service">
                 <img v-if="currentChat.provider.includes('facebook') && sendService !== 'facebook'" @click="chooseAnotherService('facebook')" src="@/assets/messenger.png" alt="messanger">
                 <img v-if="currentChat.provider.includes('skype') && sendService !== 'skype'" @click="chooseAnotherService('skype')" src="@/assets/skype.png" alt="skype">
-                <img v-if="currentChat.provider.includes('skype') && sendService !== 'skype'" @click="chooseAnotherService('skype')" src="@/assets/skype.png" alt="skype">
                 <img v-if="currentChat.provider.includes('viber') && sendService !== 'viber'" @click="chooseAnotherService('viber')" src="@/assets/viber.png" alt="viber">
                 <img v-if="currentChat.provider.includes('gmail') && sendService !== 'gmail'" @click="chooseAnotherService('gmail')" src="@/assets/gmail.png" alt="gmail">
                 <img v-if="currentChat.provider.includes('telegram') && sendService !== 'telegram'" @click="chooseAnotherService('telegram')" src="@/assets/telegram.png" alt="telegram">
