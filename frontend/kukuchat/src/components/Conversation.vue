@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="sendingsection">
-            <textarea v-model="message" rows="20" id="textarea" class="message"></textarea>
+            <textarea v-model="message" rows="6" id="textarea" class="message-box"></textarea>
             <a @click="send()" class="send-btn">Send</a>
         </div>
     </div>
@@ -247,17 +247,28 @@ export default {
     background: #1e88e5;
 }
 
-.active {
-    color: #1565c0  !important;
-}
-
-textarea:focus, .valid {
-    border-bottom: 1px solid #1565c0 !important;
-    box-shadow: 0 1px 0 0 #1565c0 !important;
-}
-
 textarea {
     color: red;
+    border-bottom: 2px solid red;
+}
+
+.active {
+    border: none;
+}
+
+.message-box {
+    border: none;
+    border-bottom: 2px solid #64b5f6;
+    resize: none;
+    width: calc(100% - 100px);
+}
+
+textarea:focus, textarea:active, textarea:focus:active {
+    border: none;
+    border-bottom: 2px solid #64b5f6;
+    box-shadow: none !important;
+    outline: 0;
+    
 }
 
 .sendingsection {
