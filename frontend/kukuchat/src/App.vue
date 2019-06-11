@@ -81,6 +81,10 @@ html,body {
   color: rgba(255, 255, 255, 0.90);
 }
 
+.dark > .wrapper > .settings > .modal > .modal-content > .premium a {
+  color: rgba(255, 255, 255, 0.90);
+}
+
 .dark > .wrapper > .settings > .menu-el:hover {
   background-color: #333333;
 }
@@ -163,12 +167,12 @@ html,body {
   background-color: #ff9100;
 }
 
-.dark > .wrapper> .chat > .col > .msg_cont_area > .messages > .msg-container .notMe > .message span {
-  background-color: #66bb6a;
+.dark > .wrapper> .chat > .conv > .messages > .msg-container .notMe > .message span {
+  background-color: #43a047;
 }
 
-.dark > .wrapper> .chat > .col > .msg_cont_area > .messages > .msg-container .me > .message span {
-  background-color: #42a5f5;
+.dark > .wrapper> .chat > .conv > .messages > .msg-container .me > .message span {
+  background-color: #1e88e5;
 }
 
 #toast-container {

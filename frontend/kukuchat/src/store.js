@@ -46,6 +46,9 @@ export const store = new Vuex.Store({
     setChat (state) {
       state.isChat = true;
     },
+    setChatFalse (state) {
+      state.isChat = false;
+    },
     setMessenger (state) {
       state.messenger = true;
     },
@@ -74,10 +77,14 @@ export const store = new Vuex.Store({
       state.contacts = [];
     },
     removeContact(state, id) {
-      let index = state.contacts.indexOf(id);
+     /* let index = state.contacts.indexOf(id);
+      console.log('index', index, 'id', id)
       if (index != -1) {
-        state.contacts.splice(index, 1);
-      }
+        state.contacts = state.contacts.splice(index, 1);
+      }*/
+    },
+    addProvider(state, fromId, toId) {
+      //state.contacts[toId].provider.push(state.contacts[fromId].provider[0])
     },
     setMessages(state, value) {
       state.messages = value;
