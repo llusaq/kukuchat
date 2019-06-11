@@ -28,3 +28,7 @@ class Contact(models.Model):
     provider = models.CharField(max_length=255)
     uid = models.CharField(max_length=255)
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+
+    class Meta:
+
+        unique_together = 'uid', 'provider', 'owner'
