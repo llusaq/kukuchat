@@ -97,10 +97,17 @@ export default {
             }
             store.getters.socket.send(JSON.stringify(data));
             M.toast({html: 'Contacts merged successfully', classes: 'green darken-2'})
-            for (let i = 1; i < this.mergeIds.length; i++) {
-                store.commit('removeContact', i);
-            }
+            /*for (let i = 1; i < this.mergeIds.length; i++) {
+                store.commit('removeContact', this.mergeIds[i]);
+                store.commit('addProvider', this.mergeIds[i], this.mergeIds[0]);
+            }*/
             this.cancelMerge();
+            store.commit('clearContacts');
+            this.$parent.currentChat = '';
+            let query = {
+                action: 'get_chats' 
+            }
+            store.getters.socket.send(JSON.stringify(query));
         }
     },
     beforeMount() {

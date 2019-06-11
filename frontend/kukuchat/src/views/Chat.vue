@@ -104,10 +104,10 @@ export default {
                     M.toast({html: 'Messenger added', classes: 'green darken-2'})
                     store.commit('setMessenger');
                     store.commit('setChat');
-                    let data = {
+                    /*let data = {
                         action: 'get_chats',
                     }
-                    store.getters.socket.send(JSON.stringify(data));
+                    store.getters.socket.send(JSON.stringify(data));*/
                 }
 
                 if (data.action === 'provider_facebook_login' && data.status === 'error') {
@@ -122,10 +122,10 @@ export default {
                     M.toast({html: 'Skype added', classes: 'green darken-2'})
                     store.commit('setSkype');
                     store.commit('setChat');
-                    let data = {
+                    /*let data = {
                         action: 'get_chats',
                     }
-                    store.getters.socket.send(JSON.stringify(data));
+                    store.getters.socket.send(JSON.stringify(data));*/
                 }
 
                 if (data.action === 'provider_skype_login' && data.status === 'error') {

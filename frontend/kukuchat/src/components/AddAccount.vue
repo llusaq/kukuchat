@@ -3,7 +3,7 @@
         <div class="modal-header">
             <h4>Add {{ choosenAccount }} account </h4>
             <span class="close-form" @click="close()" v-if="choosenAccount !== ''"><i class="material-icons small left">clear</i></span>
-            <a class="modal-close" v-if="choosenAccount === ''"><i class="material-icons small left">clear</i></a>
+            <a class="modal-close" @click="getChats()" v-if="choosenAccount === ''"><i class="material-icons small left">clear</i></a>
         </div>
         <div class="modal-content">
             <div class="row" v-if="choosenAccount === ''">
@@ -199,6 +199,12 @@ export default {
                 count++;
             }
             return count;
+        },
+        getChats() {
+            let query = {
+                action: 'get_chats' 
+            }
+            store.getters.socket.send(JSON.stringify(query));
         }
     },
     watch: {
