@@ -201,6 +201,9 @@ export default {
             return count;
         },
         getChats() {
+            
+            store.commit('setPreloader', true);
+            store.commit('clearContacts');
             let query = {
                 action: 'get_chats' 
             }

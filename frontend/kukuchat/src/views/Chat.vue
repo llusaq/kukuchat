@@ -134,6 +134,7 @@ export default {
                 }
 
                 if (data.action === 'get_chats') {
+                    store.commit('setPreloader', false);
                     let ids = [];
                     for (let contact of data.chats) {
                         ids.push(contact.id);

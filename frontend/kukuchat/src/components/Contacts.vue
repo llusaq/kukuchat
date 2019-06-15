@@ -1,11 +1,13 @@
 <template>
     <div class="col l3 m4 s12 contacts" >
+        <Preloader class="preloader" v-if="preloader"></Preloader>
             <div class="nav-wrapper">
                 <div class="input-field">
                     <input id="search" type="search" v-model="search" autocomplete="off">
                     <label class="label-icon" for="search"><i class="material-icons">search</i></label>
                 </div>
             </div>
+            
         <ul class="scroll">
             <li v-for="contact in sortedList" :key="contact.id" @dblclick="select(contact)" @click="click(contact)" :class="{ clicked: selectedContact === contact, selected: mergeIds.includes(contact.id), mergeTo: mergeIds.indexOf(contact.id) === 0}" >
                 <div class="icon">
@@ -33,6 +35,7 @@
                 <div class="clear"></div>
 		    </li>
         </ul>
+        
         <div class="col l3 m4 s12 merge-form" v-if="isMerge">
             <a class="col l6 m6" @click="mergeContacts()">Merge</a>
             <a class="col l6 m6" @click="cancelMerge()">Cancel</a>
@@ -44,16 +47,20 @@
 
 import { store } from '@/store'
 import { mapState } from 'vuex';
+import Preloader from './Preloader'
 
 export default {
     name: 'contacts',
+    components: {
+        Preloader,
+    },
     data() {
         return {
             randcolor: '',
             clicked: '',
             search: '',
             mergeIds: [],
-            isMerge: false
+            isMerge: false,
         }
     },
     methods: {
@@ -134,7 +141,8 @@ export default {
             'skype',
             'viber',
             'gmail',
-            'telegram'
+            'telegram',
+            'preloader'
         ]),
 
         sortedList() {
@@ -323,6 +331,12 @@ span {
     width: 20px;
     height: auto;
     margin-top: 7px;
+}
+
+.preloader {
+    position: absolute;
+    left: 150px;
+    top: 150px;
 }
 
 </style>
